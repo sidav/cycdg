@@ -20,6 +20,31 @@ var (
 	diagonalDirections = [4][2]int{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
 )
 
+type Coords [2]int
+
+func (c *Coords) unwrap() (int, int) {
+	return c[0], c[1]
+}
+
+func (c *Coords) equals(c2 Coords) bool {
+	return c[0] == c2[0] && c[1] == c2[1]
+}
+
+func newCoords(x, y int) Coords {
+	var a Coords = [2]int{x, y}
+	return a
+}
+
+func printCoordsArray(a [][]Coords) {
+	for i := range a {
+		for j := range a[i] {
+			fmt.Printf("%d,%d  ", a[i][j][0], a[i][j][1])
+		}
+		fmt.Printf(" |  ")
+	}
+	fmt.Printf("\n")
+}
+
 func SetRandom(r random.PRNG) {
 	rnd = r
 }
