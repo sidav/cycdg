@@ -52,6 +52,14 @@ func getRandomVectorByFunc(appropriate func(vx, vy int) bool) (int, int) {
 	return candidates[ind][0], candidates[ind][1]
 }
 
+// note: it's not IN rectangle!
+func areCoordsOnRectangle(x, y, rx, ry, w, h int) bool {
+	if x < rx || x >= rx+w || y < ry || y >= ry+h {
+		return false
+	}
+	return x == rx || x == rx+w-1 || y == ry || y == ry+h-1
+}
+
 func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
 	dx := x2 - x1
 	dy := y2 - y1
@@ -107,7 +115,8 @@ func findInCoordsArray(x, y int, coords [][2]int) int {
 			return i
 		}
 	}
-	panic("No coords found!")
+	debugPanic("No coords found!\nRequested %d,%d from %v", x, y, coords)
+	panic(nil)
 }
 
 func unwrapCoords(coords [2]int) (int, int) {

@@ -58,4 +58,29 @@ var initialRules = []ReplacementRule{
 			g.finalizeNode(x+1, y+1)
 		},
 	},
+	// random start, two paths to goal
+	{
+		Name:      "TWO WAYS",
+		AddsCycle: true,
+		IsApplicableAt: func(g *Graph, x, y, _, _ int) bool {
+			if !g.areCoordsInBounds(x+2, y+2) {
+				return false
+			}
+			return true
+		},
+		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
+			g.drawConnectedDirectionalRect(x, y, 3, 3, rnd.OneChanceFrom(2))
+
+			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
+				return areCoordsOnRectangle(i, j, x, y, 3, 3)
+			})
+			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
+				return areCoordsOnRectangle(i, j, x, y, 3, 3) && i != sx && j != sy
+			})
+			g.drawBiсonnectedDirectionalRect(x, y, 3, 3, sx, sy, gx, gy)
+			g.addNodeTag(sx, sy, "SOURC")
+			g.addNodeTag(gx, gy, "SINK")
+			g.finalizeNode(x+1, y+1)
+		},
+	},
 }
