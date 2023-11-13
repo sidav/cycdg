@@ -1,5 +1,7 @@
 package graph
 
+import "cycdg/grid_graph/geometry"
+
 func (g *Graph) IsEdgeByVectorDirectional(x, y, vx, vy int) bool {
 	n := g.GetEdgeByVector(x, y, vx, vy)
 	return n.IsDirectional()
@@ -52,7 +54,12 @@ func (g *Graph) enableDirLinkByVector(x, y, vx, vy int) {
 	g.NodeAt(x, y).SetLinkByVector(vx, vy, true, true, reverse)
 }
 
-func (g *Graph) enableDirectionalLinkBetweenCoords(fromx, fromy, x, y int) {
-	vx, vy := x-fromx, y-fromy
-	g.enableDirLinkByVector(fromx, fromy, vx, vy)
+func (g *Graph) enableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
+	vx, vy := from.VectorTo(to)
+	g.enableDirLinkByVector(from[0], from[1], vx, vy)
+}
+
+func (g *Graph) disableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
+	vx, vy := from.VectorTo(to)
+	g.setLinkByVector(from[0], from[1], vx, vy, false)
 }
