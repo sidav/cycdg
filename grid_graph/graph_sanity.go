@@ -26,5 +26,19 @@ func (g *Graph) TestSanity() (sane bool, problems []string) {
 			}
 		}
 	}
+
+	// test if any enabled node has no links
+	for x := range g.nodes {
+		for y := range g.nodes[x] {
+			n := g.NodeAt(x, y)
+			if n.IsActive() {
+				if g.CountEdgesAt(x, y) == 0 {
+					sane = false
+					problems = append(problems, sprintf("Active node at %d,%d has no active links!", x, y))
+				}
+			}
+		}
+	}
+
 	return sane, problems
 }

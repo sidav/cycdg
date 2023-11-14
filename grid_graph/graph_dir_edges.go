@@ -7,6 +7,31 @@ func (g *Graph) IsEdgeByVectorDirectional(x, y, vx, vy int) bool {
 	return n.IsDirectional()
 }
 
+func (g *Graph) CountDirEdgesAt(x, y int, countIn, countOut bool) int {
+	if !countIn && !countOut {
+		panic("And wat should I count?")
+	}
+	count := 0
+	for _, dir := range cardinalDirections {
+		vx, vy := unwrapCoords(dir)
+		otherx, othery := x+vx, y+vy
+		if !g.areCoordsInBounds(otherx, othery) {
+			continue
+		}
+		if countIn {
+			if g.IsEdgeDirectedBetweenCoords(otherx, othery, x, y) {
+				count++
+			}
+		}
+		if countOut {
+			if g.IsEdgeDirectedBetweenCoords(x, y, otherx, othery) {
+				count++
+			}
+		}
+	}
+	return count
+}
+
 func (g *Graph) isEdgeByVectorDirectionalAndActive(x, y, vx, vy int) bool {
 	n := g.GetEdgeByVector(x, y, vx, vy)
 	return n.IsActive() && n.IsDirectional()

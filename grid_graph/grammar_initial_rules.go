@@ -1,5 +1,7 @@
 package graph
 
+import "cycdg/grid_graph/geometry"
+
 var initialRules = []ReplacementRule{
 	// U U    R-R
 	//     >  | |
@@ -55,7 +57,7 @@ var initialRules = []ReplacementRule{
 			})
 			g.addNodeTag(gx, gy, "GOAL")
 			g.addEdgeTagFromCoordsByVector(sx, sy, gx-sx, gy-sy, "LOCK")
-			g.finalizeNode(x+1, y+1)
+			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
 		},
 	},
 	// random start, two paths to goal
@@ -80,7 +82,7 @@ var initialRules = []ReplacementRule{
 			g.drawBiсonnectedDirectionalRect(x, y, 3, 3, sx, sy, gx, gy)
 			g.addNodeTag(sx, sy, "SOURC")
 			g.addNodeTag(gx, gy, "SINK")
-			g.finalizeNode(x+1, y+1)
+			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
 		},
 	},
 }

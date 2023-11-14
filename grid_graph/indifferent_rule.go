@@ -14,17 +14,31 @@ type indifferentRule struct {
 }
 
 func (ir *indifferentRule) getApplicableCoordsForFunc(g *Graph,
-	afunc func(g *Graph, x, y int, prevСoords ...Coords) bool, argsForFunc ...Coords) []Coords {
+	afunc func(*Graph, int, int, ...Coords) bool, argsForFunc ...Coords) []Coords {
 	var crds []Coords
 	w, h := g.GetSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
+			// uniqueness check:
+			if areXYCoordsInCoordsArray(x, y, argsForFunc) {
+				continue
+			}
+
 			if afunc(g, x, y, argsForFunc...) {
 				crds = append(crds, NewCoords(x, y))
 			}
 		}
 	}
 	return crds
+}
+
+func areXYCoordsInCoordsArray(x, y int, coords []Coords) bool {
+	for i := range coords {
+		if coords[i].EqualsPair(x, y) {
+			return true
+		}
+	}
+	return false
 }
 
 func (ir *indifferentRule) FindAllApplicableCoordVariants(g *Graph) (result [][]Coords) {

@@ -1,6 +1,9 @@
 package graph
 
-import . "cycdg/grid_graph/graph_element"
+import (
+	"cycdg/grid_graph/geometry"
+	. "cycdg/grid_graph/graph_element"
+)
 
 func (g *Graph) resetNodeAndConnections(x, y int) {
 	g.NodeAt(x, y).ResetActiveAndLinks()
@@ -36,8 +39,8 @@ func (g *Graph) enableNode(x, y int) {
 	g.nodes[x][y].SetActive(true)
 }
 
-func (g *Graph) finalizeNode(x, y int) {
-	g.NodeAt(x, y).Finalize()
+func (g *Graph) FinalizeNode(c geometry.Coords) {
+	g.NodeAt(c.Unwrap()).Finalize()
 }
 
 func (g *Graph) IsNodeEditable(x, y int) bool {

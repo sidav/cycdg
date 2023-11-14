@@ -12,6 +12,10 @@ func (c *Coords) Equals(c2 Coords) bool {
 	return c[0] == c2[0] && c[1] == c2[1]
 }
 
+func (c *Coords) EqualsPair(x, y int) bool {
+	return c[0] == x && c[1] == y
+}
+
 func (c *Coords) VectorTo(c2 Coords) (int, int) {
 	return c2[0] - c[0], c2[1] - c[1]
 }
