@@ -75,32 +75,24 @@ func (ir *indifferentRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForF
 	currFuncIndex := len(argsForFunc)
 	w, h := g.GetSize()
 	var result [][]Coords
-	if currFuncIndex < len(ir.applicabilityFuncs)-1 {
-		for x := 0; x < w; x++ {
-			for y := 0; y < h; y++ {
-				if areXYCoordsInCoordsArray(x, y, argsForFunc) {
-					continue
-				}
-				if ir.applicabilityFuncs[currFuncIndex](g, x, y, argsForFunc...) {
+	// try all coordinates
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			if areXYCoordsInCoordsArray(x, y, argsForFunc) {
+				continue
+			}
+			if ir.applicabilityFuncs[currFuncIndex](g, x, y, argsForFunc...) {
+				// This function is not the last in rule
+				if currFuncIndex < len(ir.applicabilityFuncs)-1 {
 					res := ir.tryFindAllCoordVariantsRecursively(g, append(argsForFunc, NewCoords(x, y))...)
 					if len(res) > 0 {
 						result = append(result, res...)
 					}
-				}
-			}
-		}
-		return result
-	} else {
-		for x := 0; x < w; x++ {
-			for y := 0; y < h; y++ {
-				if areXYCoordsInCoordsArray(x, y, argsForFunc) {
-					continue
-				}
-				if ir.applicabilityFuncs[currFuncIndex](g, x, y, argsForFunc...) {
+				} else {
 					result = append(result, append(argsForFunc, NewCoords(x, y)))
 				}
 			}
 		}
-		return result
 	}
+	return result
 }
