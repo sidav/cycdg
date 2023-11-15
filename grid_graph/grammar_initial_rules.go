@@ -1,6 +1,7 @@
 package graph
 
 import "cycdg/grid_graph/geometry"
+import . "cycdg/grid_graph/graph_element"
 
 var initialRules = []ReplacementRule{
 	// U U    R-R
@@ -22,11 +23,11 @@ var initialRules = []ReplacementRule{
 			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
 				return g.IsNodeActive(i, j)
 			})
-			g.addNodeTag(sx, sy, "START")
+			g.addNodeTag(sx, sy, TagStart)
 			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
 				return g.IsNodeActive(i, j) && !g.DoesNodeHaveAnyTags(i, j)
 			})
-			g.addNodeTag(gx, gy, "GOAL")
+			g.addNodeTag(gx, gy, TagGoal)
 		},
 	},
 	// R-R-R
@@ -50,12 +51,12 @@ var initialRules = []ReplacementRule{
 			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
 				return g.IsNodeActive(i, j)
 			})
-			g.addNodeTag(sx, sy, "START")
+			g.addNodeTag(sx, sy, TagStart)
 			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
 				return g.IsNodeActive(i, j) && !g.DoesNodeHaveAnyTags(i, j) &&
 					areCoordsAdjacent(i, j, sx, sy) && g.IsEdgeDirectedBetweenCoords(i, j, sx, sy)
 			})
-			g.addNodeTag(gx, gy, "GOAL")
+			g.addNodeTag(gx, gy, TagGoal)
 			g.addEdgeTagFromCoordsByVector(sx, sy, gx-sx, gy-sy, "LOCK")
 			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
 		},
@@ -80,8 +81,8 @@ var initialRules = []ReplacementRule{
 				return areCoordsOnRectangle(i, j, x, y, 3, 3) && i != sx && j != sy
 			})
 			g.drawBiсonnectedDirectionalRect(x, y, 3, 3, sx, sy, gx, gy)
-			g.addNodeTag(sx, sy, "SOURC")
-			g.addNodeTag(gx, gy, "SINK")
+			g.addNodeTag(sx, sy, TagStart)
+			g.addNodeTag(gx, gy, TagGoal)
 			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
 		},
 	},

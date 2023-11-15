@@ -66,21 +66,6 @@ func (g *Graph) GetRandomNodeByFunc(appropriate func(int, int) bool) *Node {
 	return g.NodeAt(g.GetRandomCoordsByFunc(appropriate))
 }
 
-func (g *Graph) addNodeTag(x, y int, tag string) {
-	g.nodes[x][y].AddTag(tag)
-}
-
-func (g *Graph) SwapTagsAtCoords(x1, y1, x2, y2 int) {
-	n1 := g.NodeAt(x1, y1)
-	t1 := n1.GetTags()
-	n2 := g.NodeAt(x2, y2)
-	t2 := n2.GetTags()
-	n1.ResetTags()
-	n1.SetAllTags(t2)
-	n2.ResetTags()
-	n2.SetAllTags(t1)
-}
-
 func (g *Graph) GetEnabledNodesCount() int {
 	total := 0
 	for x := range g.nodes {

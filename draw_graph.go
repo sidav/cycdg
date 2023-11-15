@@ -51,7 +51,9 @@ func drawNodeAt(g *graph.Graph, nx, ny int) {
 	drawNodeEdges(g, nx, ny)
 	cw.SetStyle(tcell.ColorRed, background)
 	for i, tag := range g.NodeAt(nx, ny).GetTags() {
-		cw.PutStringCenteredAt(tag, x+halfNodeWidth, y+i)
+		str := tag.GetStringIdiom()
+		str = fmt.Sprintf("%s%d", str, tag.Id)
+		cw.PutStringCenteredAt(str, x+halfNodeWidth, y+i)
 	}
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d", g.CountEdgesAt(nx, ny)), x+halfNodeWidth, y+nodeHeight-2)
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d-%d",

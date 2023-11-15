@@ -8,11 +8,13 @@ type Graph struct {
 	CyclesCount       int
 	AppliedRulesCount int
 	AppliedRules      []string
+	AppliedTags       map[TagKind]int
 }
 
 func (g *Graph) InitWithConnectedNodes(w, h int) {
 	g.AppliedRules = nil
 	g.AppliedRulesCount = 0
+	g.AppliedTags = make(map[TagKind]int)
 	g.CyclesCount = 0
 	g.nodes = make([][]*Node, w)
 	for x := range g.nodes {
