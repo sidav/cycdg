@@ -62,7 +62,8 @@ func main() {
 
 func testGen(size, tests, fillPerc int) {
 	if fillPerc > 100 {
-		panic("Inadequate fill percentage")
+		testResultString = "Inadequate fill percentage\n"
+		return
 	}
 	var appliedRules int
 	gr := &graph.Graph{}

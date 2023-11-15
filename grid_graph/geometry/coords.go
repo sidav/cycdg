@@ -25,6 +25,36 @@ func NewCoords(x, y int) Coords {
 	return a
 }
 
+func AreCoords2DArraysEqual(a1, a2 [][]Coords) bool {
+	for i := range a1 {
+		found := false
+	nextCoordInA2:
+		for j := range a2 {
+			for k := range a2[j] {
+				if !a2[j][k].Equals(a1[i][k]) {
+					continue nextCoordInA2
+				}
+			}
+			found = true
+			break
+		}
+		if !found {
+			fmt.Printf("WTF %v is not in %v: iteration %d\n", a1[i], a2, i)
+			return false
+		}
+	}
+	return true
+}
+
+func areXYCoordsInCoordsArray(x, y int, coords []Coords) bool {
+	for i := range coords {
+		if coords[i].EqualsPair(x, y) {
+			return true
+		}
+	}
+	return false
+}
+
 func PrintCoordsArray(a [][]Coords) {
 	for i := range a {
 		for j := range a[i] {

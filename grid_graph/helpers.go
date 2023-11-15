@@ -122,3 +122,17 @@ func findInCoordsArray(x, y int, coords [][2]int) int {
 func unwrapCoords(coords [2]int) (int, int) {
 	return coords[0], coords[1]
 }
+
+func maxint(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func minint(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}

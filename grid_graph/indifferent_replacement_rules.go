@@ -5,7 +5,8 @@ import . "cycdg/grid_graph/geometry"
 var allReplacementRules = []*indifferentRule{
 	// 0   1       0 > 1  ; where 1 is inactive
 	{
-		Name: "ADDNODE",
+		Name:                "ADDNODE",
+		searchNearPrevIndex: []int{-1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
@@ -14,7 +15,7 @@ var allReplacementRules = []*indifferentRule{
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x1, y1 := prevСoords[0].Unwrap()
-				return areCoordsAdjacent(x, y, x1, y1) && !g.IsNodeActive(x, y) && g.IsNodeEditable(x, y)
+				return areCoordsAdjacent(x, y, x1, y1) && !g.IsNodeActive(x, y)
 			},
 		},
 		applyToCoords: func(g *Graph, allCoords ...Coords) {
@@ -27,7 +28,8 @@ var allReplacementRules = []*indifferentRule{
 	// V       >       V
 	// 1   3       1 < 3
 	{
-		Name: "U-RULE",
+		Name:                "U-RULE",
+		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// first node
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
@@ -64,8 +66,9 @@ var allReplacementRules = []*indifferentRule{
 	// V       >   V   V
 	// 1   3       1 < 3
 	{
-		Name:      "D-RULE",
-		AddsCycle: true,
+		Name:                "D-RULE",
+		AddsCycle:           true,
+		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// first node
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
@@ -101,12 +104,13 @@ var allReplacementRules = []*indifferentRule{
 	// V       >       V
 	// 0 > 2       U   2
 	{
-		Name:      "FLIP",
-		AddsCycle: true,
+		Name:                "FLIP",
+		AddsCycle:           true,
+		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return g.IsNodeActive(x, y) && g.IsNodeEditable(x, y) && g.CountEdgesAt(x, y) == 2
+				return g.IsNodeActive(x, y) && g.CountEdgesAt(x, y) == 2
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
@@ -122,7 +126,7 @@ var allReplacementRules = []*indifferentRule{
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x1, y1 := prevСoords[1].Unwrap()
 				x2, y2 := prevСoords[2].Unwrap()
-				return !g.IsNodeActive(x, y) && g.IsNodeEditable(x, y) &&
+				return !g.IsNodeActive(x, y) &&
 					areCoordsAdjacent(x, y, x1, y1) && areCoordsAdjacent(x, y, x2, y2)
 			},
 		},
@@ -143,28 +147,29 @@ var allReplacementRules = []*indifferentRule{
 	//
 	// !! N has no other connections !!
 	{
-		Name:      "CORNERLOOP",
-		AddsCycle: true,
+		Name:                "CORNERLOOP",
+		AddsCycle:           true,
+		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return g.IsNodeActive(x, y) && g.IsNodeEditable(x, y)
+				return g.IsNodeActive(x, y)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x0, y0 := prevСoords[0].Unwrap()
-				return areCoordsAdjacent(x, y, x0, y0) && !g.IsNodeActive(x, y) && g.IsNodeEditable(x, y)
+				return areCoordsAdjacent(x, y, x0, y0) && !g.IsNodeActive(x, y)
 			},
 			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x0, y0 := prevСoords[0].Unwrap()
-				return areCoordsAdjacent(x, y, x0, y0) && !g.IsNodeActive(x, y) && g.IsNodeEditable(x, y)
+				return areCoordsAdjacent(x, y, x0, y0) && !g.IsNodeActive(x, y)
 			},
 			// node 3
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x1, y1 := prevСoords[1].Unwrap()
 				x2, y2 := prevСoords[2].Unwrap()
-				return !g.IsNodeActive(x, y) && g.IsNodeEditable(x, y) && g.IsNodeEditable(x, y) &&
+				return !g.IsNodeActive(x, y) &&
 					areCoordsAdjacent(x, y, x1, y1) && areCoordsAdjacent(x, y, x2, y2)
 			},
 		},
