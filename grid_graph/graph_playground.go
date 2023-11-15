@@ -1,5 +1,10 @@
 package graph
 
+import (
+	"cycdg/grid_graph/geometry"
+	"strings"
+)
+
 func (g *Graph) AlterSomething() {
 	if g.GetFilledNodesPercentage() == 0 {
 		g.applyRandomInitialRule()
@@ -11,37 +16,29 @@ func (g *Graph) AlterSomething() {
 func (g *Graph) applyRandomInitialRule() {
 	rule := &initialRules[rnd.Rand(len(initialRules))]
 	if rule.IsApplicableForGraph(g) {
-		g.applyRule(rule)
+		g.applyInitialRule(rule)
 	} else {
 		debugPanic("Initial rule %s failed!", rule.Name)
 	}
 }
 
 func (g *Graph) applyRandomReplacementRule(minCycles, maxCycles int) {
-	index := rnd.SelectRandomIndexFromWeighted(len(atomaryRules), func(i int) int {
-		if atomaryRules[i].IsApplicableForGraph(g) {
-			if atomaryRules[i].AddsCycle {
-				if g.CyclesCount >= maxCycles {
-					return 0
-				} else if g.CyclesCount < minCycles {
-					return 2
-				}
-			}
-			return 1
+	var rule *indifferentRule
+	var applicableCoords [][]geometry.Coords
+	for {
+		rule = allReplacementRules[rnd.Rand(len(allReplacementRules))]
+		if rule.AddsCycle && g.CyclesCount >= maxCycles {
+			continue
 		}
-		return 0
-	})
-	rule := &atomaryRules[index]
-	if rule.IsApplicableForGraph(g) {
-		g.applyRule(rule)
+		applicableCoords = rule.FindAllApplicableCoordVariants(g)
+		if len(applicableCoords) > 0 {
+			break
+		}
 	}
-	sane, errs := g.TestSanity()
-	if !sane {
-		panic(sprintf("Rule %s has caused the graph to have following problems: %v", rule.Name, errs))
-	}
+	g.applyIndifferentRule(rule, applicableCoords)
 }
 
-func (g *Graph) applyRule(rule *ReplacementRule) {
+func (g *Graph) applyInitialRule(rule *ReplacementRule) {
 	x, y, vx, vy := rule.GetRandomApplicableCoordsForGraph(g)
 	rule.ApplyOnGraphAt(g, x, y, vx, vy)
 	if rule.AddsCycle {
@@ -49,4 +46,19 @@ func (g *Graph) applyRule(rule *ReplacementRule) {
 	}
 	g.AppliedRulesCount++
 	g.AppliedRules = append(g.AppliedRules, sprintf("%-10s at %d,%d vector %d,%d", rule.Name, x, y, vx, vy))
+}
+
+func (g *Graph) applyIndifferentRule(rule *indifferentRule, applicableCoords [][]geometry.Coords) {
+	crds := applicableCoords[rnd.Rand(len(applicableCoords))]
+	rule.applyToCoords(g, crds...)
+	if rule.AddsCycle {
+		g.CyclesCount++
+	}
+	g.AppliedRulesCount++
+	g.AppliedRules = append(g.AppliedRules, sprintf("%-10s at %v", rule.Name, crds))
+	sane, errs := g.TestSanity()
+	if !sane {
+		panic(sprintf("Rule %s has caused the graph to have following problems:\n%v\nCoords: %v",
+			rule.Name, strings.Join(errs, ";\n"), crds))
+	}
 }

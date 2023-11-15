@@ -16,6 +16,21 @@ func (g *Graph) IsEdgeByVectorActive(x, y, vx, vy int) bool {
 	return g.AreCoordsInterlinked(x, y, x+vx, y+vy)
 }
 
+func (g *Graph) CountEdgesAt(x, y int) int {
+	count := 0
+	for _, dir := range cardinalDirections {
+		vx, vy := unwrapCoords(dir)
+		otherx, othery := x+vx, y+vy
+		if !g.areCoordsInBounds(otherx, othery) {
+			continue
+		}
+		if g.GetEdgeBetweenCoords(otherx, othery, x, y).IsActive() {
+			count++
+		}
+	}
+	return count
+}
+
 func (g *Graph) GetEdgeByVector(x, y, vx, vy int) *Edge {
 	return g.GetEdgeBetweenCoords(x, y, x+vx, y+vy)
 }
