@@ -57,10 +57,6 @@ func (gn *Node) SetLinkByVector(vx, vy int, enabled, diectional, reverse bool) {
 	e.dirReversed = reverse
 }
 
-func (gn *Node) AddEdgeTagByVector(vx, vy int, tag string) {
-	gn.GetEdgeByVector(vx, vy).AddTag(tag)
-}
-
 func (gn *Node) HasLinkToVector(vx, vy int) bool {
 	return gn.GetEdgeByVector(vx, vy).enabled
 }

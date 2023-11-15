@@ -57,7 +57,7 @@ var initialRules = []ReplacementRule{
 					areCoordsAdjacent(i, j, sx, sy) && g.IsEdgeDirectedBetweenCoords(i, j, sx, sy)
 			})
 			g.addNodeTag(gx, gy, TagGoal)
-			g.addEdgeTagFromCoordsByVector(sx, sy, gx-sx, gy-sy, "LOCK")
+			g.addEdgeTagByVector(sx, sy, gx-sx, gy-sy, TagLockedEdge)
 			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
 		},
 	},

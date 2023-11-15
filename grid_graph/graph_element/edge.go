@@ -4,7 +4,7 @@ type Edge struct {
 	enabled     bool
 	directional bool
 	dirReversed bool
-	tags        []string
+	tags        []*Tag
 }
 
 func (e *Edge) Reset() {
@@ -14,10 +14,6 @@ func (e *Edge) Reset() {
 	// if len(e.tags) > 0 {
 	// 	panic("Tagged node being reset!")
 	// }
-}
-
-func (e *Edge) GetTags() []string {
-	return e.tags
 }
 
 func (e *Edge) IsDirectional() bool {
@@ -37,15 +33,10 @@ func (e *Edge) IsActive() bool {
 	return e.enabled
 }
 
-func (e *Edge) AddTag(t string) {
-	e.tags = append(e.tags, t)
+func (e *Edge) GetTags() []*Tag {
+	return e.tags
 }
 
-func (e *Edge) HasTag(t string) bool {
-	for _, s := range e.tags {
-		if s == t {
-			return true
-		}
-	}
-	return false
+func (e *Edge) AddTag(kind TagKind, id int) {
+	e.tags = append(e.tags, &Tag{Kind: kind, Id: id})
 }

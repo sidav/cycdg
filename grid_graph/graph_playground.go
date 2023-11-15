@@ -30,7 +30,7 @@ func (g *Graph) applyRandomReplacementRule(minCycles, maxCycles int) {
 		if rule.AddsCycle && g.CyclesCount >= maxCycles {
 			continue
 		}
-		applicableCoords = rule.FindAllApplicableCoordVariants(g)
+		applicableCoords = rule.FindAllApplicableCoordVariantsRecursively(g)
 		if len(applicableCoords) > 0 {
 			break
 		}
