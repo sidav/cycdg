@@ -20,6 +20,10 @@ var (
 	diagonalDirections = [4][2]int{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
 )
 
+func debugPanic(msg string, args ...interface{}) {
+	panic(sprintf(msg, args...))
+}
+
 func SetRandom(r random.PRNG) {
 	rnd = r
 }

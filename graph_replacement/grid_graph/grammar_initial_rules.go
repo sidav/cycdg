@@ -1,7 +1,9 @@
 package graph
 
-import "cycdg/grid_graph/geometry"
-import . "cycdg/grid_graph/graph_element"
+import (
+	"cycdg/graph_replacement/grid_graph/geometry"
+	. "cycdg/graph_replacement/grid_graph/graph_element"
+)
 
 var initialRules = []ReplacementRule{
 	// U U    R-R

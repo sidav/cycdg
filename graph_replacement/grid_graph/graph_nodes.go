@@ -1,11 +1,11 @@
 package graph
 
 import (
-	"cycdg/grid_graph/geometry"
-	. "cycdg/grid_graph/graph_element"
+	"cycdg/graph_replacement/grid_graph/geometry"
+	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-func (g *Graph) resetNodeAndConnections(x, y int) {
+func (g *Graph) ResetNodeAndConnections(x, y int) {
 	g.NodeAt(x, y).ResetActiveAndLinks()
 	for _, d := range cardinalDirections {
 		if g.areCoordsInBounds(x+d[0], y+d[1]) {
@@ -35,7 +35,7 @@ func (g *Graph) AreNodesBetweenCoordsEditable(x1, y1, x2, y2 int) bool {
 	return true
 }
 
-func (g *Graph) enableNode(x, y int) {
+func (g *Graph) EnableNode(x, y int) {
 	g.nodes[x][y].SetActive(true)
 }
 

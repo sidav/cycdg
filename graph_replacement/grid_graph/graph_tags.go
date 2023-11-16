@@ -1,6 +1,6 @@
 package graph
 
-import "cycdg/grid_graph/graph_element"
+import "cycdg/graph_replacement/grid_graph/graph_element"
 
 func (g *Graph) addNodeTag(x, y int, tag graph_element.TagKind) {
 	id := g.AppliedTags[tag]

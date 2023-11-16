@@ -1,6 +1,6 @@
 package graph
 
-import . "cycdg/grid_graph/graph_element"
+import . "cycdg/graph_replacement/grid_graph/graph_element"
 
 // graph with nodes placed at 2D grid
 type Graph struct {

@@ -1,6 +1,6 @@
 package graph
 
-import . "cycdg/grid_graph/graph_element"
+import . "cycdg/graph_replacement/grid_graph/graph_element"
 
 func (g *Graph) AreCoordsInterlinked(x1, y1, x2, y2 int) bool {
 	if x1 < 0 || y1 < 0 {
@@ -69,7 +69,7 @@ func (g *Graph) setLinkByVector(x, y, vx, vy int, link bool) {
 	g.NodeAt(x, y).SetLinkByVector(vx, vy, link, false, false)
 }
 
-func (g *Graph) setLinkBetweenCoords(fromx, fromy, x, y int, link bool) {
+func (g *Graph) SetLinkBetweenCoords(fromx, fromy, x, y int, link bool) {
 	vx, vy := x-fromx, y-fromy
 	g.setLinkByVector(fromx, fromy, vx, vy, link)
 }

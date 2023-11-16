@@ -1,6 +1,9 @@
-package graph
+package replacement
 
-import . "cycdg/grid_graph/geometry"
+import (
+	. "cycdg/graph_replacement/grid_graph"
+	. "cycdg/graph_replacement/grid_graph/geometry"
+)
 
 var allReplacementRules = []*indifferentRule{
 	// 0   1       0 > 1  ; where 1 is inactive
@@ -19,8 +22,8 @@ var allReplacementRules = []*indifferentRule{
 			},
 		},
 		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[1][0], allCoords[1][1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
+			g.EnableNode(allCoords[1][0], allCoords[1][1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
 		},
 	},
 
@@ -53,12 +56,12 @@ var allReplacementRules = []*indifferentRule{
 			},
 		},
 		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[2][0], allCoords[2][1])
-			g.enableNode(allCoords[3][0], allCoords[3][1])
-			g.setLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.enableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+			g.EnableNode(allCoords[2][0], allCoords[2][1])
+			g.EnableNode(allCoords[3][0], allCoords[3][1])
+			g.SetLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
 		},
 	},
 
@@ -92,11 +95,11 @@ var allReplacementRules = []*indifferentRule{
 			},
 		},
 		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[2][0], allCoords[2][1])
-			g.enableNode(allCoords[3][0], allCoords[3][1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.enableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+			g.EnableNode(allCoords[2][0], allCoords[2][1])
+			g.EnableNode(allCoords[3][0], allCoords[3][1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
 		},
 	},
 
@@ -131,13 +134,13 @@ var allReplacementRules = []*indifferentRule{
 			},
 		},
 		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[3][0], allCoords[3][1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
-			g.disableDirectionalLinkBetweenCoords(allCoords[1], allCoords[0])
-			g.disableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
+			g.EnableNode(allCoords[3][0], allCoords[3][1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
+			g.DisableDirectionalLinkBetweenCoords(allCoords[1], allCoords[0])
+			g.DisableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
 			g.SwapTagsAtCoords(allCoords[3][0], allCoords[3][1], allCoords[0][0], allCoords[0][1])
-			g.resetNodeAndConnections(allCoords[0][0], allCoords[0][1])
+			g.ResetNodeAndConnections(allCoords[0][0], allCoords[0][1])
 			g.FinalizeNode(allCoords[0])
 		},
 	},
@@ -174,13 +177,13 @@ var allReplacementRules = []*indifferentRule{
 			},
 		},
 		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[1].Unwrap())
-			g.enableNode(allCoords[2].Unwrap())
-			g.enableNode(allCoords[3].Unwrap())
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
-			g.enableDirectionalLinkBetweenCoords(allCoords[2], allCoords[0])
+			g.EnableNode(allCoords[1].Unwrap())
+			g.EnableNode(allCoords[2].Unwrap())
+			g.EnableNode(allCoords[3].Unwrap())
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[0])
 		},
 	},
 }

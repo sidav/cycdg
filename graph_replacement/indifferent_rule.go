@@ -1,6 +1,7 @@
-package graph
+package replacement
 
-import . "cycdg/grid_graph/geometry"
+import . "cycdg/graph_replacement/grid_graph/geometry"
+import . "cycdg/graph_replacement/grid_graph"
 
 // it's a replacement rule indifferent to mirroring and rotations
 type indifferentRule struct {

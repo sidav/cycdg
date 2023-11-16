@@ -1,7 +1,7 @@
 package main
 
 import (
-	graph "cycdg/grid_graph"
+	graph "cycdg/graph_replacement/grid_graph"
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"

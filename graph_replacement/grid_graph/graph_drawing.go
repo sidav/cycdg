@@ -4,9 +4,9 @@ func (g *Graph) enableAndInterlinkNodeFromCoords(x, y, vx, vy int, directional b
 	if g.IsNodeFinalized(x, y) {
 		panic("Node is finalized!")
 	}
-	g.enableNode(x+vx, y+vy)
+	g.EnableNode(x+vx, y+vy)
 	if directional {
-		g.enableDirLinkByVector(x, y, vx, vy)
+		g.EnableDirLinkByVector(x, y, vx, vy)
 	} else {
 		g.setLinkByVector(x, y, vx, vy, true)
 	}
@@ -21,7 +21,7 @@ func (g *Graph) drawCardinalConnectedLine(x1, y1, x2, y2 int, directed bool) {
 	if y2 != y1 {
 		vy = (y2 - y1) / intabs(y2-y1)
 	}
-	g.enableNode(x1, y1)
+	g.EnableNode(x1, y1)
 	x := x1
 	y := y1
 	for vx != 0 && x != x2 {
@@ -69,7 +69,7 @@ func (g *Graph) drawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, si
 	allCoords := GetAllRectCoordsClockwise(x, y, w, h)
 	sourceIndex := findInCoordsArray(sourceX, sourceY, allCoords)
 	sinkIndex := findInCoordsArray(sinkX, sinkY, allCoords)
-	g.enableNode(sourceX, sourceY)
+	g.EnableNode(sourceX, sourceY)
 	// first path: clockwise
 	index := sourceIndex
 	for index != sinkIndex {

@@ -1,6 +1,7 @@
-package graph
+package replacement
 
-import . "cycdg/grid_graph/geometry"
+import . "cycdg/graph_replacement/grid_graph/geometry"
+import . "cycdg/graph_replacement/grid_graph"
 
 // TODO: delete this whole file?
 
