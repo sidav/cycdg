@@ -54,10 +54,6 @@ func (g *Graph) GetEdgeBetweenCoords(fromx, fromy, x, y int) *Edge {
 	return g.NodeAt(fromx, fromy).GetEdgeByVector(vx, vy)
 }
 
-func (g *Graph) addEdgeTagFromCoordsByVector(x, y, vx, vy int, tag string) {
-	g.GetEdgeByVector(x, y, vx, vy).AddTag(tag)
-}
-
 func (g *Graph) setLinkByVector(x, y, vx, vy int, link bool) {
 	if vx*vy != 0 {
 		debugPanic("Diagonal connection?.. %d,%d -> %d,%d", x, y, vx, vy)

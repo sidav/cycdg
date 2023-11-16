@@ -2,23 +2,27 @@ package graph_element
 
 import (
 	"fmt"
-	"strings"
 )
 
 type Node struct {
 	active    bool
 	finalized bool    // if true, restrict changing this node
 	edges     [2]Edge // to the right and to the down
-	tags      []string
+	tags      []*Tag
 }
 
 func (gn *Node) Init() {
 	// gn.finalized = false
 	gn.ResetActiveAndLinks()
+	gn.tags = nil
 }
 
 func (gn *Node) Finalize() {
 	gn.finalized = true
+}
+
+func (gn *Node) SwapTagsWith(gn2 *Node) {
+	gn.tags, gn2.tags = gn2.tags, gn.tags
 }
 
 func (gn *Node) ResetActiveAndLinks() {
@@ -31,19 +35,15 @@ func (gn *Node) ResetActiveAndLinks() {
 	}
 }
 
-func (gn *Node) AddTag(tag string) {
+func (gn *Node) AddTag(tagType TagKind, tagId int) {
 	if gn.finalized {
-		panic("Node is finalized!")
+		panic("AddTag: Node is finalized!")
 	}
-	gn.tags = append(gn.tags, strings.ToUpper(tag))
+	gn.tags = append(gn.tags, &Tag{Kind: tagType, Id: tagId})
 }
 
 func (gn *Node) HasAnyTags() bool {
 	return len(gn.tags) > 0
-}
-
-func (gn *Node) SetAllTags(tags []string) {
-	gn.tags = tags
 }
 
 func (gn *Node) ResetTags() {
@@ -55,10 +55,6 @@ func (gn *Node) SetLinkByVector(vx, vy int, enabled, diectional, reverse bool) {
 	e.enabled = enabled
 	e.directional = diectional
 	e.dirReversed = reverse
-}
-
-func (gn *Node) AddEdgeTagByVector(vx, vy int, tag string) {
-	gn.GetEdgeByVector(vx, vy).AddTag(tag)
 }
 
 func (gn *Node) HasLinkToVector(vx, vy int) bool {
@@ -77,7 +73,7 @@ func (gn *Node) GetEdgeByVector(vx, vy int) *Edge {
 	panic(fmt.Sprintf("Oh noes, bad vector %d,%d", vx, vy))
 }
 
-func (gn *Node) GetTags() []string {
+func (gn *Node) GetTags() []*Tag {
 	return gn.tags
 }
 
