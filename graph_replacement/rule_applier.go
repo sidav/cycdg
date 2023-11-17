@@ -1,8 +1,8 @@
 package replacement
 
 import (
+	"cycdg/graph_replacement/geometry"
 	graph "cycdg/graph_replacement/grid_graph"
-	"cycdg/graph_replacement/grid_graph/geometry"
 	"cycdg/lib/random"
 	"strings"
 )
@@ -29,7 +29,7 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	graph.SetRandom(r)
 	gra.graph = &graph.Graph{}
 	gra.graph.InitWithConnectedNodes(width, height)
-	gra.graph.ApplyRandomInitialRule()
+	gra.ApplyRandomInitialRule()
 	// gra.graph.ap
 }
 
@@ -67,4 +67,23 @@ func (gra *GraphReplacementApplier) applyIndifferentRule(rule *indifferentRule, 
 		panic(sprintf("Rule %s has caused the graph to have following problems:\n%v\nCoords: %v",
 			rule.Name, strings.Join(errs, ";\n"), crds))
 	}
+}
+
+func (gra *GraphReplacementApplier) ApplyRandomInitialRule() {
+	rule := &initialRules[rnd.Rand(len(initialRules))]
+	if rule.IsApplicableForGraph(gra.graph) {
+		gra.applyInitialRule(rule)
+	} else {
+		debugPanic("Initial rule %s failed!", rule.Name)
+	}
+}
+
+func (gra *GraphReplacementApplier) applyInitialRule(rule *InitialRule) {
+	x, y, vx, vy := rule.GetRandomApplicableCoordsForGraph(gra.graph)
+	rule.ApplyOnGraphAt(gra.graph, x, y, vx, vy)
+	if rule.AddsCycle {
+		gra.graph.CyclesCount++
+	}
+	gra.graph.AppliedRulesCount++
+	gra.graph.AppliedRules = append(gra.graph.AppliedRules, sprintf("%-10s at %d,%d vector %d,%d", rule.Name, x, y, vx, vy))
 }

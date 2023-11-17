@@ -1,7 +1,10 @@
 package replacement
 
-import . "cycdg/graph_replacement/grid_graph/geometry"
-import . "cycdg/graph_replacement/grid_graph"
+import (
+	"cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/grid_graph"
+)
 
 // it's a replacement rule indifferent to mirroring and rotations
 type indifferentRule struct {
@@ -14,15 +17,6 @@ type indifferentRule struct {
 	searchNearPrevIndex []int // -1 means "any coords"
 	applicabilityFuncs  []func(g *Graph, x, y int, prevСoords ...Coords) bool
 	applyToCoords       func(g *Graph, allCoords ...Coords)
-}
-
-func areXYCoordsInCoordsArray(x, y int, coords []Coords) bool {
-	for i := range coords {
-		if coords[i].EqualsPair(x, y) {
-			return true
-		}
-	}
-	return false
 }
 
 func (ir *indifferentRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
@@ -51,7 +45,7 @@ func (ir *indifferentRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForF
 				continue
 			}
 
-			if areXYCoordsInCoordsArray(x, y, argsForFunc) {
+			if geometry.AreXYCoordsInCoordsArray(x, y, argsForFunc) {
 				continue
 			}
 			if ir.applicabilityFuncs[currFuncIndex](g, x, y, argsForFunc...) {

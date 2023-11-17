@@ -1,6 +1,8 @@
-package graph
+package replacement
 
-type ReplacementRule struct {
+import . "cycdg/graph_replacement/grid_graph"
+
+type InitialRule struct {
 	Name string
 	// params restrictions:
 	vectorable             bool
@@ -15,10 +17,11 @@ type ReplacementRule struct {
 	ApplyOnGraphAt func(g *Graph, x, y, vx, vy int)
 }
 
-func (r *ReplacementRule) IsApplicableForGraph(g *Graph) bool {
+func (r *InitialRule) IsApplicableForGraph(g *Graph) bool {
+	w, h := g.GetSize()
 	if !r.vectorable {
-		for x := range g.nodes {
-			for y := range g.nodes[0] {
+		for x := 0; x < w; x++ {
+			for y := 0; y < h; y++ {
 				if r.IsApplicableAt(g, x, y, 0, 0) {
 					return true
 				}
@@ -28,8 +31,8 @@ func (r *ReplacementRule) IsApplicableForGraph(g *Graph) bool {
 		if !(r.cardinalVectorsAllowed || r.diagonalVectorsAllowed) {
 			debugPanic("Rule %s is vectorable, but has no directions allowed!", r.Name)
 		}
-		for x := range g.nodes {
-			for y := range g.nodes[0] {
+		for x := 0; x < w; x++ {
+			for y := 0; y < h; y++ {
 				if r.cardinalVectorsAllowed {
 					for _, dir := range cardinalDirections {
 						if r.IsApplicableAt(g, x, y, dir[0], dir[1]) {
@@ -50,10 +53,11 @@ func (r *ReplacementRule) IsApplicableForGraph(g *Graph) bool {
 	return false
 }
 
-func (r *ReplacementRule) GetRandomApplicableCoordsForGraph(g *Graph) (int, int, int, int) {
+func (r *InitialRule) GetRandomApplicableCoordsForGraph(g *Graph) (int, int, int, int) {
+	w, h := g.GetSize()
 	var candidates [][4]int
-	for x := range g.nodes {
-		for y := range g.nodes[0] {
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
 			if !r.vectorable {
 				if r.IsApplicableAt(g, x, y, 0, 0) {
 					candidates = append(candidates, [4]int{x, y, 0, 0})

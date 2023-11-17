@@ -1,6 +1,6 @@
 package replacement
 
-import . "cycdg/graph_replacement/grid_graph/geometry"
+import . "cycdg/graph_replacement/geometry"
 import . "cycdg/graph_replacement/grid_graph"
 
 // TODO: delete this whole file?
@@ -16,7 +16,7 @@ func (ir *indifferentRule) getApplicableCoordsForFunc(g *Graph,
 				continue
 			}
 			// uniqueness check:
-			if areXYCoordsInCoordsArray(x, y, argsForFunc) {
+			if AreXYCoordsInCoordsArray(x, y, argsForFunc) {
 				continue
 			}
 

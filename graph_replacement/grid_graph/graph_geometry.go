@@ -4,7 +4,7 @@ func (g *Graph) GetSize() (w, h int) {
 	return len(g.nodes), len(g.nodes[0])
 }
 
-func (g *Graph) areCoordsInBounds(x, y int) bool {
+func (g *Graph) AreCoordsInBounds(x, y int) bool {
 	return x >= 0 && x < len(g.nodes) && y >= 0 && y < len(g.nodes[0])
 }
 

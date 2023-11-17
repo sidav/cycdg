@@ -4,13 +4,9 @@ import (
 	"fmt"
 )
 
-type direction uint8
-
-const (
-	dirE direction = iota
-	dirS
-	dirW
-	dirN
+var (
+	cardinalDirections = [4][2]int{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
+	diagonalDirections = [4][2]int{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
 )
 
 func debugPanic(msg string, args ...interface{}) {
@@ -31,18 +27,6 @@ func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
 	return dx*dy == 0 && (dx == -1 || dx == 1 || dy == -1 || dy == 1)
 }
 
-func rotateCoordsCW(x, y int) (int, int) {
-	return y, -x
-}
-
-func rotateCoordsCCW(x, y int) (int, int) {
-	return -y, x
-}
-
-func randomUnitVector() (int, int) {
-	return rnd.RandomUnitVectorInt(false)
-}
-
 func sprintf(str string, args ...interface{}) string {
 	return fmt.Sprintf(str, args...)
 }
@@ -52,20 +36,6 @@ func intabs(x int) int {
 		return -x
 	}
 	return x
-}
-
-func findInCoordsArray(x, y int, coords [][2]int) int {
-	for i := range coords {
-		if coords[i][0] == x && coords[i][1] == y {
-			return i
-		}
-	}
-	debugPanic("No coords found!\nRequested %d,%d from %v", x, y, coords)
-	panic(nil)
-}
-
-func unwrapCoords(coords [2]int) (int, int) {
-	return coords[0], coords[1]
 }
 
 func maxint(a, b int) int {

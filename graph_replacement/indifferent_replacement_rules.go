@@ -1,8 +1,8 @@
 package replacement
 
 import (
+	. "cycdg/graph_replacement/geometry"
 	. "cycdg/graph_replacement/grid_graph"
-	. "cycdg/graph_replacement/grid_graph/geometry"
 )
 
 var allReplacementRules = []*indifferentRule{

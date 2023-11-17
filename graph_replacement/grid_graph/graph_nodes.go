@@ -1,14 +1,14 @@
 package graph
 
 import (
-	"cycdg/graph_replacement/grid_graph/geometry"
+	"cycdg/graph_replacement/geometry"
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
 func (g *Graph) ResetNodeAndConnections(x, y int) {
 	g.NodeAt(x, y).ResetActiveAndLinks()
 	for _, d := range cardinalDirections {
-		if g.areCoordsInBounds(x+d[0], y+d[1]) {
+		if g.AreCoordsInBounds(x+d[0], y+d[1]) {
 			e := g.GetEdgeByVector(x, y, d[0], d[1])
 			e.Reset()
 		}
@@ -24,7 +24,7 @@ func (g *Graph) AreNodesBetweenCoordsEditable(x1, y1, x2, y2 int) bool {
 	}
 	for x := x1; x <= x2; x++ {
 		for y := y1; y <= y2; y++ {
-			if !g.areCoordsInBounds(x, y) {
+			if !g.AreCoordsInBounds(x, y) {
 				return false
 			}
 			if g.IsNodeFinalized(x, y) {
@@ -56,7 +56,7 @@ func (g *Graph) IsNodeActive(x, y int) bool {
 }
 
 func (g *Graph) NodeAt(x, y int) *Node {
-	if !g.areCoordsInBounds(x, y) {
+	if !g.AreCoordsInBounds(x, y) {
 		return nil
 	}
 	return g.nodes[x][y]

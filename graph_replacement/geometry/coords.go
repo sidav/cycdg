@@ -46,7 +46,7 @@ func AreCoords2DArraysEqual(a1, a2 [][]Coords) bool {
 	return true
 }
 
-func areXYCoordsInCoordsArray(x, y int, coords []Coords) bool {
+func AreXYCoordsInCoordsArray(x, y int, coords []Coords) bool {
 	for i := range coords {
 		if coords[i].EqualsPair(x, y) {
 			return true

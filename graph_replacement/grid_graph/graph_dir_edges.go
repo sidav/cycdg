@@ -1,6 +1,6 @@
 package graph
 
-import "cycdg/graph_replacement/grid_graph/geometry"
+import "cycdg/graph_replacement/geometry"
 
 func (g *Graph) IsEdgeByVectorDirectional(x, y, vx, vy int) bool {
 	n := g.GetEdgeByVector(x, y, vx, vy)
@@ -15,7 +15,7 @@ func (g *Graph) CountDirEdgesAt(x, y int, countIn, countOut bool) int {
 	for _, dir := range cardinalDirections {
 		vx, vy := unwrapCoords(dir)
 		otherx, othery := x+vx, y+vy
-		if !g.areCoordsInBounds(otherx, othery) {
+		if !g.AreCoordsInBounds(otherx, othery) {
 			continue
 		}
 		if countIn {
@@ -51,7 +51,7 @@ func (g *Graph) IsEdgeDirectedBetweenCoords(x, y, tox, toy int) bool {
 func (g *Graph) doCoordsHaveIngoingLinksOnly(x, y int) bool {
 	for i := range cardinalDirections {
 		vx, vy := unwrapCoords(cardinalDirections[i])
-		if g.areCoordsInBounds(x+vx, y+vy) {
+		if g.AreCoordsInBounds(x+vx, y+vy) {
 			if g.isEdgeByVectorDirectionalAndActive(x, y, vx, vy) {
 				if g.IsEdgeDirectedByVector(x, y, vx, vy) {
 					return false

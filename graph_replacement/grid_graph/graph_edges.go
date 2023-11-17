@@ -21,7 +21,7 @@ func (g *Graph) CountEdgesAt(x, y int) int {
 	for _, dir := range cardinalDirections {
 		vx, vy := unwrapCoords(dir)
 		otherx, othery := x+vx, y+vy
-		if !g.areCoordsInBounds(otherx, othery) {
+		if !g.AreCoordsInBounds(otherx, othery) {
 			continue
 		}
 		if g.GetEdgeBetweenCoords(otherx, othery, x, y).IsActive() {
