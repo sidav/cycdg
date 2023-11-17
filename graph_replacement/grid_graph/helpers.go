@@ -1,22 +1,16 @@
 package graph
 
 import (
-	"cycdg/lib/random"
 	"fmt"
 )
 
 var (
-	rnd                random.PRNG
 	cardinalDirections = [4][2]int{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 	diagonalDirections = [4][2]int{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
 )
 
 func debugPanic(msg string, args ...interface{}) {
 	panic(sprintf(msg, args...))
-}
-
-func SetRandom(r random.PRNG) {
-	rnd = r
 }
 
 func areCoordsAdjacent(x1, y1, x2, y2 int) bool {

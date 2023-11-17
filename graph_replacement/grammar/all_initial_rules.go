@@ -1,4 +1,4 @@
-package replacement
+package grammar
 
 import (
 	"cycdg/graph_replacement/geometry"
@@ -6,7 +6,7 @@ import (
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-var initialRules = []InitialRule{
+var AllInitialRules = []InitialRule{
 	// U U    R-R
 	//     >  | |
 	// U U    R-R
@@ -75,8 +75,6 @@ var initialRules = []InitialRule{
 			return true
 		},
 		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
-			g.DrawConnectedDirectionalRect(x, y, 3, 3, rnd.OneChanceFrom(2))
-
 			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
 				return areCoordsOnRectangle(i, j, x, y, 3, 3)
 			})

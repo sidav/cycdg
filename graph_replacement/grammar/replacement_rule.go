@@ -1,4 +1,4 @@
-package replacement
+package grammar
 
 import (
 	"cycdg/graph_replacement/geometry"
@@ -7,7 +7,7 @@ import (
 )
 
 // it's a replacement rule indifferent to mirroring and rotations
-type indifferentRule struct {
+type ReplacementRule struct {
 	Name string
 
 	// metadata:
@@ -16,14 +16,14 @@ type indifferentRule struct {
 	// each value is coords index, near which the applicability func will be checked
 	searchNearPrevIndex []int // -1 means "any coords"
 	applicabilityFuncs  []func(g *Graph, x, y int, prevСoords ...Coords) bool
-	applyToCoords       func(g *Graph, allCoords ...Coords)
+	ApplyToGraph        func(g *Graph, allCoords ...Coords)
 }
 
-func (ir *indifferentRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
+func (ir *ReplacementRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
 	return ir.tryFindAllCoordVariantsRecursively(g)
 }
 
-func (ir *indifferentRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForFunc ...Coords) [][]Coords {
+func (ir *ReplacementRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForFunc ...Coords) [][]Coords {
 	currFuncIndex := len(argsForFunc)
 	w, h := g.GetSize()
 	var result [][]Coords

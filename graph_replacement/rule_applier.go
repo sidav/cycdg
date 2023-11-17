@@ -2,6 +2,7 @@ package replacement
 
 import (
 	"cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/grammar"
 	graph "cycdg/graph_replacement/grid_graph"
 	"cycdg/lib/random"
 	"strings"
@@ -26,19 +27,19 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 		gra.MaxCycles = 4
 	}
 	rnd = r
-	graph.SetRandom(r)
+	SetRandom(rnd)
 	gra.graph = &graph.Graph{}
-	gra.graph.InitWithConnectedNodes(width, height)
+	gra.graph.Init(rnd, width, height)
 	gra.ApplyRandomInitialRule()
 	// gra.graph.ap
 }
 
-func (gra *GraphReplacementApplier) ApplyRandomRuleToTheGraph() {
-	var rule *indifferentRule
+func (gra *GraphReplacementApplier) ApplyRandomReplacementRuleToTheGraph() {
+	var rule *ReplacementRule
 	var applicableCoords [][]geometry.Coords
 	try := 0
 	for {
-		rule = allReplacementRules[rnd.Rand(len(allReplacementRules))]
+		rule = AllReplacementRules[rnd.Rand(len(AllReplacementRules))]
 		if rule.AddsCycle && gra.graph.CyclesCount >= gra.MaxCycles {
 			continue
 		}
@@ -51,12 +52,12 @@ func (gra *GraphReplacementApplier) ApplyRandomRuleToTheGraph() {
 			panic("No applicable coords even after 10000 tries!")
 		}
 	}
-	gra.applyIndifferentRule(rule, applicableCoords)
+	gra.applyReplacementRule(rule, applicableCoords)
 }
 
-func (gra *GraphReplacementApplier) applyIndifferentRule(rule *indifferentRule, applicableCoords [][]geometry.Coords) {
+func (gra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, applicableCoords [][]geometry.Coords) {
 	crds := applicableCoords[rnd.Rand(len(applicableCoords))]
-	rule.applyToCoords(gra.graph, crds...)
+	rule.ApplyToGraph(gra.graph, crds...)
 	if rule.AddsCycle {
 		gra.graph.CyclesCount++
 	}
@@ -70,7 +71,7 @@ func (gra *GraphReplacementApplier) applyIndifferentRule(rule *indifferentRule, 
 }
 
 func (gra *GraphReplacementApplier) ApplyRandomInitialRule() {
-	rule := &initialRules[rnd.Rand(len(initialRules))]
+	rule := &AllInitialRules[rnd.Rand(len(AllInitialRules))]
 	if rule.IsApplicableForGraph(gra.graph) {
 		gra.applyInitialRule(rule)
 	} else {

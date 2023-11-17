@@ -51,7 +51,7 @@ func main() {
 		if key == "" || gen.GetGraph().GetFilledNodesPercentage() > 65 {
 			gen.Init(rnd, 5, 5)
 		} else {
-			gen.ApplyRandomRuleToTheGraph()
+			gen.ApplyRandomReplacementRuleToTheGraph()
 		}
 
 		drawGraph(gen.GetGraph())
@@ -72,7 +72,7 @@ func testGen(size, tests, fillPerc int) {
 	for i := 0; i < tests; i++ {
 		gen.Init(rnd, size, size) // .InitWithConnectedNodes(size, size)
 		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
-			gen.ApplyRandomRuleToTheGraph()
+			gen.ApplyRandomReplacementRuleToTheGraph()
 		}
 		appliedRules += gen.GetGraph().AppliedRulesCount
 	}
