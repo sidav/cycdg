@@ -5,7 +5,8 @@ import (
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-func (g *Graph) ResetNodeAndConnections(x, y int) {
+func (g *Graph) ResetNodeAndConnections(c geometry.Coords) {
+	x, y := c.Unwrap()
 	g.NodeAt(x, y).ResetActiveAndLinks()
 	for _, d := range cardinalDirections {
 		if g.AreCoordsInBounds(x+d[0], y+d[1]) {

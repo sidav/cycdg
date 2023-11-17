@@ -1,6 +1,9 @@
 package graph
 
-import "cycdg/graph_replacement/grid_graph/graph_element"
+import (
+	. "cycdg/graph_replacement/geometry"
+	"cycdg/graph_replacement/grid_graph/graph_element"
+)
 
 func (g *Graph) AddNodeTag(x, y int, tag graph_element.TagKind) {
 	id := g.AppliedTags[tag]
@@ -8,14 +11,49 @@ func (g *Graph) AddNodeTag(x, y int, tag graph_element.TagKind) {
 	g.nodes[x][y].AddTag(tag, id)
 }
 
-func (g *Graph) SwapTagsAtCoords(x1, y1, x2, y2 int) {
-	n1 := g.NodeAt(x1, y1)
-	n2 := g.NodeAt(x2, y2)
-	n1.SwapTagsWith(n2)
+func (g *Graph) AddNodeTagByCoords(c Coords, tag graph_element.TagKind) {
+	x, y := c.Unwrap()
+	g.AddNodeTag(x, y, tag)
 }
 
 func (g *Graph) AddEdgeTagByVector(x, y, vx, vy int, tag graph_element.TagKind) {
 	id := g.AppliedTags[tag]
 	g.AppliedTags[tag] = id + 1
 	g.GetEdgeByVector(x, y, vx, vy).AddTag(tag, id)
+}
+
+func (g *Graph) AddEdgeTagByCoords(c1, c2 Coords, tag graph_element.TagKind) {
+	id := g.AppliedTags[tag]
+	g.AppliedTags[tag] = id + 1
+	edge := g.GetEdgeBetweenCoords(c1, c2)
+	edge.AddTag(tag, id)
+}
+
+func (g *Graph) SwapNodeTags(c1, c2 Coords) {
+	n1 := g.NodeAt(c1.Unwrap())
+	n2 := g.NodeAt(c2.Unwrap())
+	n1.SwapTagsWith(n2)
+}
+
+func (g *Graph) CountNodeTags(c Coords) int {
+	x, y := c.Unwrap()
+	return len(g.NodeAt(x, y).GetTags())
+}
+
+func (g *Graph) DoesEdgeHaveZeroTags(c1, c2 Coords) bool {
+	edge := g.GetEdgeBetweenCoords(c1, c2)
+	return len(edge.GetTags()) == 0
+}
+
+func (g *Graph) SwapEdgeTags(cfrom1, cfrom2, cto1, cto2 Coords) {
+	edge1 := g.GetEdgeBetweenCoords(cfrom1, cfrom2)
+	edge2 := g.GetEdgeBetweenCoords(cto1, cto2)
+	edge1.SwapTagsWith(edge2)
+}
+
+// WARNING: COPIES IDS TOO!
+func (g *Graph) CopyEdgeTagsPreservingIds(cfrom1, cfrom2, cto1, cto2 Coords) {
+	edge1 := g.GetEdgeBetweenCoords(cfrom1, cfrom2)
+	edge2 := g.GetEdgeBetweenCoords(cto1, cto2)
+	edge1.CopyTagsFrom(edge2)
 }

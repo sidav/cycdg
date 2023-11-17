@@ -35,9 +35,9 @@ var AllInitialRules = []InitialRule{
 	},
 	// R-R-R
 	// |   |
-	// R   R
+	// G   R
 	// |   |
-	// R-R-R
+	// S-R-R
 	// random start, neighbouring goal
 	{
 		Name:      "LONG WAY",

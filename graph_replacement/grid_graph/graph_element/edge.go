@@ -37,6 +37,16 @@ func (e *Edge) GetTags() []*Tag {
 	return e.tags
 }
 
+func (e *Edge) SwapTagsWith(e2 *Edge) {
+	e.tags, e2.tags = e2.tags, e.tags
+}
+
+func (e *Edge) CopyTagsFrom(from *Edge) {
+	for _, t := range from.tags {
+		e.AddTag(t.Kind, t.Id)
+	}
+}
+
 func (e *Edge) AddTag(kind TagKind, id int) {
 	e.tags = append(e.tags, &Tag{Kind: kind, Id: id})
 }

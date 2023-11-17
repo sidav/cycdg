@@ -58,10 +58,11 @@ var AllReplacementRules = []*ReplacementRule{
 		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
 			g.EnableNode(allCoords[2][0], allCoords[2][1])
 			g.EnableNode(allCoords[3][0], allCoords[3][1])
-			g.SetLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
 			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
 			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
 			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+			g.SwapEdgeTags(allCoords[0], allCoords[1], allCoords[3], allCoords[1])
+			g.SetLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
 		},
 	},
 
@@ -100,6 +101,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
 			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
 			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+			g.CopyEdgeTagsPreservingIds(allCoords[0], allCoords[1], allCoords[0], allCoords[2])
 		},
 	},
 
@@ -139,8 +141,8 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
 			g.DisableDirectionalLinkBetweenCoords(allCoords[1], allCoords[0])
 			g.DisableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.SwapTagsAtCoords(allCoords[3][0], allCoords[3][1], allCoords[0][0], allCoords[0][1])
-			g.ResetNodeAndConnections(allCoords[0][0], allCoords[0][1])
+			g.SwapNodeTags(allCoords[3], allCoords[0])
+			g.ResetNodeAndConnections(allCoords[0])
 			g.FinalizeNode(allCoords[0])
 		},
 	},
