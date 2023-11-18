@@ -3,6 +3,7 @@ package grammar
 import (
 	. "cycdg/graph_replacement/geometry"
 	. "cycdg/graph_replacement/grid_graph"
+	"cycdg/graph_replacement/grid_graph/graph_element"
 )
 
 var AllReplacementRules = []*ReplacementRule{
@@ -25,7 +26,65 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableNode(allCoords[1][0], allCoords[1][1])
 			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
 		},
+		Features: []*FeatureAdder{
+			{
+				Name: "Boss",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)
+				},
+			},
+			{
+				Name: "Treasure",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[1], graph_element.TagTreasure)
+				},
+			},
+			{
+				Name: "Secret Treasure",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
+					g.AddNodeTagByCoords(crds[1], graph_element.TagTreasure)
+				},
+			},
+		},
 	},
+
+	// 0   1   2       0 > 1 > 2 ; where 1 and 2 are inactive; may be bent
+	// {
+	// 	Name:                "ADD2NODES",
+	// 	searchNearPrevIndex: []int{-1, 0, 1},
+	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+	// 		// node 0
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return g.IsNodeActive(x, y)
+	// 		},
+	// 		// node 1
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			x0, y0 := prevСoords[0].Unwrap()
+	// 			return areCoordsAdjacent(x, y, x0, y0) && !g.IsNodeActive(x, y)
+	// 		},
+	// 		// node 2
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			x1, y1 := prevСoords[1].Unwrap()
+	// 			return areCoordsAdjacent(x, y, x1, y1) && !g.IsNodeActive(x, y)
+	// 		},
+	// 	},
+	// 	ApplyToGraph: func(g *Graph, allCoords ...Coords) {
+	// 		g.EnableNodeByCoords(allCoords[1])
+	// 		g.EnableNodeByCoords(allCoords[2])
+	// 		g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
+	// 		g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[2])
+	// 	},
+	// 	Features: []*FeatureAdder{
+	// 		{
+	// 			Name: "Guard",
+	// 			ApplyFeature: func(g *Graph, crds ...Coords) {
+	// 				g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)
+	// 				g.AddNodeTagByCoords(crds[2], graph_element.TagTreasure)
+	// 			},
+	// 		},
+	// 	},
+	// },
 
 	// 0   2       0 > 2
 	// V       >       V
@@ -34,21 +93,21 @@ var AllReplacementRules = []*ReplacementRule{
 		Name:                "U-RULE",
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
-			// first node
+			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				return g.IsNodeActive(x, y)
 			},
-			// second node
+			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x1, y1 := prevСoords[0].Unwrap()
 				return areCoordsAdjacent(x, y, x1, y1) && g.IsNodeActive(x, y) && g.IsEdgeDirectedBetweenCoords(x1, y1, x, y)
 			},
-			// third node
+			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x1, y1 := prevСoords[0].Unwrap()
 				return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x1, y1)
 			},
-			// fourth node
+			// node 3
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x2, y2 := prevСoords[1].Unwrap()
 				x3, y3 := prevСoords[2].Unwrap()
@@ -64,6 +123,14 @@ var AllReplacementRules = []*ReplacementRule{
 			g.SwapEdgeTags(allCoords[0], allCoords[1], allCoords[3], allCoords[1])
 			g.SetLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
 		},
+		Features: []*FeatureAdder{
+			{
+				Name: "Boss",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[3], graph_element.TagBoss)
+				},
+			},
+		},
 	},
 
 	// 0   2       0 > 2
@@ -74,21 +141,21 @@ var AllReplacementRules = []*ReplacementRule{
 		AddsCycle:           true,
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
-			// first node
+			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				return g.IsNodeActive(x, y)
 			},
-			// second node
+			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x1, y1 := prevСoords[0].Unwrap()
 				return areCoordsAdjacent(x, y, x1, y1) && g.IsNodeActive(x, y) && g.IsEdgeDirectedBetweenCoords(x1, y1, x, y)
 			},
-			// third node
+			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x1, y1 := prevСoords[0].Unwrap()
 				return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x1, y1)
 			},
-			// fourth node
+			// node 3
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				x2, y2 := prevСoords[1].Unwrap()
 				x3, y3 := prevСoords[2].Unwrap()
@@ -146,9 +213,9 @@ var AllReplacementRules = []*ReplacementRule{
 			g.FinalizeNode(allCoords[0])
 		},
 	},
-	// 0   1       0 - 1
-	//         >   |   |    0 is active, others not
-	// 2   3       2 - 3
+	// 0   1       0 > 1
+	//         >   ^   V    0 is active, others not
+	// 2   3       2 < 3
 	{
 		Name:                "CORNERLOOP",
 		AddsCycle:           true,
@@ -184,6 +251,16 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
 			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
 			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[0])
+		},
+		Features: []*FeatureAdder{
+			{
+				Name: "AltHazard",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)
+					g.AddNodeTagByCoords(crds[2], graph_element.TagTreasure)
+					g.AddEdgeTagByCoords(crds[2], crds[0], graph_element.TagSecretEdge)
+				},
+			},
 		},
 	},
 }

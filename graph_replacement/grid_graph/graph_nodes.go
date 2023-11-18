@@ -40,6 +40,10 @@ func (g *Graph) EnableNode(x, y int) {
 	g.nodes[x][y].SetActive(true)
 }
 
+func (g *Graph) EnableNodeByCoords(c geometry.Coords) {
+	g.EnableNode(c.Unwrap())
+}
+
 func (g *Graph) FinalizeNode(c geometry.Coords) {
 	g.NodeAt(c.Unwrap()).Finalize()
 }

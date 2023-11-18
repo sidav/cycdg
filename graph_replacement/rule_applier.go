@@ -11,6 +11,7 @@ var rnd random.PRNG
 type GraphReplacementApplier struct {
 	graph                *graph.Graph
 	MinCycles, MaxCycles int
+	DesiredFeatures      int
 }
 
 func (gra *GraphReplacementApplier) GetGraph() *graph.Graph {
@@ -23,6 +24,9 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	}
 	if gra.MaxCycles == 0 {
 		gra.MaxCycles = 4
+	}
+	if gra.DesiredFeatures == 0 {
+		gra.DesiredFeatures = 5
 	}
 	rnd = r
 	grammar.SetRandom(rnd)

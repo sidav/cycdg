@@ -23,6 +23,15 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 	return AllReplacementRules[index]
 }
 
+func (ra *GraphReplacementApplier) shouldFeatureBeAdded() bool {
+	// TODO: rework :(
+	if ra.DesiredFeatures <= ra.graph.AppliedFeaturesCount {
+		return false
+	}
+	featuresPerc := (100*ra.graph.AppliedFeaturesCount + ra.DesiredFeatures/2) / ra.DesiredFeatures
+	return rnd.Rand(100) > featuresPerc
+}
+
 func (ra *GraphReplacementApplier) ApplyRandomReplacementRuleToTheGraph() {
 	var rule *ReplacementRule
 	var applicableCoords [][]Coords
@@ -42,15 +51,36 @@ func (ra *GraphReplacementApplier) ApplyRandomReplacementRuleToTheGraph() {
 }
 
 func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, applicableCoords [][]Coords) {
-
 	crds := applicableCoords[rnd.Rand(len(applicableCoords))]
+
+	// Set random feature to be added if needed
+	addFeature := ra.shouldFeatureBeAdded() && len(rule.Features) > 0
+	featureIndex := 0
+	if addFeature {
+		featureIndex = rnd.Rand(len(rule.Features))
+		if rule.Features[featureIndex].PrepareFeature != nil {
+			rule.Features[featureIndex].PrepareFeature(ra.graph, crds...)
+		}
+	}
+
 	rule.ApplyToGraph(ra.graph, crds...)
 
+	if addFeature && rule.Features[featureIndex].ApplyFeature != nil {
+		rule.Features[featureIndex].ApplyFeature(ra.graph, crds...)
+	}
+
+	// update stats
 	if rule.AddsCycle {
 		ra.graph.CyclesCount++
 	}
 	ra.graph.AppliedRulesCount++
-	ra.graph.AppliedRules = append(ra.graph.AppliedRules, sprintf("%-10s at %v", rule.Name, crds))
+	if addFeature {
+		ra.graph.AppliedRules = append(ra.graph.AppliedRules,
+			sprintf("%-15s at %v", (rule.Name+"+"+rule.Features[featureIndex].Name), crds))
+		ra.graph.AppliedFeaturesCount++
+	} else {
+		ra.graph.AppliedRules = append(ra.graph.AppliedRules, sprintf("%-10s at %v", rule.Name, crds))
+	}
 	sane, errs := ra.graph.TestSanity()
 	if !sane {
 		panic(sprintf("Rule %s has caused the graph to have following problems:\n%v\nCoords: %v",

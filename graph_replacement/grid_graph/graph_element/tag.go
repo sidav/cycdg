@@ -3,11 +3,15 @@ package graph_element
 type TagKind uint8
 
 const (
+	// Node tags
 	TagStart = iota
 	TagGoal
-	TagLockedEdge
 	TagKeyForEdge
 	TagBoss
+	TagTreasure
+	// Edge tags
+	TagLockedEdge
+	TagSecretEdge
 )
 
 type Tag struct {
@@ -25,7 +29,9 @@ func (t *Tag) GetStringIdiom() string {
 		return "KEY"
 	case TagBoss:
 		return "BOSS"
+	case TagTreasure:
+		return "TRSR"
 	default:
-		panic("No such idiom!")
+		return "????"
 	}
 }
