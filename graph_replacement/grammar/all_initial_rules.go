@@ -23,14 +23,14 @@ var AllInitialRules = []InitialRule{
 		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
 			g.DrawConnectedDirectionalRect(x, y, 2, 2, rnd.OneChanceFrom(2))
 
-			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
+			start := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
 				return g.IsNodeActive(i, j)
 			})
-			g.AddNodeTag(sx, sy, TagStart)
-			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
+			g.AddNodeTagByCoords(start, TagStart)
+			goal := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
 				return g.IsNodeActive(i, j) && !g.DoesNodeHaveAnyTags(i, j)
 			})
-			g.AddNodeTag(gx, gy, TagGoal)
+			g.AddNodeTagByCoords(goal, TagGoal)
 		},
 	},
 	// R-R-R
@@ -51,16 +51,17 @@ var AllInitialRules = []InitialRule{
 		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
 			g.DrawConnectedDirectionalRect(x, y, 3, 3, rnd.OneChanceFrom(2))
 
-			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
+			start := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
 				return g.IsNodeActive(i, j)
 			})
-			g.AddNodeTag(sx, sy, TagStart)
-			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
+			g.AddNodeTagByCoords(start, TagStart)
+			sx, sy := start.Unwrap()
+			goal := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
 				return g.IsNodeActive(i, j) && !g.DoesNodeHaveAnyTags(i, j) &&
 					areCoordsAdjacent(i, j, sx, sy) && g.IsEdgeDirectedBetweenCoords(i, j, sx, sy)
 			})
-			g.AddNodeTag(gx, gy, TagGoal)
-			g.AddEdgeTagByVector(sx, sy, gx-sx, gy-sy, TagLockedEdge)
+			g.AddNodeTagByCoords(goal, TagGoal)
+			g.AddEdgeTagByCoords(start, goal, TagLockedEdge)
 			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
 		},
 	},
@@ -75,12 +76,14 @@ var AllInitialRules = []InitialRule{
 			return true
 		},
 		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
-			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
+			start := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
 				return areCoordsOnRectangle(i, j, x, y, 3, 3)
 			})
-			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
-				return areCoordsOnRectangle(i, j, x, y, 3, 3) && i != sx && j != sy
+			goal := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+				return areCoordsOnRectangle(i, j, x, y, 3, 3) && !start.EqualsPair(i, j)
 			})
+			sx, sy := start.Unwrap()
+			gx, gy := goal.Unwrap()
 			g.DrawBiсonnectedDirectionalRect(x, y, 3, 3, sx, sy, gx, gy)
 			g.AddNodeTag(sx, sy, TagStart)
 			g.AddNodeTag(gx, gy, TagGoal)

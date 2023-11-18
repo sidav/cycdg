@@ -67,10 +67,6 @@ func (g *Graph) NodeAt(x, y int) *Node {
 	return g.nodes[x][y]
 }
 
-func (g *Graph) GetRandomNodeByFunc(appropriate func(int, int) bool) *Node {
-	return g.NodeAt(g.GetRandomCoordsByFunc(appropriate))
-}
-
 func (g *Graph) GetEnabledNodesCount() int {
 	total := 0
 	for x := range g.nodes {

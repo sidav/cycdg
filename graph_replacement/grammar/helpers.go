@@ -1,6 +1,8 @@
 package grammar
 
 import (
+	"cycdg/graph_replacement/geometry"
+	graph "cycdg/graph_replacement/grid_graph"
 	"fmt"
 )
 
@@ -22,9 +24,9 @@ func areCoordsOnRectangle(x, y, rx, ry, w, h int) bool {
 }
 
 func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
-	dx := x2 - x1
-	dy := y2 - y1
-	return dx*dy == 0 && (dx == -1 || dx == 1 || dy == -1 || dy == 1)
+	dx := intabs(x2 - x1)
+	dy := intabs(y2 - y1)
+	return dx+dy == 1
 }
 
 func sprintf(str string, args ...interface{}) string {
@@ -50,4 +52,18 @@ func minint(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geometry.Coords {
+	var candidates []geometry.Coords
+	w, h := g.GetSize()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			if good(x, y) {
+				candidates = append(candidates, [2]int{x, y})
+			}
+		}
+	}
+	ind := rnd.Rand(len(candidates))
+	return candidates[ind]
 }

@@ -31,7 +31,7 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	rnd = r
 	grammar.SetRandom(rnd)
 	gra.graph = &graph.Graph{}
-	gra.graph.Init(rnd, width, height)
+	gra.graph.Init(width, height)
 	gra.ApplyRandomInitialRule()
 	// gra.graph.ap
 }

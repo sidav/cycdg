@@ -25,25 +25,3 @@ func (g *Graph) checkNearCoords(x, y int, check func(x, y int) bool) bool {
 	}
 	return false
 }
-
-func (g *Graph) GetRandomCoordsByFunc(appropriate func(int, int) bool) (int, int) {
-	var candidates [][2]int
-	for x := range g.nodes {
-		for y := range g.nodes[x] {
-			if appropriate(x, y) {
-				candidates = append(candidates, [2]int{x, y})
-			}
-		}
-	}
-	ind := rnd.Rand(len(candidates))
-	return candidates[ind][0], candidates[ind][1]
-}
-
-func (g *Graph) GetRandomAdjacentCoordsByFunc(fx, fy int, appropriate func(int, int) bool) (int, int) {
-	x, y := g.GetRandomCoordsByFunc(
-		func(x, y int) bool {
-			return areCoordsAdjacent(x, y, fx, fy) && appropriate(x, y)
-		},
-	)
-	return x, y
-}

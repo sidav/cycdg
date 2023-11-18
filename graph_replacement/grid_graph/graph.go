@@ -2,11 +2,6 @@ package graph
 
 import (
 	. "cycdg/graph_replacement/grid_graph/graph_element"
-	"cycdg/lib/random"
-)
-
-var (
-	rnd random.PRNG
 )
 
 // graph with nodes placed at 2D grid
@@ -19,8 +14,7 @@ type Graph struct {
 	AppliedTags          map[TagKind]int
 }
 
-func (g *Graph) Init(r random.PRNG, w, h int) {
-	rnd = r
+func (g *Graph) Init(w, h int) {
 	g.AppliedRules = nil
 	g.AppliedRulesCount = 0
 	g.AppliedFeaturesCount = 0
