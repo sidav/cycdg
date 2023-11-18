@@ -1,6 +1,6 @@
 package graph
 
-import "cycdg/grid_graph/geometry"
+import "cycdg/graph_replacement/geometry"
 
 func (g *Graph) IsEdgeByVectorDirectional(x, y, vx, vy int) bool {
 	n := g.GetEdgeByVector(x, y, vx, vy)
@@ -15,7 +15,7 @@ func (g *Graph) CountDirEdgesAt(x, y int, countIn, countOut bool) int {
 	for _, dir := range cardinalDirections {
 		vx, vy := unwrapCoords(dir)
 		otherx, othery := x+vx, y+vy
-		if !g.areCoordsInBounds(otherx, othery) {
+		if !g.AreCoordsInBounds(otherx, othery) {
 			continue
 		}
 		if countIn {
@@ -51,7 +51,7 @@ func (g *Graph) IsEdgeDirectedBetweenCoords(x, y, tox, toy int) bool {
 func (g *Graph) doCoordsHaveIngoingLinksOnly(x, y int) bool {
 	for i := range cardinalDirections {
 		vx, vy := unwrapCoords(cardinalDirections[i])
-		if g.areCoordsInBounds(x+vx, y+vy) {
+		if g.AreCoordsInBounds(x+vx, y+vy) {
 			if g.isEdgeByVectorDirectionalAndActive(x, y, vx, vy) {
 				if g.IsEdgeDirectedByVector(x, y, vx, vy) {
 					return false
@@ -62,7 +62,7 @@ func (g *Graph) doCoordsHaveIngoingLinksOnly(x, y int) bool {
 	return true
 }
 
-func (g *Graph) enableDirLinkByVector(x, y, vx, vy int) {
+func (g *Graph) EnableDirLinkByVector(x, y, vx, vy int) {
 	if vx*vy != 0 {
 		debugPanic("Diagonal connection?.. %d,%d -> %d,%d", x, y, vx, vy)
 	}
@@ -79,12 +79,12 @@ func (g *Graph) enableDirLinkByVector(x, y, vx, vy int) {
 	g.NodeAt(x, y).SetLinkByVector(vx, vy, true, true, reverse)
 }
 
-func (g *Graph) enableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
+func (g *Graph) EnableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
 	vx, vy := from.VectorTo(to)
-	g.enableDirLinkByVector(from[0], from[1], vx, vy)
+	g.EnableDirLinkByVector(from[0], from[1], vx, vy)
 }
 
-func (g *Graph) disableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
+func (g *Graph) DisableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
 	vx, vy := from.VectorTo(to)
 	g.setLinkByVector(from[0], from[1], vx, vy, false)
 }

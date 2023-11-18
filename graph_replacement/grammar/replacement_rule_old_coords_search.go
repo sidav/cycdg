@@ -1,10 +1,13 @@
-package graph
+package grammar
 
-import . "cycdg/grid_graph/geometry"
+import (
+	. "cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/grid_graph"
+)
 
 // TODO: delete this whole file?
 
-func (ir *indifferentRule) getApplicableCoordsForFunc(g *Graph,
+func (ir *ReplacementRule) getApplicableCoordsForFunc(g *Graph,
 	afunc func(*Graph, int, int, ...Coords) bool, argsForFunc ...Coords) []Coords {
 	var crds []Coords
 	w, h := g.GetSize()
@@ -15,7 +18,7 @@ func (ir *indifferentRule) getApplicableCoordsForFunc(g *Graph,
 				continue
 			}
 			// uniqueness check:
-			if areXYCoordsInCoordsArray(x, y, argsForFunc) {
+			if AreXYCoordsInCoordsArray(x, y, argsForFunc) {
 				continue
 			}
 
@@ -72,7 +75,7 @@ func (ir *indifferentRule) getApplicableCoordsForFunc(g *Graph,
 // 	panic("too many dimensions?")
 // }
 
-func (ir *indifferentRule) FindAllApplicableCoordVariants(g *Graph) (result [][]Coords) {
+func (ir *ReplacementRule) FindAllApplicableCoordVariants(g *Graph) (result [][]Coords) {
 	var applicableArray [][]Coords
 	var prevApplicableArray [][]Coords
 

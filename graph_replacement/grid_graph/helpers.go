@@ -1,81 +1,22 @@
 package graph
 
 import (
-	"cycdg/lib/random"
 	"fmt"
 )
 
-type direction uint8
-
-const (
-	dirE direction = iota
-	dirS
-	dirW
-	dirN
-)
-
 var (
-	rnd                random.PRNG
 	cardinalDirections = [4][2]int{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 	diagonalDirections = [4][2]int{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
 )
 
-func SetRandom(r random.PRNG) {
-	rnd = r
-}
-
-func VectorToDirection(vx, vy int) direction {
-	if vx == 0 && vy == -1 {
-		return dirN
-	}
-	if vx == 0 && vy == 1 {
-		return dirS
-	}
-	if vx == -1 && vy == 0 {
-		return dirW
-	}
-	if vx == 1 && vy == 0 {
-		return dirE
-	}
-	debugPanic("No such direction: %d,%d", vx, vy)
-	panic(nil)
-}
-
-func getRandomVectorByFunc(appropriate func(vx, vy int) bool) (int, int) {
-	var candidates [][2]int
-	for _, d := range cardinalDirections {
-		if appropriate(d[0], d[1]) {
-			candidates = append(candidates, d)
-		}
-	}
-	ind := rnd.Rand(len(candidates))
-	return candidates[ind][0], candidates[ind][1]
-}
-
-// note: it's not IN rectangle!
-func areCoordsOnRectangle(x, y, rx, ry, w, h int) bool {
-	if x < rx || x >= rx+w || y < ry || y >= ry+h {
-		return false
-	}
-	return x == rx || x == rx+w-1 || y == ry || y == ry+h-1
+func debugPanic(msg string, args ...interface{}) {
+	panic(sprintf(msg, args...))
 }
 
 func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
 	dx := x2 - x1
 	dy := y2 - y1
 	return dx*dy == 0 && (dx == -1 || dx == 1 || dy == -1 || dy == 1)
-}
-
-func rotateCoordsCW(x, y int) (int, int) {
-	return y, -x
-}
-
-func rotateCoordsCCW(x, y int) (int, int) {
-	return -y, x
-}
-
-func randomUnitVector() (int, int) {
-	return rnd.RandomUnitVectorInt(false)
 }
 
 func sprintf(str string, args ...interface{}) string {
@@ -121,18 +62,4 @@ func findInCoordsArray(x, y int, coords [][2]int) int {
 
 func unwrapCoords(coords [2]int) (int, int) {
 	return coords[0], coords[1]
-}
-
-func maxint(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func minint(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

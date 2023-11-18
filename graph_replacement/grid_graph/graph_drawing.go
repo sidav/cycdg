@@ -4,9 +4,9 @@ func (g *Graph) enableAndInterlinkNodeFromCoords(x, y, vx, vy int, directional b
 	if g.IsNodeFinalized(x, y) {
 		panic("Node is finalized!")
 	}
-	g.enableNode(x+vx, y+vy)
+	g.EnableNode(x+vx, y+vy)
 	if directional {
-		g.enableDirLinkByVector(x, y, vx, vy)
+		g.EnableDirLinkByVector(x, y, vx, vy)
 	} else {
 		g.setLinkByVector(x, y, vx, vy, true)
 	}
@@ -21,7 +21,7 @@ func (g *Graph) drawCardinalConnectedLine(x1, y1, x2, y2 int, directed bool) {
 	if y2 != y1 {
 		vy = (y2 - y1) / intabs(y2-y1)
 	}
-	g.enableNode(x1, y1)
+	g.EnableNode(x1, y1)
 	x := x1
 	y := y1
 	for vx != 0 && x != x2 {
@@ -43,7 +43,7 @@ func (g *Graph) drawConnectedNodeRect(x, y, w, h int) {
 	g.drawCardinalConnectedLine(x, botY, x, y, false)
 }
 
-func (g *Graph) drawConnectedDirectionalRect(x, y, w, h int, ccw bool) {
+func (g *Graph) DrawConnectedDirectionalRect(x, y, w, h int, ccw bool) {
 	rghX, botY := x+w-1, y+h-1
 	if ccw {
 		g.drawCardinalConnectedLine(x, y, x, botY, true)
@@ -65,11 +65,11 @@ func (g *Graph) drawConnectedDirectionalRect(x, y, w, h int, ccw bool) {
 // N       N
 // ^       ^
 // O > N > N
-func (g *Graph) drawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, sinkX, sinkY int) {
+func (g *Graph) DrawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, sinkX, sinkY int) {
 	allCoords := GetAllRectCoordsClockwise(x, y, w, h)
 	sourceIndex := findInCoordsArray(sourceX, sourceY, allCoords)
 	sinkIndex := findInCoordsArray(sinkX, sinkY, allCoords)
-	g.enableNode(sourceX, sourceY)
+	g.EnableNode(sourceX, sourceY)
 	// first path: clockwise
 	index := sourceIndex
 	for index != sinkIndex {

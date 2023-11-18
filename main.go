@@ -1,7 +1,7 @@
 package main
 
 import (
-	"cycdg/grid_graph"
+	replacement "cycdg/graph_replacement"
 	"cycdg/lib/random"
 	"cycdg/lib/random/pcgrandom"
 	"cycdg/lib/tcell_console_wrapper"
@@ -22,7 +22,6 @@ func main() {
 
 	rnd = pcgrandom.NewPCG64()
 	rnd.SetSeed(int(time.Now().UnixNano()))
-	graph.SetRandom(rnd)
 
 	if len(os.Args) > 1 {
 		if len(os.Args) < 4 {
@@ -45,16 +44,17 @@ func main() {
 	cw.Init()
 	defer cw.Close()
 
-	gr := &graph.Graph{}
+	gen := replacement.GraphReplacementApplier{}
 
 	key := ""
 	for key != "ESCAPE" {
-		if key == "" || gr.GetFilledNodesPercentage() > 65 {
-			gr.InitWithConnectedNodes(5, 5)
+		if key == "" || gen.GetGraph().GetFilledNodesPercentage() > 65 {
+			gen.Init(rnd, 5, 5)
+		} else {
+			gen.ApplyRandomReplacementRuleToTheGraph()
 		}
-		gr.AlterSomething()
 
-		drawGraph(gr)
+		drawGraph(gen.GetGraph())
 		cw.FlushScreen()
 		key = cw.ReadKey()
 	}
@@ -66,15 +66,15 @@ func testGen(size, tests, fillPerc int) {
 		return
 	}
 	var appliedRules int
-	gr := &graph.Graph{}
+	gen := replacement.GraphReplacementApplier{}
 
 	start := time.Now()
 	for i := 0; i < tests; i++ {
-		gr.InitWithConnectedNodes(size, size)
-		for gr.GetFilledNodesPercentage() < fillPerc {
-			gr.AlterSomething()
+		gen.Init(rnd, size, size) // .InitWithConnectedNodes(size, size)
+		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
+			gen.ApplyRandomReplacementRuleToTheGraph()
 		}
-		appliedRules += gr.AppliedRulesCount
+		appliedRules += gen.GetGraph().AppliedRulesCount
 	}
 	totalGenTime := time.Since(start)
 	testResultString = fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, size, size, fillPerc)

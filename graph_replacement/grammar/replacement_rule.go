@@ -1,9 +1,13 @@
-package graph
+package grammar
 
-import . "cycdg/grid_graph/geometry"
+import (
+	"cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/grid_graph"
+)
 
 // it's a replacement rule indifferent to mirroring and rotations
-type indifferentRule struct {
+type ReplacementRule struct {
 	Name string
 
 	// metadata:
@@ -12,23 +16,14 @@ type indifferentRule struct {
 	// each value is coords index, near which the applicability func will be checked
 	searchNearPrevIndex []int // -1 means "any coords"
 	applicabilityFuncs  []func(g *Graph, x, y int, prevСoords ...Coords) bool
-	applyToCoords       func(g *Graph, allCoords ...Coords)
+	ApplyToGraph        func(g *Graph, allCoords ...Coords)
 }
 
-func areXYCoordsInCoordsArray(x, y int, coords []Coords) bool {
-	for i := range coords {
-		if coords[i].EqualsPair(x, y) {
-			return true
-		}
-	}
-	return false
-}
-
-func (ir *indifferentRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
+func (ir *ReplacementRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
 	return ir.tryFindAllCoordVariantsRecursively(g)
 }
 
-func (ir *indifferentRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForFunc ...Coords) [][]Coords {
+func (ir *ReplacementRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForFunc ...Coords) [][]Coords {
 	currFuncIndex := len(argsForFunc)
 	w, h := g.GetSize()
 	var result [][]Coords
@@ -50,7 +45,7 @@ func (ir *indifferentRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForF
 				continue
 			}
 
-			if areXYCoordsInCoordsArray(x, y, argsForFunc) {
+			if geometry.AreXYCoordsInCoordsArray(x, y, argsForFunc) {
 				continue
 			}
 			if ir.applicabilityFuncs[currFuncIndex](g, x, y, argsForFunc...) {

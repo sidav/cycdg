@@ -1,8 +1,11 @@
-package graph
+package grammar
 
-import . "cycdg/grid_graph/geometry"
+import (
+	. "cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/grid_graph"
+)
 
-var allReplacementRules = []*indifferentRule{
+var AllReplacementRules = []*ReplacementRule{
 	// 0   1       0 > 1  ; where 1 is inactive
 	{
 		Name:                "ADDNODE",
@@ -18,9 +21,9 @@ var allReplacementRules = []*indifferentRule{
 				return areCoordsAdjacent(x, y, x1, y1) && !g.IsNodeActive(x, y)
 			},
 		},
-		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[1][0], allCoords[1][1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
+		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
+			g.EnableNode(allCoords[1][0], allCoords[1][1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
 		},
 	},
 
@@ -52,13 +55,14 @@ var allReplacementRules = []*indifferentRule{
 				return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x2, y2) && areCoordsAdjacent(x, y, x3, y3)
 			},
 		},
-		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[2][0], allCoords[2][1])
-			g.enableNode(allCoords[3][0], allCoords[3][1])
-			g.setLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.enableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
+			g.EnableNode(allCoords[2][0], allCoords[2][1])
+			g.EnableNode(allCoords[3][0], allCoords[3][1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+			g.SwapEdgeTags(allCoords[0], allCoords[1], allCoords[3], allCoords[1])
+			g.SetLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
 		},
 	},
 
@@ -91,12 +95,13 @@ var allReplacementRules = []*indifferentRule{
 				return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x2, y2) && areCoordsAdjacent(x, y, x3, y3)
 			},
 		},
-		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[2][0], allCoords[2][1])
-			g.enableNode(allCoords[3][0], allCoords[3][1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.enableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
+			g.EnableNode(allCoords[2][0], allCoords[2][1])
+			g.EnableNode(allCoords[3][0], allCoords[3][1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
+			g.CopyEdgeTagsPreservingIds(allCoords[0], allCoords[1], allCoords[0], allCoords[2])
 		},
 	},
 
@@ -130,22 +135,20 @@ var allReplacementRules = []*indifferentRule{
 					areCoordsAdjacent(x, y, x1, y1) && areCoordsAdjacent(x, y, x2, y2)
 			},
 		},
-		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[3][0], allCoords[3][1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
-			g.disableDirectionalLinkBetweenCoords(allCoords[1], allCoords[0])
-			g.disableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.SwapTagsAtCoords(allCoords[3][0], allCoords[3][1], allCoords[0][0], allCoords[0][1])
-			g.resetNodeAndConnections(allCoords[0][0], allCoords[0][1])
+		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
+			g.EnableNode(allCoords[3][0], allCoords[3][1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
+			g.DisableDirectionalLinkBetweenCoords(allCoords[1], allCoords[0])
+			g.DisableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
+			g.SwapNodeTags(allCoords[3], allCoords[0])
+			g.ResetNodeAndConnections(allCoords[0])
 			g.FinalizeNode(allCoords[0])
 		},
 	},
 	// 0   1       0 - 1
 	//         >   |   |    0 is active, others not
 	// 2   3       2 - 3
-	//
-	// !! N has no other connections !!
 	{
 		Name:                "CORNERLOOP",
 		AddsCycle:           true,
@@ -173,14 +176,14 @@ var allReplacementRules = []*indifferentRule{
 					areCoordsAdjacent(x, y, x1, y1) && areCoordsAdjacent(x, y, x2, y2)
 			},
 		},
-		applyToCoords: func(g *Graph, allCoords ...Coords) {
-			g.enableNode(allCoords[1].Unwrap())
-			g.enableNode(allCoords[2].Unwrap())
-			g.enableNode(allCoords[3].Unwrap())
-			g.enableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
-			g.enableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
-			g.enableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
-			g.enableDirectionalLinkBetweenCoords(allCoords[2], allCoords[0])
+		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
+			g.EnableNode(allCoords[1].Unwrap())
+			g.EnableNode(allCoords[2].Unwrap())
+			g.EnableNode(allCoords[3].Unwrap())
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[0])
 		},
 	},
 }
