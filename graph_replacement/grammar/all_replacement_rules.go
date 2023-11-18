@@ -149,8 +149,6 @@ var AllReplacementRules = []*ReplacementRule{
 	// 0   1       0 - 1
 	//         >   |   |    0 is active, others not
 	// 2   3       2 - 3
-	//
-	// !! N has no other connections !!
 	{
 		Name:                "CORNERLOOP",
 		AddsCycle:           true,
