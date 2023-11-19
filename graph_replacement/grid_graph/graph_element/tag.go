@@ -13,6 +13,8 @@ const (
 	TagTrap
 	// Edge tags
 	TagLockedEdge
+	TagBilockedEdge // requires two keys of same id
+	TagWindowEdge   // can be seen through, but not passable
 	TagSecretEdge
 )
 

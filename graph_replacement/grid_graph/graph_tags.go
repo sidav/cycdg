@@ -16,6 +16,12 @@ func (g *Graph) AddNodeTagByCoords(c Coords, tag TagKind) {
 	g.AddNodeTag(x, y, tag)
 }
 
+func (g *Graph) AddNodeTagByCoordsPreserveLastId(c Coords, tag TagKind) {
+	g.AppliedTags[tag]--
+	x, y := c.Unwrap()
+	g.AddNodeTag(x, y, tag)
+}
+
 func (g *Graph) AddEdgeTagByVector(x, y, vx, vy int, tag TagKind) {
 	id := g.AppliedTags[tag]
 	g.AppliedTags[tag] = id + 1

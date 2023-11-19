@@ -89,19 +89,31 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 			}
 			if len(g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()) > 0 {
 				tag := g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()[0]
-				switch tag.Kind {
-				case TagLockedEdge:
-					char = rune(fmt.Sprintf("%d", tag.Id)[0])
-					cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
-				case TagSecretEdge:
-					char = '?'
-					cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGreen)
-				}
+				char = GetEdgeTagCharAndSetColor(tag)
 			}
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+1), cy+dir[1]*(halfNodeHeight+1))
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+2), cy+dir[1]*(halfNodeHeight+2))
 		}
 	}
+}
+
+func GetEdgeTagCharAndSetColor(tag *Tag) rune {
+	char := '%'
+	switch tag.Kind {
+	case TagLockedEdge:
+		char = rune(fmt.Sprintf("%d", tag.Id)[0])
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
+	case TagBilockedEdge:
+		char = rune(fmt.Sprintf("%d", tag.Id)[0])
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkMagenta)
+	case TagWindowEdge:
+		char = '#'
+		cw.SetStyle(tcell.ColorWhite, tcell.ColorBlack)
+	case TagSecretEdge:
+		char = '?'
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGreen)
+	}
+	return char
 }
 
 func GetTagIdiomAndSetColor(t *Tag) string {
@@ -111,8 +123,8 @@ func GetTagIdiomAndSetColor(t *Tag) string {
 		cw.SetStyle(tcell.ColorWhite, tcell.ColorDarkBlue)
 		return "STRT"
 	case TagGoal:
-		str = "GOAL"
-		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)
+		cw.SetStyle(tcell.ColorWhite, tcell.ColorDarkBlue)
+		return "GOAL"
 	case TagKeyForEdge:
 		str = "KEY"
 		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)

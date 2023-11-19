@@ -3,12 +3,12 @@ package grammar
 import (
 	"cycdg/graph_replacement/geometry"
 	graph "cycdg/graph_replacement/grid_graph"
+	. "cycdg/graph_replacement/grid_graph/graph_element"
 	"fmt"
 )
 
 var (
 	cardinalDirections = [4][2]int{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
-	diagonalDirections = [4][2]int{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
 )
 
 func debugPanic(msg string, args ...interface{}) {
@@ -64,6 +64,40 @@ func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geomet
 			}
 		}
 	}
+	if len(candidates) == 0 {
+		panic("No candidates!")
+		return geometry.NewCoords(-1, -1)
+	}
 	ind := rnd.Rand(len(candidates))
 	return candidates[ind]
+}
+
+func AddRandomHazardAt(g *graph.Graph, crds geometry.Coords) {
+	possibleTags := []TagKind{TagBoss, TagTrap, TagHazard}
+	g.AddNodeTagByCoords(crds, possibleTags[rnd.Rand(len(possibleTags))])
+}
+
+func PushNodeContentsInRandomDirection(g *graph.Graph, crds geometry.Coords) {
+	pushTo := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
+		return !g.IsNodeActive(x, y) && crds.IsAdjacentToXY(x, y)
+	})
+	if pushTo.EqualsPair(-1, -1) {
+		return
+	}
+	g.EnableNodeByCoords(pushTo)
+	g.EnableDirectionalLinkBetweenCoords(crds, pushTo)
+	g.SwapNodeTags(crds, pushTo)
+}
+
+func PushNodeContentsInRandomDirectionWithEdgeTag(g *graph.Graph, crds geometry.Coords, tag TagKind) {
+	pushTo := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
+		return !g.IsNodeActive(x, y) && crds.IsAdjacentToXY(x, y)
+	})
+	if pushTo.EqualsPair(-1, -1) {
+		return
+	}
+	g.EnableNodeByCoords(pushTo)
+	g.EnableDirectionalLinkBetweenCoords(crds, pushTo)
+	g.AddEdgeTagByCoords(crds, pushTo, tag)
+	g.SwapNodeTags(crds, pushTo)
 }
