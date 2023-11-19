@@ -92,7 +92,3 @@ func (g *Graph) GetFilledNodesPercentage() int {
 	totalNodes := w * h
 	return (100*count + totalNodes/2) / totalNodes
 }
-
-func (g *Graph) DoesNodeHaveAnyTags(x, y int) bool {
-	return g.NodeAt(x, y).HasAnyTags()
-}

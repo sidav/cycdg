@@ -17,9 +17,11 @@ func (c *Coords) EqualsPair(x, y int) bool {
 }
 
 func (c *Coords) IsAdjacentToXY(x, y int) bool {
-	dx := intAbs(x - c[0])
-	dy := intAbs(y - c[1])
-	return dx+dy == 1
+	return c.ManhattanDistToXY(x, y) == 1
+}
+
+func (c *Coords) ManhattanDistToXY(x, y int) int {
+	return intAbs(x-c[0]) + intAbs(y-c[1])
 }
 
 func (c *Coords) VectorTo(c2 Coords) (int, int) {

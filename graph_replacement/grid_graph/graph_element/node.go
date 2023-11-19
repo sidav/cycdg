@@ -46,6 +46,15 @@ func (gn *Node) HasAnyTags() bool {
 	return len(gn.tags) > 0
 }
 
+func (gn *Node) HasTag(t TagKind) bool {
+	for _, tg := range gn.tags {
+		if tg.Kind == t {
+			return true
+		}
+	}
+	return false
+}
+
 func (gn *Node) ResetTags() {
 	gn.tags = nil
 }

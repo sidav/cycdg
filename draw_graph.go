@@ -2,7 +2,7 @@ package main
 
 import (
 	graph "cycdg/graph_replacement/grid_graph"
-	"cycdg/graph_replacement/grid_graph/graph_element"
+	. "cycdg/graph_replacement/grid_graph/graph_element"
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
@@ -50,12 +50,8 @@ func drawNodeAt(g *graph.Graph, nx, ny int) {
 	cw.SetStyle(tcell.ColorBlack, background)
 	cw.DrawFilledRect(' ', x, y, nodeWidth-1, nodeHeight-1)
 	drawNodeEdges(g, nx, ny)
-	cw.SetStyle(tcell.ColorRed, background)
 	for i, tag := range g.NodeAt(nx, ny).GetTags() {
-		str := tag.GetStringIdiom()
-		if tag.Kind != graph_element.TagStart {
-			str = fmt.Sprintf("%s%d", str, tag.Id)
-		}
+		str := GetTagIdiomAndSetColor(tag)
 		cw.PutStringCenteredAt(str, x+halfNodeWidth, y+i)
 	}
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d", g.CountEdgesAt(nx, ny)), x+halfNodeWidth, y+nodeHeight-2)
@@ -94,10 +90,10 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 			if len(g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()) > 0 {
 				tag := g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()[0]
 				switch tag.Kind {
-				case graph_element.TagLockedEdge:
+				case TagLockedEdge:
 					char = rune(fmt.Sprintf("%d", tag.Id)[0])
 					cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
-				case graph_element.TagSecretEdge:
+				case TagSecretEdge:
 					char = '?'
 					cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGreen)
 				}
@@ -106,4 +102,32 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+2), cy+dir[1]*(halfNodeHeight+2))
 		}
 	}
+}
+
+func GetTagIdiomAndSetColor(t *Tag) string {
+	str := "?????"
+	switch t.Kind {
+	case TagStart:
+		cw.SetStyle(tcell.ColorWhite, tcell.ColorDarkBlue)
+		return "STRT"
+	case TagGoal:
+		str = "GOAL"
+		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)
+	case TagKeyForEdge:
+		str = "KEY"
+		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)
+	case TagBoss:
+		str = "BOSS"
+		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
+	case TagTrap:
+		str = "TRAP"
+		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
+	case TagHazard:
+		str = "HZRD"
+		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
+	case TagTreasure:
+		str = "TRSR"
+		cw.SetStyle(tcell.ColorYellow, tcell.ColorDarkBlue)
+	}
+	return fmt.Sprintf("%s%d", str, t.Id)
 }

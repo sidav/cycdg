@@ -9,6 +9,8 @@ const (
 	TagKeyForEdge
 	TagBoss
 	TagTreasure
+	TagHazard
+	TagTrap
 	// Edge tags
 	TagLockedEdge
 	TagSecretEdge
@@ -17,21 +19,4 @@ const (
 type Tag struct {
 	Kind TagKind
 	Id   int // should be unique in TagKind scope
-}
-
-func (t *Tag) GetStringIdiom() string {
-	switch t.Kind {
-	case TagStart:
-		return "STRT"
-	case TagGoal:
-		return "GOAL"
-	case TagKeyForEdge:
-		return "KEY"
-	case TagBoss:
-		return "BOSS"
-	case TagTreasure:
-		return "TRSR"
-	default:
-		return "????"
-	}
 }
