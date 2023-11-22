@@ -15,9 +15,10 @@ type ReplacementRule struct {
 
 	// each value is coords index, near which the applicability func will be checked
 	searchNearPrevIndex []int // -1 means "any coords"
-	applicabilityFuncs  []func(g *Graph, x, y int, prevСoords ...Coords) bool
-	ApplyToGraph        func(g *Graph, allCoords ...Coords)
-	Features            []*FeatureAdder
+
+	applicabilityFuncs []func(g *Graph, x, y int, prevСoords ...Coords) bool
+	ApplyToGraph       func(g *Graph, applyAt ...Coords)
+	Features           []*FeatureAdder
 }
 
 func (ir *ReplacementRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {

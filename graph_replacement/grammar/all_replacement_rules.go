@@ -22,9 +22,9 @@ var AllReplacementRules = []*ReplacementRule{
 				return areCoordsAdjacent(x, y, x1, y1) && !g.IsNodeActive(x, y)
 			},
 		},
-		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
-			g.EnableNode(allCoords[1][0], allCoords[1][1])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNode(applyAt[1][0], applyAt[1][1])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
 		},
 		Features: []*FeatureAdder{
 			{
@@ -67,10 +67,10 @@ var AllReplacementRules = []*ReplacementRule{
 				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
 			},
 		},
-		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
-			g.EnableNodeByCoords(allCoords[2])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[1])
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNodeByCoords(applyAt[2])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[1])
 		},
 		Features: []*FeatureAdder{
 			{
@@ -114,14 +114,14 @@ var AllReplacementRules = []*ReplacementRule{
 				return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x2, y2) && areCoordsAdjacent(x, y, x3, y3)
 			},
 		},
-		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
-			g.EnableNode(allCoords[2][0], allCoords[2][1])
-			g.EnableNode(allCoords[3][0], allCoords[3][1])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
-			g.SwapEdgeTags(allCoords[0], allCoords[1], allCoords[3], allCoords[1])
-			g.SetLinkBetweenCoords(allCoords[0][0], allCoords[0][1], allCoords[1][0], allCoords[1][1], false)
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNode(applyAt[2][0], applyAt[2][1])
+			g.EnableNode(applyAt[3][0], applyAt[3][1])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[3])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
+			g.SwapEdgeTags(applyAt[0], applyAt[1], applyAt[3], applyAt[1])
+			g.SetLinkBetweenCoords(applyAt[0][0], applyAt[0][1], applyAt[1][0], applyAt[1][1], false)
 		},
 		Features: []*FeatureAdder{
 			{
@@ -162,13 +162,13 @@ var AllReplacementRules = []*ReplacementRule{
 				return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x2, y2) && areCoordsAdjacent(x, y, x3, y3)
 			},
 		},
-		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
-			g.EnableNode(allCoords[2][0], allCoords[2][1])
-			g.EnableNode(allCoords[3][0], allCoords[3][1])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[3])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
-			g.CopyEdgeTagsPreservingIds(allCoords[0], allCoords[1], allCoords[0], allCoords[2])
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNode(applyAt[2][0], applyAt[2][1])
+			g.EnableNode(applyAt[3][0], applyAt[3][1])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[3])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
+			g.CopyEdgeTagsPreservingIds(applyAt[0], applyAt[1], applyAt[0], applyAt[2])
 		},
 		Features: []*FeatureAdder{
 			{
@@ -212,15 +212,15 @@ var AllReplacementRules = []*ReplacementRule{
 					areCoordsAdjacent(x, y, x1, y1) && areCoordsAdjacent(x, y, x2, y2)
 			},
 		},
-		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
-			g.EnableNode(allCoords[3][0], allCoords[3][1])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
-			g.DisableDirectionalLinkBetweenCoords(allCoords[1], allCoords[0])
-			g.DisableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
-			g.SwapNodeTags(allCoords[3], allCoords[0])
-			g.ResetNodeAndConnections(allCoords[0])
-			g.FinalizeNode(allCoords[0])
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNode(applyAt[3][0], applyAt[3][1])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[3])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[2])
+			g.DisableDirectionalLinkBetweenCoords(applyAt[1], applyAt[0])
+			g.DisableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
+			g.SwapNodeTags(applyAt[3], applyAt[0])
+			g.ResetNodeAndConnections(applyAt[0])
+			g.FinalizeNode(applyAt[0])
 		},
 	},
 	// 0   1       0 > 1
@@ -253,14 +253,14 @@ var AllReplacementRules = []*ReplacementRule{
 					areCoordsAdjacent(x, y, x1, y1) && areCoordsAdjacent(x, y, x2, y2)
 			},
 		},
-		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
-			g.EnableNode(allCoords[1].Unwrap())
-			g.EnableNode(allCoords[2].Unwrap())
-			g.EnableNode(allCoords[3].Unwrap())
-			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[3])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[2])
-			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[0])
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNode(applyAt[1].Unwrap())
+			g.EnableNode(applyAt[2].Unwrap())
+			g.EnableNode(applyAt[3].Unwrap())
+			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[3])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[2])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[0])
 		},
 		Features: []*FeatureAdder{
 			{
