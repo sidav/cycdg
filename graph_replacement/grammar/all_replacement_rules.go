@@ -49,42 +49,42 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
-	// 0   1   2       0 > 1 > 2 ; where 1 and 2 are inactive; may be bent
-	// {
-	// 	Name:                "ADD2NODES",
-	// 	searchNearPrevIndex: []int{-1, 0, 1},
-	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
-	// 		// node 0
-	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
-	// 			return g.IsNodeActive(x, y)
-	// 		},
-	// 		// node 1
-	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
-	// 			x0, y0 := prevСoords[0].Unwrap()
-	// 			return areCoordsAdjacent(x, y, x0, y0) && !g.IsNodeActive(x, y)
-	// 		},
-	// 		// node 2
-	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
-	// 			x1, y1 := prevСoords[1].Unwrap()
-	// 			return areCoordsAdjacent(x, y, x1, y1) && !g.IsNodeActive(x, y)
-	// 		},
-	// 	},
-	// 	ApplyToGraph: func(g *Graph, allCoords ...Coords) {
-	// 		g.EnableNodeByCoords(allCoords[1])
-	// 		g.EnableNodeByCoords(allCoords[2])
-	// 		g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[1])
-	// 		g.EnableDirectionalLinkBetweenCoords(allCoords[1], allCoords[2])
-	// 	},
-	// 	Features: []*FeatureAdder{
-	// 		{
-	// 			Name: "Guard",
-	// 			ApplyFeature: func(g *Graph, crds ...Coords) {
-	// 				g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)
-	// 				g.AddNodeTagByCoords(crds[2], graph_element.TagTreasure)
-	// 			},
-	// 		},
-	// 	},
-	// },
+	// 0   2   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
+	{
+		Name:                "CONNECT",
+		searchNearPrevIndex: []int{-1, -1, 0},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y) && !prevСoords[0].IsAdjacentToXY(x, y) && prevСoords[0].IsCardinalToPair(x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, allCoords ...Coords) {
+			g.EnableNodeByCoords(allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[0], allCoords[2])
+			g.EnableDirectionalLinkBetweenCoords(allCoords[2], allCoords[1])
+		},
+		Features: []*FeatureAdder{
+			{
+				Name: "SecretPassage",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[2], graph_element.TagSecretEdge)
+					g.AddEdgeTagByCoords(crds[2], crds[1], graph_element.TagSecretEdge)
+					if rnd.Rand(2) == 0 {
+						AddRandomHazardAt(g, crds[2])
+					}
+				},
+			},
+		},
+	},
 
 	// 0   2       0 > 2
 	// V       >       V
@@ -170,6 +170,17 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(allCoords[3], allCoords[1])
 			g.CopyEdgeTagsPreservingIds(allCoords[0], allCoords[1], allCoords[0], allCoords[2])
 		},
+		Features: []*FeatureAdder{
+			{
+				Name: "SecretOrMaybeDanger",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
+					if rnd.Rand(3) < 2 {
+						AddRandomHazardAt(g, crds[3])
+					}
+				},
+			},
+		},
 	},
 
 	// 1   3       1 > 3
@@ -177,7 +188,6 @@ var AllReplacementRules = []*ReplacementRule{
 	// 0 > 2       U   2
 	{
 		Name:                "FLIP",
-		AddsCycle:           true,
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -254,7 +264,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		Features: []*FeatureAdder{
 			{
-				Name: "AltHazard",
+				Name: "SecretOrHazard",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
 					g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)
 					g.AddNodeTagByCoords(crds[2], graph_element.TagTreasure)

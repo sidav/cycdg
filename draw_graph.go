@@ -24,6 +24,7 @@ var (
 func drawGraph(g *graph.Graph) {
 	cw.ClearScreen()
 	w, h := g.GetSize()
+	drawCoords(g)
 	for nx := 0; nx < w; nx++ {
 		for ny := 0; ny < h; ny++ {
 			drawNodeAt(g, nx, ny)
@@ -35,6 +36,21 @@ func drawGraph(g *graph.Graph) {
 	cw.PutString("Applied rules: ", w*(nodeWidth+nodeSpacing), 1)
 	for i := range g.AppliedRules {
 		cw.PutStringf(w*(nodeWidth+nodeSpacing), i+2, "%d:%s", i, g.AppliedRules[i])
+	}
+}
+
+func drawCoords(g *graph.Graph) {
+	cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
+	w, h := g.GetSize()
+	hStep := (nodeWidth + nodeSpacing)
+	for x := 0; x < w; x++ {
+		cw.PutStringCenteredAt(fmt.Sprintf("%d", x), hStep*x+hStep/2, 0)
+	}
+	vStep := (nodeHeight + nodeSpacing)
+	for y := 0; y < h; y++ {
+		if y < 10 {
+			cw.PutStringCenteredAt(fmt.Sprintf("%d", y), 0, vStep*y+vStep/2)
+		}
 	}
 }
 
