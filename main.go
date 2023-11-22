@@ -35,10 +35,10 @@ func main() {
 			fmt.Println("Please use numbers as args.")
 			return
 		}
-		testGen(size, tests, fill)
+		testResultString = replacement.TestGen(rnd, size, tests, fill)
 		return
 	} else {
-		testGen(5, 1000, 100)
+		testResultString = replacement.TestGen(rnd, 5, 1000, 100)
 	}
 
 	cw.Init()
@@ -48,37 +48,17 @@ func main() {
 
 	key := ""
 	for key != "ESCAPE" {
-		if key == "" || gen.GetGraph().GetFilledNodesPercentage() > 65 {
+		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= 65 {
 			gen.Init(rnd, 5, 5)
 		} else {
 			gen.ApplyRandomReplacementRuleToTheGraph()
+			for key == "ENTER" && gen.GetGraph().GetFilledNodesPercentage() < 65 {
+				gen.ApplyRandomReplacementRuleToTheGraph()
+			}
 		}
 
 		drawGraph(gen.GetGraph())
 		cw.FlushScreen()
 		key = cw.ReadKey()
 	}
-}
-
-func testGen(size, tests, fillPerc int) {
-	if fillPerc > 100 {
-		testResultString = "Inadequate fill percentage\n"
-		return
-	}
-	var appliedRules int
-	gen := replacement.GraphReplacementApplier{}
-
-	start := time.Now()
-	for i := 0; i < tests; i++ {
-		gen.Init(rnd, size, size) // .InitWithConnectedNodes(size, size)
-		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
-			gen.ApplyRandomReplacementRuleToTheGraph()
-		}
-		appliedRules += gen.GetGraph().AppliedRulesCount
-	}
-	totalGenTime := time.Since(start)
-	testResultString = fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, size, size, fillPerc)
-	testResultString += fmt.Sprintf("Total time %v, mean time per single gen %v\n", totalGenTime, totalGenTime/time.Duration(tests))
-	testResultString += fmt.Sprintf("Total rules applied %d, mean time per rule %v\n",
-		appliedRules, totalGenTime/time.Duration(appliedRules))
 }
