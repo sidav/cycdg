@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestGen(prng random.PRNG, size, tests, fillPerc int) (testResultString string) {
+func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultString string) {
 	if fillPerc > 100 {
 		testResultString = "Inadequate fill percentage\n"
 		return
@@ -18,7 +18,7 @@ func TestGen(prng random.PRNG, size, tests, fillPerc int) (testResultString stri
 	progressBarCLI("Benchmarking", 0, tests+1, 20)
 	start := time.Now()
 	for i := 0; i < tests; i++ {
-		gen.Init(prng, size, size)
+		gen.Init(prng, width, height)
 		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
 			gen.ApplyRandomReplacementRuleToTheGraph()
 		}
@@ -26,7 +26,7 @@ func TestGen(prng random.PRNG, size, tests, fillPerc int) (testResultString stri
 		progressBarCLI("Benchmarking", i+1, tests+1, 20)
 	}
 	totalGenTime := time.Since(start)
-	testResultString = fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, size, size, fillPerc)
+	testResultString = fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, width, height, fillPerc)
 	testResultString += fmt.Sprintf("Total time %v, mean time per single gen %v\n", totalGenTime, totalGenTime/time.Duration(tests))
 	testResultString += fmt.Sprintf("Total rules applied %d, mean time per rule %v\n",
 		appliedRules, totalGenTime/time.Duration(appliedRules))
