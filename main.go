@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	cw               tcell_console_wrapper.ConsoleWrapper
-	width, height    int
-	rnd              random.PRNG
-	testResultString string
+	cw                  tcell_console_wrapper.ConsoleWrapper
+	width, height, fill int
+	rnd                 random.PRNG
+	testResultString    string
 )
 
 func main() {
@@ -35,11 +35,11 @@ func main() {
 
 	key := ""
 	for key != "ESCAPE" {
-		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= 65 {
+		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= fill {
 			gen.Init(rnd, width, height)
 		} else {
 			gen.ApplyRandomReplacementRuleToTheGraph()
-			for key == "ENTER" && gen.GetGraph().GetFilledNodesPercentage() < 65 {
+			for key == "ENTER" && gen.GetGraph().GetFilledNodesPercentage() < fill {
 				gen.ApplyRandomReplacementRuleToTheGraph()
 			}
 		}
@@ -53,7 +53,8 @@ func main() {
 // returns true if the program should exit
 func execArgs() bool {
 	exit := false
-	tests, fill := 1000, 100
+	tests := 1000
+	fill = 70
 
 	argsCount := len(os.Args)
 	if argsCount != 1 && argsCount != 3 && argsCount != 5 {

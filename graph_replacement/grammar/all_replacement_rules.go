@@ -105,7 +105,7 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return g.IsNodeActive(x, y) && !prevСoords[0].IsAdjacentToXY(x, y) && prevСoords[0].IsCardinalToPair(x, y)
+				return g.IsNodeActive(x, y) && !prevСoords[0].IsAdjacentToXY(x, y) // && prevСoords[0].IsCardinalToPair(x, y)
 			},
 			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {

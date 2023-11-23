@@ -29,7 +29,7 @@ func (ra *GraphReplacementApplier) shouldFeatureBeAdded() bool {
 		return false
 	}
 	featuresPerc := (100*ra.graph.AppliedFeaturesCount + ra.DesiredFeatures/2) / ra.DesiredFeatures
-	return rnd.Rand(100) > featuresPerc
+	return rnd.Rand(120) > featuresPerc
 }
 
 func (ra *GraphReplacementApplier) ApplyRandomReplacementRuleToTheGraph() {
