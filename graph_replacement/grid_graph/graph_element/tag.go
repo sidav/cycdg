@@ -16,6 +16,7 @@ const (
 	TagLockedEdge
 	TagBilockedEdge // requires two keys of same id
 	TagWindowEdge   // can be seen through, but not passable
+	TagOnetimeEdge  // one-time passage
 	TagSecretEdge
 )
 

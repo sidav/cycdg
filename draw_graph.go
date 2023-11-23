@@ -105,7 +105,10 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 			}
 			if len(g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()) > 0 {
 				tag := g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()[0]
-				char = GetEdgeTagCharAndSetColor(tag)
+				change, newChar := GetEdgeTagCharAndSetColor(tag)
+				if change {
+					char = newChar
+				}
 			}
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+1), cy+dir[1]*(halfNodeHeight+1))
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+2), cy+dir[1]*(halfNodeHeight+2))
@@ -113,7 +116,7 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 	}
 }
 
-func GetEdgeTagCharAndSetColor(tag *Tag) rune {
+func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 	char := '%'
 	switch tag.Kind {
 	case TagLockedEdge:
@@ -128,8 +131,11 @@ func GetEdgeTagCharAndSetColor(tag *Tag) rune {
 	case TagSecretEdge:
 		char = '?'
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGreen)
+	case TagOnetimeEdge:
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
+		return false, ' '
 	}
-	return char
+	return true, char
 }
 
 func GetTagIdiomAndSetColor(t *Tag) string {

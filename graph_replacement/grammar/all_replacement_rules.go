@@ -7,6 +7,56 @@ import (
 )
 
 var AllReplacementRules = []*ReplacementRule{
+
+	// 0  X  ; just finalize disabled node
+	{
+		Name:                "DISABLE",
+		searchNearPrevIndex: []int{-1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.FinalizeNode(applyAt[0])
+		},
+	},
+
+	// 0   1       0 > 1  ; where both are active
+	{
+		Name:                "CONNECT",
+		searchNearPrevIndex: []int{-1, 0},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				x1, y1 := prevСoords[0].Unwrap()
+				return areCoordsAdjacent(x, y, x1, y1) && g.IsNodeActive(x, y) && !g.AreCoordsInterlinked(x, y, x1, y1)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
+		},
+		Features: []*FeatureAdder{
+			{
+				Name: "Secret Passage",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
+				},
+			},
+			{
+				Name: "One-Time Passage",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagOnetimeEdge)
+				},
+			},
+		},
+	},
+
 	// 0   1       0 > 1  ; where 1 is inactive
 	{
 		Name:                "ADDNODE",
@@ -95,7 +145,7 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0   2   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
 	{
-		Name:                "CONNECT",
+		Name:                "CONNROOM",
 		AddsCycle:           true, // it's not guaranteed, but should be more possible than not
 		searchNearPrevIndex: []int{-1, -1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -126,6 +176,12 @@ var AllReplacementRules = []*ReplacementRule{
 					if rnd.Rand(2) == 0 {
 						AddRandomHazardAt(g, crds[2])
 					}
+				},
+			},
+			{
+				Name: "One-Time Passage",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[2], graph_element.TagOnetimeEdge)
 				},
 			},
 		},
