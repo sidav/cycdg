@@ -1,5 +1,7 @@
 package graph
 
+import "cycdg/graph_replacement/grid_graph/graph_element"
+
 func (g *Graph) TestSanity() (sane bool, problems []string) {
 	sane = true
 	// test if any disabled node has tags
@@ -32,7 +34,7 @@ func (g *Graph) TestSanity() (sane bool, problems []string) {
 		for y := range g.nodes[x] {
 			n := g.NodeAt(x, y)
 			if n.IsActive() {
-				if g.CountEdgesAt(x, y) == 0 {
+				if g.CountEdgesAt(x, y) == 0 && !g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidirectional) {
 					sane = false
 					problems = append(problems, sprintf("Active node at %d,%d has no active links!", x, y))
 				}

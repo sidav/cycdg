@@ -156,6 +156,9 @@ func GetTagIdiomAndSetColor(t *Tag) string {
 	case TagTreasure:
 		str = "TRSR"
 		cw.SetStyle(tcell.ColorYellow, tcell.ColorDarkBlue)
+	case TagTeleportBidirectional:
+		str = "TELE"
+		cw.SetStyle(tcell.ColorDarkCyan, tcell.ColorDarkBlue)
 	}
 	return fmt.Sprintf("%s%d", str, t.Id)
 }

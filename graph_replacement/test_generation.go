@@ -15,6 +15,7 @@ func TestGen(prng random.PRNG, size, tests, fillPerc int) (testResultString stri
 	var appliedRules int
 	gen := &GraphReplacementApplier{}
 
+	progressBarCLI("Benchmarking", 0, tests+1, 20)
 	start := time.Now()
 	for i := 0; i < tests; i++ {
 		gen.Init(prng, size, size)

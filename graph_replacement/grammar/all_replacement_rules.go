@@ -49,9 +49,54 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
+	// 0 ...  1  2       0 (teleport)> 1 > 2  ; where 1 and 2 are inactive
+	{
+		Name:                "TELEPORT",
+		searchNearPrevIndex: []int{-1, -1, 1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y) && g.DoesNodeHaveAnyTags(x, y) &&
+					!g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidirectional) &&
+					!g.DoesNodeHaveTag(x, y, graph_element.TagStart)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNodeByCoords(applyAt[1])
+			g.EnableNodeByCoords(applyAt[2])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[2])
+			g.SwapNodeTags(applyAt[0], applyAt[2])
+			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidirectional)
+			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidirectional)
+		},
+		Features: []*FeatureAdder{
+			{
+				Name: "Boss",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[2], graph_element.TagBoss)
+				},
+			},
+			{
+				Name: "Treasure",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[2], graph_element.TagTreasure)
+				},
+			},
+		},
+	},
+
 	// 0   2   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
 	{
 		Name:                "CONNECT",
+		AddsCycle:           true, // it's not guaranteed, but should be more possible than not
 		searchNearPrevIndex: []int{-1, -1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0

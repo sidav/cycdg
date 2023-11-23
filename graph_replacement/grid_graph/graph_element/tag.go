@@ -11,6 +11,7 @@ const (
 	TagTreasure
 	TagHazard
 	TagTrap
+	TagTeleportBidirectional
 	// Edge tags
 	TagLockedEdge
 	TagBilockedEdge // requires two keys of same id
