@@ -1,6 +1,7 @@
 package replacement
 
 import (
+	"cycdg/graph_replacement/grammar"
 	"cycdg/lib/random"
 	"fmt"
 	"strings"
@@ -26,12 +27,29 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 		progressBarCLI("Benchmarking", i+1, tests+1, 20)
 	}
 	totalGenTime := time.Since(start)
-	testResultString = fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, width, height, fillPerc)
+	testResultString = showRulesInfo()
+	testResultString += fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, width, height, fillPerc)
 	testResultString += fmt.Sprintf("Total time %v, mean time per single gen %v\n", totalGenTime, totalGenTime/time.Duration(tests))
 	testResultString += fmt.Sprintf("Total rules applied %d, mean time per rule %v\n",
 		appliedRules, totalGenTime/time.Duration(appliedRules))
 
 	return
+}
+
+func showRulesInfo() string {
+	variants := 0
+	for _, r := range grammar.AllInitialRules {
+		variants++
+		variants += len(r.Features)
+	}
+	str := fmt.Sprintf("Total initial rules %d (%d counting all the features)\n", len(grammar.AllInitialRules), variants)
+	variants = 0
+	for _, r := range grammar.AllReplacementRules {
+		variants++
+		variants += len(r.Features)
+	}
+	str += fmt.Sprintf("Total replacement rules %d (%d counting all the features)\n", len(grammar.AllReplacementRules), variants)
+	return str
 }
 
 func progressBarCLI(title string, value, endvalue, bar_length int) { // because I can
