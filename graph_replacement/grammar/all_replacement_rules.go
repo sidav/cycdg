@@ -374,4 +374,55 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 		},
 	},
+	// STRAIGHT EXAMPLE
+	// 0 > 1 > 2       0 > 1 > 2
+	//             >   V       ^   0-2 are active, others not, may be bent
+	// 3   4   5       3 > 4 > 5
+	//
+	// BENT EXAMPLE:
+	// 0   3   4       0 > 3 > 4
+	// V           >   V       V
+	// 1 > 2   5       1 > 2 < 5
+	{
+		Name:                "ALTWAY",
+		AddsCycle:           true,
+		searchNearPrevIndex: []int{-1, 0, 1, 0, 3, 2},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[0].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedBetweenCoords(prevСoords[0][0], prevСoords[0][1], x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[1].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedBetweenCoords(prevСoords[1][0], prevСoords[1][1], x, y)
+			},
+			// node 3
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[0].IsAdjacentToXY(x, y) && !g.IsNodeActive(x, y)
+			},
+			// node 4
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[3].IsAdjacentToXY(x, y) && !g.IsNodeActive(x, y)
+			},
+			// node 5
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[2].IsAdjacentToXY(x, y) && prevСoords[4].IsAdjacentToXY(x, y) && !g.IsNodeActive(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNode(applyAt[3].Unwrap())
+			g.EnableNode(applyAt[4].Unwrap())
+			g.EnableNode(applyAt[5].Unwrap())
+			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[3])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[4])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[4], applyAt[5])
+			g.EnableDirectionalLinkBetweenCoords(applyAt[5], applyAt[2])
+		},
+	},
 }
