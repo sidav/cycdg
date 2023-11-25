@@ -77,6 +77,18 @@ func AddRandomHazardAt(g *graph.Graph, crds geometry.Coords) {
 	g.AddNodeTagByCoords(crds, possibleTags[rnd.Rand(len(possibleTags))])
 }
 
+func moveRandomNodeTag(g *graph.Graph, from, to geometry.Coords) {
+	fromNode := g.NodeAt(from.Unwrap())
+	fromTags := fromNode.GetTags()
+	if len(fromTags) == 0 {
+		return
+	}
+	index := rnd.Rand(len(fromTags))
+	toNode := g.NodeAt(to.Unwrap())
+	toNode.AddTag(fromTags[index].Kind, fromTags[index].Id)
+	fromNode.RemoveTagByIndex(index)
+}
+
 func PushNodeContentsInRandomDirection(g *graph.Graph, crds geometry.Coords) {
 	pushTo := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
 		return !g.IsNodeActive(x, y) && crds.IsAdjacentToXY(x, y)

@@ -42,6 +42,13 @@ func (gn *Node) AddTag(tagType TagKind, tagId int) {
 	gn.tags = append(gn.tags, &Tag{Kind: tagType, Id: tagId})
 }
 
+func (gn *Node) RemoveTagByIndex(i int) {
+	if gn.finalized {
+		panic("AddTag: Node is finalized!")
+	}
+	gn.tags = append(gn.tags[:i], gn.tags[i+1:]...)
+}
+
 func (gn *Node) HasAnyTags() bool {
 	return len(gn.tags) > 0
 }
