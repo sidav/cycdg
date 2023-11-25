@@ -23,9 +23,37 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
+	// 0; just add someting to empty active node
+	{
+		Name:                "THING",
+		searchNearPrevIndex: []int{-1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y) && !g.DoesNodeHaveAnyTags(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {},
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Treasure",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[0], graph_element.TagTreasure)
+				},
+			},
+			{
+				Name: "Danger",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					AddRandomHazardAt(g, crds[0])
+				},
+			},
+		},
+	},
+
 	// 0   1       0 > 1  ; where both are active
 	{
 		Name:                "CONNECT",
+		AddsCycle:           true, // it's not guaranteed, but should be more possible than not
 		searchNearPrevIndex: []int{-1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -41,7 +69,16 @@ var AllReplacementRules = []*ReplacementRule{
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
 		},
-		OptionalFeatures: []*FeatureAdder{
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Keyed",
+				PrepareFeature: func(g *Graph, crds ...Coords) {
+					addKeyAtRandom(g)
+				},
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagLockedEdge)
+				},
+			},
 			{
 				Name: "Secret Passage",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -73,10 +110,13 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
-			g.EnableNode(applyAt[1][0], applyAt[1][1])
+			g.EnableNodeByCoords(applyAt[1])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
+			if !g.DoesNodeByCoordsHaveTag(applyAt[0], graph_element.TagStart) {
+				moveRandomNodeTag(g, applyAt[0], applyAt[1])
+			}
 		},
-		OptionalFeatures: []*FeatureAdder{
+		MandatoryFeatures: []*FeatureAdder{
 			{
 				Name: "Keyed",
 				PrepareFeature: func(g *Graph, crds ...Coords) {
@@ -87,6 +127,20 @@ var AllReplacementRules = []*ReplacementRule{
 				},
 			},
 			{
+				Name: "Secret Passage",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
+				},
+			},
+			{
+				Name: "One-Time Passage",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagOnetimeEdge)
+				},
+			},
+		},
+		OptionalFeatures: []*FeatureAdder{
+			{
 				Name: "Boss",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
 					g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)
@@ -95,13 +149,6 @@ var AllReplacementRules = []*ReplacementRule{
 			{
 				Name: "Treasure",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddNodeTagByCoords(crds[1], graph_element.TagTreasure)
-				},
-			},
-			{
-				Name: "Secret Treasure",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
 					g.AddNodeTagByCoords(crds[1], graph_element.TagTreasure)
 				},
 			},
@@ -132,7 +179,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableNodeByCoords(applyAt[1])
 			g.EnableNodeByCoords(applyAt[2])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[2])
-			g.SwapNodeTags(applyAt[0], applyAt[2])
+			moveRandomNodeTag(g, applyAt[0], applyAt[2])
 			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidirectional)
 			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidirectional)
 		},
@@ -176,7 +223,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[1])
 		},
-		OptionalFeatures: []*FeatureAdder{
+		MandatoryFeatures: []*FeatureAdder{
 			{
 				Name: "SecretPassage",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -191,6 +238,20 @@ var AllReplacementRules = []*ReplacementRule{
 				Name: "One-Time Passage",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
 					g.AddEdgeTagByCoords(crds[0], crds[2], graph_element.TagOnetimeEdge)
+				},
+			},
+		},
+		OptionalFeatures: []*FeatureAdder{
+			{
+				Name: "Boss",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[2], graph_element.TagBoss)
+				},
+			},
+			{
+				Name: "Treasure",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[2], graph_element.TagTreasure)
 				},
 			},
 		},
@@ -230,14 +291,41 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[3])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
-			g.SwapEdgeTags(applyAt[0], applyAt[1], applyAt[3], applyAt[1])
 			g.SetLinkBetweenCoords(applyAt[0][0], applyAt[0][1], applyAt[1][0], applyAt[1][1], false)
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Swap 01-02",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.SwapEdgeTags(crds[0], crds[1], crds[0], crds[2])
+				},
+			},
+			{
+				Name: "Swap 01-23",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.SwapEdgeTags(crds[0], crds[1], crds[2], crds[3])
+				},
+			},
+			{
+				Name: "Swap 01-31",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.SwapEdgeTags(crds[0], crds[1], crds[3], crds[1])
+				},
+			},
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "Boss",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddNodeTagByCoords(crds[3], graph_element.TagBoss)
+					ind := rnd.Rand(2) + 2
+					g.AddNodeTagByCoords(crds[ind], graph_element.TagBoss)
+				},
+			},
+			{
+				Name: "Window",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.EnableDirectionalLinkBetweenCoords(crds[0], crds[1])
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagWindowEdge)
 				},
 			},
 		},
@@ -247,7 +335,7 @@ var AllReplacementRules = []*ReplacementRule{
 	// V       >   V   V
 	// 1   3       1 < 3
 	{
-		Name:                "D-RULE",
+		Name:                "LOOP-RULE",
 		AddsCycle:           true,
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -278,16 +366,26 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[3])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
-			g.CopyEdgeTagsPreservingIds(applyAt[0], applyAt[1], applyAt[0], applyAt[2])
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Copy 01-02",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.CopyEdgeTagsPreservingIds(crds[0], crds[1], crds[0], crds[2])
+				},
+			},
+			{
+				Name: "Secret",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[2], graph_element.TagSecretEdge)
+				},
+			},
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
-				Name: "SecretOrMaybeDanger",
+				Name: "Danger",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
-					if rnd.Rand(3) < 2 {
-						AddRandomHazardAt(g, crds[3])
-					}
+					AddRandomHazardAt(g, crds[3])
 				},
 			},
 		},
@@ -329,6 +427,8 @@ var AllReplacementRules = []*ReplacementRule{
 			g.DisableDirectionalLinkBetweenCoords(applyAt[1], applyAt[0])
 			g.DisableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
 			g.SwapNodeTags(applyAt[3], applyAt[0])
+			g.CopyEdgeTagsPreservingIds(applyAt[1], applyAt[0], applyAt[1], applyAt[3])
+			g.CopyEdgeTagsPreservingIds(applyAt[0], applyAt[2], applyAt[3], applyAt[2])
 			g.ResetNodeAndConnections(applyAt[0])
 			g.FinalizeNode(applyAt[0])
 		},
@@ -379,6 +479,14 @@ var AllReplacementRules = []*ReplacementRule{
 					g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)
 					g.AddNodeTagByCoords(crds[2], graph_element.TagTreasure)
 					g.AddEdgeTagByCoords(crds[2], crds[0], graph_element.TagSecretEdge)
+				},
+			},
+			{
+				Name: "ForcedBoss",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[3], graph_element.TagBoss)
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagOnetimeEdge)
+					g.AddEdgeTagByCoords(crds[2], crds[0], graph_element.TagOnetimeEdge)
 				},
 			},
 		},
@@ -432,6 +540,43 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[4])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[4], applyAt[5])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[5], applyAt[2])
+			if !g.DoesNodeHaveAnyTags(applyAt[1].Unwrap()) {
+				AddRandomHazardAt(g, applyAt[1])
+			}
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			nil,
+			{
+				Name: "Secret",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[3], graph_element.TagSecretEdge)
+				},
+			},
+			{
+				Name: "Keyed",
+				PrepareFeature: func(g *Graph, crds ...Coords) {
+					addKeyAtRandom(g)
+				},
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[3], graph_element.TagLockedEdge)
+					g.AddEdgeTagByCoordsPreserveLastId(crds[5], crds[2], graph_element.TagLockedEdge)
+				},
+			},
+			// {
+			// 	Name: "OneTime",
+			// 	ApplyFeature: func(g *Graph, crds ...Coords) {
+			// 		g.AddEdgeTagByCoords(crds[0], crds[3], graph_element.TagOnetimeEdge)
+			// 		g.AddEdgeTagByCoords(crds[5], crds[2], graph_element.TagOnetimeEdge)
+			// 	},
+			// },
+		},
+		OptionalFeatures: []*FeatureAdder{
+			{
+				Name: "Danger",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					AddRandomHazardAt(g, crds[4])
+				},
+			},
 		},
 	},
 }

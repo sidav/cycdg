@@ -35,6 +35,11 @@ func (g *Graph) AddEdgeTagByCoords(c1, c2 Coords, tag TagKind) {
 	edge.AddTag(tag, id)
 }
 
+func (g *Graph) AddEdgeTagByCoordsPreserveLastId(c1, c2 Coords, tag TagKind) {
+	g.AppliedTags[tag]--
+	g.AddEdgeTagByCoords(c1, c2, tag)
+}
+
 func (g *Graph) AddTagToAllActiveEdgesAtCoords(t TagKind, crds Coords) {
 	x, y := crds.Unwrap()
 	for _, dir := range cardinalDirections {

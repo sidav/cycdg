@@ -7,6 +7,7 @@ const (
 	TagStart = iota
 	TagGoal
 	TagKeyForEdge
+	TagHalfkey // for TagBilockedEdge
 	TagBoss
 	TagTreasure
 	TagHazard
@@ -14,7 +15,7 @@ const (
 	TagTeleportBidirectional
 	// Edge tags
 	TagLockedEdge
-	TagBilockedEdge // requires two keys of same id
+	TagBilockedEdge // requires two Halfkeys of same id
 	TagWindowEdge   // can be seen through, but not passable
 	TagOnetimeEdge  // one-time passage
 	TagSecretEdge

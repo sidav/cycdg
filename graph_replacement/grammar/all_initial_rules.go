@@ -66,8 +66,8 @@ var AllInitialRules = []InitialRule{
 						return g.IsNodeActive(i, j) && !crds1.EqualsPair(i, j) && !crds1.IsAdjacentToXY(i, j) &&
 							(goalCrd.IsAdjacentToXY(i, j) || startCrd.IsAdjacentToXY(i, j))
 					})
-					g.AddNodeTagByCoords(crds1, TagKeyForEdge)
-					g.AddNodeTagByCoordsPreserveLastId(crds2, TagKeyForEdge)
+					g.AddNodeTagByCoords(crds1, TagHalfkey)
+					g.AddNodeTagByCoordsPreserveLastId(crds2, TagHalfkey)
 					PushNodeContentsInRandomDirectionWithEdgeTag(g, goalCrd, TagBilockedEdge)
 				},
 			},

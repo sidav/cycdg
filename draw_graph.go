@@ -76,7 +76,7 @@ func drawNodeAt(g *graph.Graph, nx, ny int) {
 	cw.DrawFilledRect(' ', x, y, nodeWidth-1, nodeHeight-1)
 	drawNodeEdges(g, nx, ny)
 	for i, tag := range g.NodeAt(nx, ny).GetTags() {
-		str := GetTagIdiomAndSetColor(tag)
+		str := GetNodeTagIdiomAndSetColor(tag)
 		cw.PutStringCenteredAt(str, x+halfNodeWidth, y+i)
 	}
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d", g.CountEdgesAt(nx, ny)), x+halfNodeWidth, y+nodeHeight-2)
@@ -130,7 +130,7 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 	switch tag.Kind {
 	case TagLockedEdge:
 		char = rune(fmt.Sprintf("%d", tag.Id)[0])
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGreen)
 	case TagBilockedEdge:
 		char = rune(fmt.Sprintf("%d", tag.Id)[0])
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkMagenta)
@@ -139,7 +139,7 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 		cw.SetStyle(tcell.ColorWhite, tcell.ColorBlack)
 	case TagSecretEdge:
 		char = '?'
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGreen)
+		cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
 	case TagOnetimeEdge:
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 		return false, ' '
@@ -149,7 +149,7 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 	return true, char
 }
 
-func GetTagIdiomAndSetColor(t *Tag) string {
+func GetNodeTagIdiomAndSetColor(t *Tag) string {
 	str := "?????"
 	switch t.Kind {
 	case TagStart:
@@ -161,6 +161,9 @@ func GetTagIdiomAndSetColor(t *Tag) string {
 	case TagKeyForEdge:
 		str = "KEY"
 		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)
+	case TagHalfkey:
+		str = "HKEY"
+		cw.SetStyle(tcell.ColorDarkMagenta, tcell.ColorDarkBlue)
 	case TagBoss:
 		str = "BOSS"
 		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
