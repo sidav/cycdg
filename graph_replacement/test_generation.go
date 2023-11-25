@@ -43,12 +43,18 @@ func showRulesInfo() string {
 		variants += len(r.MandatoryFeatures)
 	}
 	str := fmt.Sprintf("Total initial rules %d (%d counting all the features)\n", len(grammar.AllInitialRules), variants)
-	variants = 0
+
+	mandatory := 0
+	features := 0
+	totalVariants := 0
 	for _, r := range grammar.AllReplacementRules {
-		variants++
-		variants += len(r.OptionalFeatures)
+		mandatory += max(1, len(r.MandatoryFeatures))
+		features += len(r.OptionalFeatures)
+		totalVariants += max(1, len(r.MandatoryFeatures)) * (1 + len(r.OptionalFeatures))
 	}
-	str += fmt.Sprintf("Total replacement rules %d (%d counting all the features)\n", len(grammar.AllReplacementRules), variants)
+	str += fmt.Sprintf("Total replacement rules %d - %d variants of each, total %d optional features\n",
+		len(grammar.AllReplacementRules), mandatory, features)
+	str += fmt.Sprintf("Total replacement rules variants: %d\n", totalVariants)
 	return str
 }
 

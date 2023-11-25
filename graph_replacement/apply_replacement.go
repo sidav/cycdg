@@ -53,6 +53,11 @@ func (ra *GraphReplacementApplier) ApplyRandomReplacementRuleToTheGraph() {
 func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, applicableCoords [][]Coords) {
 	crds := applicableCoords[rnd.Rand(len(applicableCoords))]
 
+	selectedMandatoryFeature := ra.SelectRandomMandatoryFeatureToApply(rule)
+	if selectedMandatoryFeature != nil && selectedMandatoryFeature.PrepareFeature != nil {
+		selectedMandatoryFeature.PrepareFeature(ra.graph, crds...)
+	}
+
 	// Set random optional feature to be added if needed
 	selectedOptionalFeature := ra.SelectRandomOptionalFeatureToApply(rule)
 	if selectedOptionalFeature != nil && selectedOptionalFeature.PrepareFeature != nil {
@@ -61,6 +66,9 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 
 	rule.ApplyToGraph(ra.graph, crds...)
 
+	if selectedMandatoryFeature != nil && selectedMandatoryFeature.ApplyFeature != nil {
+		selectedMandatoryFeature.ApplyFeature(ra.graph, crds...)
+	}
 	if selectedOptionalFeature != nil && selectedOptionalFeature.ApplyFeature != nil {
 		selectedOptionalFeature.ApplyFeature(ra.graph, crds...)
 	}
@@ -70,7 +78,8 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 		ra.CyclesCount++
 	}
 	ra.AppliedRulesCount++
-	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(rule, nil, selectedOptionalFeature, crds))
+	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(
+		rule, selectedMandatoryFeature, selectedOptionalFeature, crds))
 
 	// checking graph sanity (are there any bad graph patterns after the rule?)
 	sane, errs := ra.graph.TestSanity()

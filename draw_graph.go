@@ -36,12 +36,14 @@ func drawGraph(gen *replacement.GraphReplacementApplier) {
 
 func printInfo(gen *replacement.GraphReplacementApplier) {
 	w, _ := gen.GetGraph().GetSize()
-	cw.ResetStyle()
+	cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
 	cw.PutStringf(w*(nodeWidth+nodeSpacing), 0, "%d rules, %d cycles, filled: %d%%",
 		gen.AppliedRulesCount, gen.CyclesCount, gen.GetGraph().GetFilledNodesPercentage())
 	cw.PutString("Applied rules: ", w*(nodeWidth+nodeSpacing), 1)
 	for i := range gen.AppliedRules {
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
 		cw.PutStringf(w*(nodeWidth+nodeSpacing), (i*2)+2, "%d:%s", i, gen.AppliedRules[i].StringifyRule())
+		cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
 		cw.PutStringf(w*(nodeWidth+nodeSpacing), (i*2+1)+2, "  %s", gen.AppliedRules[i].StringifyCoords())
 	}
 }
