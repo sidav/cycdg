@@ -41,7 +41,8 @@ func printInfo(gen *replacement.GraphReplacementApplier) {
 		gen.AppliedRulesCount, gen.CyclesCount, gen.GetGraph().GetFilledNodesPercentage())
 	cw.PutString("Applied rules: ", w*(nodeWidth+nodeSpacing), 1)
 	for i := range gen.AppliedRules {
-		cw.PutStringf(w*(nodeWidth+nodeSpacing), i+2, "%d:%s", i, gen.AppliedRules[i])
+		cw.PutStringf(w*(nodeWidth+nodeSpacing), (i*2)+2, "%d:%s", i, gen.AppliedRules[i].StringifyRule())
+		cw.PutStringf(w*(nodeWidth+nodeSpacing), (i*2+1)+2, "  %s", gen.AppliedRules[i].StringifyCoords())
 	}
 }
 

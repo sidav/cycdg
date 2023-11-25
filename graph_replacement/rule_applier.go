@@ -17,7 +17,7 @@ type GraphReplacementApplier struct {
 	CyclesCount          int
 	AppliedRulesCount    int
 	AppliedFeaturesCount int
-	AppliedRules         []string
+	AppliedRules         []*AppliedRuleInfo
 }
 
 func (gra *GraphReplacementApplier) GetGraph() *graph.Graph {

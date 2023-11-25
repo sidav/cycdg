@@ -70,7 +70,7 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 		ra.CyclesCount++
 	}
 	ra.AppliedRulesCount++
-	ra.AppliedRules = append(ra.AppliedRules, ra.makeAppliedRuleString(rule, nil, selectedOptionalFeature, crds))
+	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(rule, nil, selectedOptionalFeature, crds))
 
 	// checking graph sanity (are there any bad graph patterns after the rule?)
 	sane, errs := ra.graph.TestSanity()
@@ -94,13 +94,4 @@ func (ra *GraphReplacementApplier) SelectRandomMandatoryFeatureToApply(rule *Rep
 		mandatoryFeature = rule.MandatoryFeatures[rnd.Rand(len(rule.MandatoryFeatures))]
 	}
 	return mandatoryFeature
-}
-
-func (ra *GraphReplacementApplier) makeAppliedRuleString(
-	rule *ReplacementRule, mandatory, optional *FeatureAdder, coords []Coords) string {
-	ruleString := rule.Name
-	if optional != nil {
-		ruleString += "+" + optional.Name
-	}
-	return sprintf("%-15s at %v", ruleString, coords)
 }

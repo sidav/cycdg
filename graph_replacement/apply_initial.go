@@ -20,5 +20,5 @@ func (gra *GraphReplacementApplier) applyInitialRule(rule *InitialRule) {
 		gra.CyclesCount++
 	}
 	gra.AppliedRulesCount++
-	gra.AppliedRules = append(gra.AppliedRules, sprintf("%-10s at %d,%d", rule.Name+"+"+appliedFeature.Name, x, y))
+	gra.AppliedRules = append(gra.AppliedRules, newAppliedRuleInfoInitial(rule, appliedFeature, x, y))
 }
