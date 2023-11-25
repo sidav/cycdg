@@ -14,7 +14,7 @@ func (gra *GraphReplacementApplier) ApplyRandomInitialRule() {
 func (gra *GraphReplacementApplier) applyInitialRule(rule *InitialRule) {
 	x, y := rule.GetRandomApplicableCoordsForGraph(gra.graph)
 	rule.ApplyOnGraphAt(gra.graph, x, y)
-	appliedFeature := rule.Features[rnd.Rand(len(rule.Features))]
+	appliedFeature := rule.MandatoryFeatures[rnd.Rand(len(rule.MandatoryFeatures))]
 	appliedFeature.ApplyFeature(gra.graph)
 	if rule.AddsCycle {
 		gra.graph.CyclesCount++

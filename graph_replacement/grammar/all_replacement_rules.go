@@ -41,7 +41,7 @@ var AllReplacementRules = []*ReplacementRule{
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
 		},
-		Features: []*FeatureAdder{
+		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "Secret Passage",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -76,7 +76,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableNode(applyAt[1][0], applyAt[1][1])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
 		},
-		Features: []*FeatureAdder{
+		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "Keyed",
 				PrepareFeature: func(g *Graph, crds ...Coords) {
@@ -136,7 +136,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidirectional)
 			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidirectional)
 		},
-		Features: []*FeatureAdder{
+		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "Boss",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -176,7 +176,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[1])
 		},
-		Features: []*FeatureAdder{
+		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "SecretPassage",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -233,7 +233,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.SwapEdgeTags(applyAt[0], applyAt[1], applyAt[3], applyAt[1])
 			g.SetLinkBetweenCoords(applyAt[0][0], applyAt[0][1], applyAt[1][0], applyAt[1][1], false)
 		},
-		Features: []*FeatureAdder{
+		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "Boss",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -280,7 +280,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
 			g.CopyEdgeTagsPreservingIds(applyAt[0], applyAt[1], applyAt[0], applyAt[2])
 		},
-		Features: []*FeatureAdder{
+		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "SecretOrMaybeDanger",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -372,7 +372,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[2])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[0])
 		},
-		Features: []*FeatureAdder{
+		OptionalFeatures: []*FeatureAdder{
 			{
 				Name: "SecretOrHazard",
 				ApplyFeature: func(g *Graph, crds ...Coords) {

@@ -54,19 +54,19 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 	crds := applicableCoords[rnd.Rand(len(applicableCoords))]
 
 	// Set random feature to be added if needed
-	addFeature := ra.shouldFeatureBeAdded() && len(rule.Features) > 0
+	addFeature := ra.shouldFeatureBeAdded() && len(rule.OptionalFeatures) > 0
 	featureIndex := 0
 	if addFeature {
-		featureIndex = rnd.Rand(len(rule.Features))
-		if rule.Features[featureIndex].PrepareFeature != nil {
-			rule.Features[featureIndex].PrepareFeature(ra.graph, crds...)
+		featureIndex = rnd.Rand(len(rule.OptionalFeatures))
+		if rule.OptionalFeatures[featureIndex].PrepareFeature != nil {
+			rule.OptionalFeatures[featureIndex].PrepareFeature(ra.graph, crds...)
 		}
 	}
 
 	rule.ApplyToGraph(ra.graph, crds...)
 
-	if addFeature && rule.Features[featureIndex].ApplyFeature != nil {
-		rule.Features[featureIndex].ApplyFeature(ra.graph, crds...)
+	if addFeature && rule.OptionalFeatures[featureIndex].ApplyFeature != nil {
+		rule.OptionalFeatures[featureIndex].ApplyFeature(ra.graph, crds...)
 	}
 
 	// update stats
@@ -76,7 +76,7 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 	ra.graph.AppliedRulesCount++
 	if addFeature {
 		ra.graph.AppliedRules = append(ra.graph.AppliedRules,
-			sprintf("%-15s at %v", (rule.Name+"+"+rule.Features[featureIndex].Name), crds))
+			sprintf("%-15s at %v", (rule.Name+"+"+rule.OptionalFeatures[featureIndex].Name), crds))
 		ra.graph.AppliedFeaturesCount++
 	} else {
 		ra.graph.AppliedRules = append(ra.graph.AppliedRules, sprintf("%-10s at %v", rule.Name, crds))

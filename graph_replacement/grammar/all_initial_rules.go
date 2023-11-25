@@ -30,7 +30,7 @@ var AllInitialRules = []InitialRule{
 			g.AddNodeTagByCoords(start, TagStart)
 			g.AddNodeTagByCoords(goal, TagGoal)
 		},
-		Features: []*FeatureAdder{
+		MandatoryFeatures: []*FeatureAdder{
 			{
 				Name: "Alt paths w hazards",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -96,7 +96,7 @@ var AllInitialRules = []InitialRule{
 			g.AddNodeTagByCoords(start, TagStart)
 			g.AddNodeTagByCoords(goal, TagGoal)
 		},
-		Features: []*FeatureAdder{
+		MandatoryFeatures: []*FeatureAdder{
 			{
 				Name: "Foresee",
 				ApplyFeature: func(g *Graph, crds ...Coords) {

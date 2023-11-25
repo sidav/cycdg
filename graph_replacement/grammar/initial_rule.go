@@ -8,9 +8,9 @@ type InitialRule struct {
 	AddsCycle bool
 
 	// funcs:
-	IsApplicableAt func(g *Graph, x, y int) bool
-	ApplyOnGraphAt func(g *Graph, x, y int)
-	Features       []*FeatureAdder // They're mandatory to apply!
+	IsApplicableAt    func(g *Graph, x, y int) bool
+	ApplyOnGraphAt    func(g *Graph, x, y int)
+	MandatoryFeatures []*FeatureAdder // One (and only) of them SHOULD apply!
 }
 
 func (r *InitialRule) IsApplicableForGraph(g *Graph) bool {

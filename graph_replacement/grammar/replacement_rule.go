@@ -18,7 +18,7 @@ type ReplacementRule struct {
 
 	applicabilityFuncs []func(g *Graph, x, y int, prevСoords ...Coords) bool
 	ApplyToGraph       func(g *Graph, applyAt ...Coords)
-	Features           []*FeatureAdder
+	OptionalFeatures   []*FeatureAdder
 }
 
 func (ir *ReplacementRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
