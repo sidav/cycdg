@@ -11,10 +11,10 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 		func(i int) int {
 			r := AllReplacementRules[i]
 			if r.AddsCycle {
-				if ra.MinCycles > ra.graph.CyclesCount {
+				if ra.MinCycles > ra.CyclesCount {
 					return 2 // ra.graph.AppliedRulesCount
 				}
-				if ra.MaxCycles <= ra.graph.CyclesCount {
+				if ra.MaxCycles <= ra.CyclesCount {
 					return 0
 				}
 			}
@@ -25,10 +25,10 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 
 func (ra *GraphReplacementApplier) shouldFeatureBeAdded() bool {
 	// TODO: rework :(
-	if ra.DesiredFeatures <= ra.graph.AppliedFeaturesCount {
+	if ra.DesiredFeatures <= ra.AppliedFeaturesCount {
 		return false
 	}
-	featuresPerc := (100*ra.graph.AppliedFeaturesCount + ra.DesiredFeatures/2) / ra.DesiredFeatures
+	featuresPerc := (100*ra.AppliedFeaturesCount + ra.DesiredFeatures/2) / ra.DesiredFeatures
 	return rnd.Rand(120) > featuresPerc
 }
 
@@ -67,10 +67,10 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 
 	// update stats
 	if rule.AddsCycle {
-		ra.graph.CyclesCount++
+		ra.CyclesCount++
 	}
-	ra.graph.AppliedRulesCount++
-	ra.graph.AppliedRules = append(ra.graph.AppliedRules, ra.makeAppliedRuleString(rule, nil, selectedOptionalFeature, crds))
+	ra.AppliedRulesCount++
+	ra.AppliedRules = append(ra.AppliedRules, ra.makeAppliedRuleString(rule, nil, selectedOptionalFeature, crds))
 
 	// checking graph sanity (are there any bad graph patterns after the rule?)
 	sane, errs := ra.graph.TestSanity()

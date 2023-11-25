@@ -12,6 +12,12 @@ type GraphReplacementApplier struct {
 	graph                *graph.Graph
 	MinCycles, MaxCycles int
 	DesiredFeatures      int
+
+	// Some meta-info on applied rules
+	CyclesCount          int
+	AppliedRulesCount    int
+	AppliedFeaturesCount int
+	AppliedRules         []string
 }
 
 func (gra *GraphReplacementApplier) GetGraph() *graph.Graph {
@@ -28,6 +34,10 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	if gra.DesiredFeatures == 0 {
 		gra.DesiredFeatures = 5
 	}
+	gra.AppliedRules = nil
+	gra.AppliedRulesCount = 0
+	gra.AppliedFeaturesCount = 0
+	gra.CyclesCount = 0
 	rnd = r
 	grammar.SetRandom(rnd)
 	gra.graph = &graph.Graph{}

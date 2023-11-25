@@ -44,7 +44,7 @@ func main() {
 			}
 		}
 
-		drawGraph(gen.GetGraph())
+		drawGraph(&gen)
 		cw.FlushScreen()
 		key = cw.ReadKey()
 	}

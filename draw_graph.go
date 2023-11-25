@@ -1,6 +1,7 @@
 package main
 
 import (
+	replacement "cycdg/graph_replacement"
 	graph "cycdg/graph_replacement/grid_graph"
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 	"fmt"
@@ -21,21 +22,26 @@ var (
 	edgeDirections = [2][2]int{{1, 0}, {0, 1}}
 )
 
-func drawGraph(g *graph.Graph) {
+func drawGraph(gen *replacement.GraphReplacementApplier) {
 	cw.ClearScreen()
-	w, h := g.GetSize()
-	drawCoords(g)
+	w, h := gen.GetGraph().GetSize()
+	drawCoords(gen.GetGraph())
 	for nx := 0; nx < w; nx++ {
 		for ny := 0; ny < h; ny++ {
-			drawNodeAt(g, nx, ny)
+			drawNodeAt(gen.GetGraph(), nx, ny)
 		}
 	}
+	printInfo(gen)
+}
+
+func printInfo(gen *replacement.GraphReplacementApplier) {
+	w, _ := gen.GetGraph().GetSize()
 	cw.ResetStyle()
 	cw.PutStringf(w*(nodeWidth+nodeSpacing), 0, "%d rules, %d cycles, filled: %d%%",
-		g.AppliedRulesCount, g.CyclesCount, g.GetFilledNodesPercentage())
+		gen.AppliedRulesCount, gen.CyclesCount, gen.GetGraph().GetFilledNodesPercentage())
 	cw.PutString("Applied rules: ", w*(nodeWidth+nodeSpacing), 1)
-	for i := range g.AppliedRules {
-		cw.PutStringf(w*(nodeWidth+nodeSpacing), i+2, "%d:%s", i, g.AppliedRules[i])
+	for i := range gen.AppliedRules {
+		cw.PutStringf(w*(nodeWidth+nodeSpacing), i+2, "%d:%s", i, gen.AppliedRules[i])
 	}
 }
 

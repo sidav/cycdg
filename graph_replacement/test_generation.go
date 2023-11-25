@@ -23,7 +23,7 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
 			gen.ApplyRandomReplacementRuleToTheGraph()
 		}
-		appliedRules += gen.GetGraph().AppliedRulesCount
+		appliedRules += gen.AppliedRulesCount
 		progressBarCLI("Benchmarking", i+1, tests+1, 20)
 	}
 	totalGenTime := time.Since(start)

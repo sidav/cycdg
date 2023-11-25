@@ -6,20 +6,12 @@ import (
 
 // graph with nodes placed at 2D grid
 type Graph struct {
-	nodes                [][]*Node
-	CyclesCount          int
-	AppliedRulesCount    int
-	AppliedFeaturesCount int
-	AppliedRules         []string
-	AppliedTags          map[TagKind]int
+	nodes       [][]*Node
+	AppliedTags map[TagKind]int
 }
 
 func (g *Graph) Init(w, h int) {
-	g.AppliedRules = nil
-	g.AppliedRulesCount = 0
-	g.AppliedFeaturesCount = 0
 	g.AppliedTags = make(map[TagKind]int)
-	g.CyclesCount = 0
 	g.nodes = make([][]*Node, w)
 	for x := range g.nodes {
 		g.nodes[x] = make([]*Node, h)

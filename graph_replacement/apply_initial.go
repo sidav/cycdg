@@ -17,8 +17,8 @@ func (gra *GraphReplacementApplier) applyInitialRule(rule *InitialRule) {
 	appliedFeature := rule.MandatoryFeatures[rnd.Rand(len(rule.MandatoryFeatures))]
 	appliedFeature.ApplyFeature(gra.graph)
 	if rule.AddsCycle {
-		gra.graph.CyclesCount++
+		gra.CyclesCount++
 	}
-	gra.graph.AppliedRulesCount++
-	gra.graph.AppliedRules = append(gra.graph.AppliedRules, sprintf("%-10s at %d,%d", rule.Name+"+"+appliedFeature.Name, x, y))
+	gra.AppliedRulesCount++
+	gra.AppliedRules = append(gra.AppliedRules, sprintf("%-10s at %d,%d", rule.Name+"+"+appliedFeature.Name, x, y))
 }
