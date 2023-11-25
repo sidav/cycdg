@@ -78,6 +78,15 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		Features: []*FeatureAdder{
 			{
+				Name: "Keyed",
+				PrepareFeature: func(g *Graph, crds ...Coords) {
+					addKeyAtRandom(g)
+				},
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagLockedEdge)
+				},
+			},
+			{
 				Name: "Boss",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
 					g.AddNodeTagByCoords(crds[1], graph_element.TagBoss)

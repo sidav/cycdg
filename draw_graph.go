@@ -134,6 +134,8 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 	case TagOnetimeEdge:
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 		return false, ' '
+	default:
+		panic("Unknown edge tag!")
 	}
 	return true, char
 }
@@ -165,6 +167,8 @@ func GetTagIdiomAndSetColor(t *Tag) string {
 	case TagTeleportBidirectional:
 		str = "TELE"
 		cw.SetStyle(tcell.ColorDarkCyan, tcell.ColorDarkBlue)
+	default:
+		panic("Unknown node tag!")
 	}
 	return fmt.Sprintf("%s%d", str, t.Id)
 }
