@@ -5,9 +5,8 @@ import (
 	"cycdg/lib/random"
 	"cycdg/lib/random/pcgrandom"
 	"cycdg/lib/tcell_console_wrapper"
+	"flag"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -52,39 +51,17 @@ func main() {
 
 // returns true if the program should exit
 func execArgs() bool {
-	exit := false
-	tests := 1000
-	fill = 70
+	benchOnly := false
+	var testMapsCount int
+	flag.IntVar(&width, "w", 5, "Graph width")
+	flag.IntVar(&height, "h", 5, "Graph height")
+	flag.IntVar(&fill, "fill", 70, "Fill percentage")
+	flag.BoolVar(&benchOnly, "b", false, "Run benchmark only")
+	flag.IntVar(&testMapsCount, "total", 1000, "Generated maps count")
+	flag.Parse()
 
-	argsCount := len(os.Args)
-	if argsCount != 1 && argsCount != 3 && argsCount != 5 {
-		fmt.Println("USAGE: ")
-		fmt.Println("  Generation: go run *.go [graph width] [graph height]")
-		fmt.Println("  Benchmark:  go run *.go [graph width] [graph height] [total generated graphs] [desired fill percentage]")
-		return true
+	if testMapsCount > 0 {
+		testResultString = replacement.TestGen(rnd, width, height, testMapsCount, fill)
 	}
-
-	if len(os.Args) <= 1 {
-		width, height = 5, 5
-	} else if len(os.Args) > 2 {
-		for i := range os.Args {
-			if i == 0 {
-				continue
-			}
-			if _, err := strconv.Atoi(os.Args[i]); err != nil {
-				fmt.Println("Please use numbers as args.")
-				return true
-			}
-		}
-		width, _ = strconv.Atoi(os.Args[1])
-		height, _ = strconv.Atoi(os.Args[2])
-	}
-	if len(os.Args) > 3 {
-		tests, _ = strconv.Atoi(os.Args[3])
-		fill, _ = strconv.Atoi(os.Args[4])
-		exit = true
-	}
-
-	testResultString = replacement.TestGen(rnd, width, height, tests, fill)
-	return exit
+	return benchOnly
 }

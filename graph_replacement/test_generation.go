@@ -30,8 +30,8 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	testResultString = showRulesInfo()
 	testResultString += fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, width, height, fillPerc)
 	testResultString += fmt.Sprintf("Total time %v, mean time per single gen %v\n", totalGenTime, totalGenTime/time.Duration(tests))
-	testResultString += fmt.Sprintf("Total rules applied %d, mean time per rule %v\n",
-		appliedRules, totalGenTime/time.Duration(appliedRules))
+	testResultString += fmt.Sprintf("Total rules applied %d, mean %d rules per map, mean time per rule %v\n",
+		appliedRules, (appliedRules+tests/2)/tests, totalGenTime/time.Duration(appliedRules))
 
 	return
 }
@@ -52,7 +52,7 @@ func showRulesInfo() string {
 		features += len(r.OptionalFeatures)
 		totalVariants += max(1, len(r.MandatoryFeatures)) * (1 + len(r.OptionalFeatures))
 	}
-	str += fmt.Sprintf("Total replacement rules %d - %d variants of each, total %d optional features\n",
+	str += fmt.Sprintf("Total replacement rules %d (%d with variants), total %d optional features\n",
 		len(grammar.AllReplacementRules), mandatory, features)
 	str += fmt.Sprintf("Total replacement rules variants: %d\n", totalVariants)
 	return str
