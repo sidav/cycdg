@@ -140,8 +140,11 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 	case TagSecretEdge:
 		char = '?'
 		cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
-	case TagOnetimeEdge:
+	case TagOneTimeEdge:
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
+		return false, ' '
+	case TagOneWayEdge:
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
 		return false, ' '
 	default:
 		panic("Unknown edge tag!")
@@ -154,12 +157,12 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 	switch t.Kind {
 	case TagStart:
 		cw.SetStyle(tcell.ColorWhite, tcell.ColorDarkBlue)
-		return "STRT"
+		return "START"
 	case TagGoal:
 		cw.SetStyle(tcell.ColorWhite, tcell.ColorDarkBlue)
 		return "GOAL"
 	case TagKeyForEdge:
-		str = "KEY"
+		str = "KEY "
 		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)
 	case TagHalfkey:
 		str = "HKEY"

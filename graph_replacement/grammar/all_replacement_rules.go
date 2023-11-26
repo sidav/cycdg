@@ -70,27 +70,10 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
-			{
-				Name: "Keyed",
-				PrepareFeature: func(g *Graph, crds ...Coords) {
-					addKeyAtRandom(g)
-				},
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagLockedEdge)
-				},
-			},
-			{
-				Name: "Secret Passage",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
-				},
-			},
-			{
-				Name: "One-Time Passage",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagOnetimeEdge)
-				},
-			},
+			makeKeyLockFeature(0, 1),
+			makeSecretPassageFeature(0, 1),
+			makeOneTimePassageFeature(0, 1),
+			makeOneWayPassagesFeature(0, 1, 0, 1), // repeat on purpose
 		},
 	},
 
@@ -117,27 +100,9 @@ var AllReplacementRules = []*ReplacementRule{
 			}
 		},
 		MandatoryFeatures: []*FeatureAdder{
-			{
-				Name: "Keyed",
-				PrepareFeature: func(g *Graph, crds ...Coords) {
-					addKeyAtRandom(g)
-				},
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagLockedEdge)
-				},
-			},
-			{
-				Name: "Secret Passage",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagSecretEdge)
-				},
-			},
-			{
-				Name: "One-Time Passage",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagOnetimeEdge)
-				},
-			},
+			makeKeyLockFeature(0, 1),
+			makeSecretPassageFeature(0, 1),
+			makeOneTimePassageFeature(0, 1),
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
@@ -224,6 +189,8 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
+			makeOneTimePassageFeature(0, 2),
+			makeOneWayPassagesFeature(0, 2, 2, 1),
 			{
 				Name: "SecretPassage",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -232,12 +199,6 @@ var AllReplacementRules = []*ReplacementRule{
 					if rnd.Rand(2) == 0 {
 						AddRandomHazardAt(g, crds[2])
 					}
-				},
-			},
-			{
-				Name: "One-Time Passage",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[2], graph_element.TagOnetimeEdge)
 				},
 			},
 		},
@@ -374,12 +335,8 @@ var AllReplacementRules = []*ReplacementRule{
 					g.CopyEdgeTagsPreservingIds(crds[0], crds[1], crds[0], crds[2])
 				},
 			},
-			{
-				Name: "Secret",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[2], graph_element.TagSecretEdge)
-				},
-			},
+			makeSecretPassageFeature(0, 2),
+			makeOneWayPassagesFeature(0, 2, 3, 1),
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
@@ -473,6 +430,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[0])
 		},
 		OptionalFeatures: []*FeatureAdder{
+			makeOneWayPassagesFeature(0, 1, 2, 0),
 			{
 				Name: "SecretOrHazard",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -485,8 +443,8 @@ var AllReplacementRules = []*ReplacementRule{
 				Name: "ForcedBoss",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
 					g.AddNodeTagByCoords(crds[3], graph_element.TagBoss)
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagOnetimeEdge)
-					g.AddEdgeTagByCoords(crds[2], crds[0], graph_element.TagOnetimeEdge)
+					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagOneTimeEdge)
+					g.AddEdgeTagByCoords(crds[2], crds[0], graph_element.TagOneTimeEdge)
 				},
 			},
 		},
@@ -546,22 +504,9 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			nil,
-			{
-				Name: "Secret",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[3], graph_element.TagSecretEdge)
-				},
-			},
-			{
-				Name: "Keyed",
-				PrepareFeature: func(g *Graph, crds ...Coords) {
-					addKeyAtRandom(g)
-				},
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddEdgeTagByCoords(crds[0], crds[3], graph_element.TagLockedEdge)
-					g.AddEdgeTagByCoordsPreserveLastId(crds[5], crds[2], graph_element.TagLockedEdge)
-				},
-			},
+			makeSecretPassageFeature(0, 3),
+			makeOneKeyTwoLocksFeature(0, 3, 5, 2),
+			makeOneWayPassagesFeature(0, 3, 5, 2),
 			// {
 			// 	Name: "OneTime",
 			// 	ApplyFeature: func(g *Graph, crds ...Coords) {

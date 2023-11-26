@@ -17,7 +17,8 @@ const (
 	TagLockedEdge
 	TagBilockedEdge // requires two Halfkeys of same id
 	TagWindowEdge   // can be seen through, but not passable
-	TagOnetimeEdge  // one-time passage
+	TagOneTimeEdge  // one-time passage
+	TagOneWayEdge   // can be passed only in one direction (or maybe a door that opens from only one side?)
 	TagSecretEdge
 )
 

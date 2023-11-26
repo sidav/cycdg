@@ -24,8 +24,3 @@ func addKeyAtRandom(g *Graph) {
 	})
 	g.AddNodeTagByCoords(crd, TagKeyForEdge)
 }
-
-func addKeyLockFeature(g *Graph, keyCoords, lockBetween1, lockBetween2 Coords) {
-	g.AddNodeTagByCoords(keyCoords, TagKeyForEdge)
-	g.AddEdgeTagByCoords(lockBetween1, lockBetween2, TagLockedEdge)
-}
