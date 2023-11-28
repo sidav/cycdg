@@ -48,6 +48,21 @@ func makeMasterKeyLockFeature(lockBetweenIndex1, lockBetweenIndex2 int) *Feature
 	}
 }
 
+func makeTwoMasterKeyLocksFeature(lock1ind1, lock1ind2, lock2ind1, lock2ind2 int) *FeatureAdder {
+	return &FeatureAdder{
+		Name: "Master-locked",
+		PrepareFeature: func(g *Graph, crds ...Coords) {
+			if !doesGraphContainNodeTag(g, TagMasterkey) {
+				addTagAtRandomActiveNode(g, TagMasterkey)
+			}
+		},
+		ApplyFeature: func(g *Graph, crds ...Coords) {
+			g.AddEdgeTagByCoords(crds[lock1ind1], crds[lock1ind2], TagMasterLockedEdge)
+			g.AddEdgeTagByCoordsPreserveLastId(crds[lock2ind1], crds[lock2ind2], TagMasterLockedEdge)
+		},
+	}
+}
+
 func makeSecretPassageFeature(edgeIndex1, edgeIndex2 int) *FeatureAdder {
 	return &FeatureAdder{
 		Name: "Secret",

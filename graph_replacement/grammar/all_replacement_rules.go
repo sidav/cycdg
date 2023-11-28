@@ -99,7 +99,7 @@ var AllReplacementRules = []*ReplacementRule{
 			makeKeyLockFeature(0, 1),
 			makeMasterKeyLockFeature(0, 1),
 			makeSecretPassageFeature(0, 1),
-			// makeOneTimePassageFeature(0, 1), // CAUSES UNPASSABLE MAPS TO CREATE
+			// makeOneTimePassageFeature(0, 1), // CAUSES UNPASSABLE MAPS TO CREATE (WITH THIS RULE)
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
@@ -189,6 +189,7 @@ var AllReplacementRules = []*ReplacementRule{
 			makeOneTimePassageFeature(0, 2),
 			makeMasterKeyLockFeature(0, 2),
 			makeOneWayPassagesFeature(0, 2, 2, 1),
+			makeTwoMasterKeyLocksFeature(0, 2, 2, 1),
 			{
 				Name: "SecretPassage",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -331,6 +332,7 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 			makeSecretPassageFeature(0, 2),
 			makeMasterKeyLockFeature(0, 2),
+			makeTwoMasterKeyLocksFeature(0, 2, 3, 1),
 			makeOneWayPassagesFeature(0, 2, 3, 1),
 		},
 		OptionalFeatures: []*FeatureAdder{
@@ -421,6 +423,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		OptionalFeatures: []*FeatureAdder{
 			makeOneWayPassagesFeature(0, 1, 2, 0),
+			makeTwoMasterKeyLocksFeature(0, 1, 2, 0),
 			makeMasterKeyLockFeature(0, 1),
 			{
 				Name: "SecretOrHazard",
@@ -499,6 +502,7 @@ var AllReplacementRules = []*ReplacementRule{
 			makeMasterKeyLockFeature(0, 3),
 			makeOneKeyTwoLocksFeature(0, 3, 5, 2),
 			makeOneWayPassagesFeature(0, 3, 5, 2),
+			makeTwoMasterKeyLocksFeature(0, 3, 5, 2),
 			// {
 			// 	Name: "OneTime",
 			// 	ApplyFeature: func(g *Graph, crds ...Coords) {
