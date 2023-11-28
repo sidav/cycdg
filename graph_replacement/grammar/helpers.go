@@ -72,6 +72,26 @@ func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geomet
 	return candidates[ind]
 }
 
+func getRandomGraphCoordsByScore(g *graph.Graph, score func(x, y int) int) geometry.Coords {
+	var candidates []geometry.Coords
+	var scores []int
+	w, h := g.GetSize()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			score := score(x, y)
+			if score > 0 {
+				candidates = append(candidates, [2]int{x, y})
+				scores = append(scores, score)
+			}
+		}
+	}
+	if len(candidates) == 0 {
+		panic("No scored candidates!")
+	}
+	ind := rnd.SelectRandomIndexFromWeighted(len(candidates), func(i int) int { return scores[i] })
+	return candidates[ind]
+}
+
 func doesGraphContainNodeTag(g *graph.Graph, tag TagKind) bool {
 	w, h := g.GetSize()
 	for x := 0; x < w; x++ {

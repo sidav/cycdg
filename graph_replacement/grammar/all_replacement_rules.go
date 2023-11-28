@@ -99,7 +99,7 @@ var AllReplacementRules = []*ReplacementRule{
 			makeKeyLockFeature(0, 1),
 			makeMasterKeyLockFeature(0, 1),
 			makeSecretPassageFeature(0, 1),
-			makeOneTimePassageFeature(0, 1),
+			// makeOneTimePassageFeature(0, 1), // CAUSES UNPASSABLE MAPS TO CREATE
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
