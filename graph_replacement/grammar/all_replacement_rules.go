@@ -91,9 +91,7 @@ var AllReplacementRules = []*ReplacementRule{
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableNodeByCoords(applyAt[1])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
-			if !g.DoesNodeByCoordsHaveTag(applyAt[0], graph_element.TagStart) {
-				moveRandomNodeTag(g, applyAt[0], applyAt[1])
-			}
+			moveRandomNodeTag(g, applyAt[0], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			makeKeyLockFeature(0, 1),

@@ -104,6 +104,21 @@ func doesGraphContainNodeTag(g *graph.Graph, tag TagKind) bool {
 	return false
 }
 
+func isTagMovable(tag *Tag) bool {
+	t := tag.Kind
+	return !(t == TagKey || t == TagHalfkey || t == TagMasterkey || t == TagStart)
+}
+
+func areAllNodeTagsMovable(g *graph.Graph, crds geometry.Coords) bool {
+	tags := g.NodeAt(crds.Unwrap()).GetTags()
+	for _, t := range tags {
+		if !isTagMovable(t) {
+			return false
+		}
+	}
+	return true
+}
+
 func AddRandomHazardAt(g *graph.Graph, crds geometry.Coords) {
 	possibleTags := []TagKind{TagBoss, TagTrap, TagHazard}
 	g.AddNodeTagByCoords(crds, possibleTags[rnd.Rand(len(possibleTags))])
@@ -116,6 +131,9 @@ func moveRandomNodeTag(g *graph.Graph, from, to geometry.Coords) {
 		return
 	}
 	index := rnd.Rand(len(fromTags))
+	if !isTagMovable(fromTags[index]) {
+		return
+	}
 	toNode := g.NodeAt(to.Unwrap())
 	toNode.AddTag(fromTags[index].Kind, fromTags[index].Id)
 	fromNode.RemoveTagByIndex(index)
@@ -125,7 +143,7 @@ func PushNodeContentsInRandomDirection(g *graph.Graph, crds geometry.Coords) {
 	pushTo := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
 		return !g.IsNodeActive(x, y) && crds.IsAdjacentToXY(x, y)
 	})
-	if pushTo.EqualsPair(-1, -1) {
+	if pushTo.EqualsPair(-1, -1) || !areAllNodeTagsMovable(g, crds) {
 		return
 	}
 	g.EnableNodeByCoords(pushTo)
@@ -137,7 +155,7 @@ func PushNodeContentsInRandomDirectionWithEdgeTag(g *graph.Graph, crds geometry.
 	pushTo := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
 		return !g.IsNodeActive(x, y) && crds.IsAdjacentToXY(x, y)
 	})
-	if pushTo.EqualsPair(-1, -1) {
+	if pushTo.EqualsPair(-1, -1) || !areAllNodeTagsMovable(g, crds) {
 		return
 	}
 	g.EnableNodeByCoords(pushTo)
