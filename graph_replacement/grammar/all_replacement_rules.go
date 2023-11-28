@@ -66,6 +66,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			makeKeyLockFeature(0, 1),
+			makeMasterKeyLockFeature(0, 1),
 			makeSecretPassageFeature(0, 1),
 			makeOneTimePassageFeature(0, 1),
 			makeOneWayPassagesFeature(0, 1, 0, 1), // repeat on purpose
@@ -96,6 +97,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			makeKeyLockFeature(0, 1),
+			makeMasterKeyLockFeature(0, 1),
 			makeSecretPassageFeature(0, 1),
 			makeOneTimePassageFeature(0, 1),
 		},
@@ -185,6 +187,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			makeOneTimePassageFeature(0, 2),
+			makeMasterKeyLockFeature(0, 2),
 			makeOneWayPassagesFeature(0, 2, 2, 1),
 			{
 				Name: "SecretPassage",
@@ -199,6 +202,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		OptionalFeatures: []*FeatureAdder{
 			makeRandomHazardFeature(2),
+			makeMasterKeyLockFeature(2, 1),
 			{
 				Name: "Treasure",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -326,6 +330,7 @@ var AllReplacementRules = []*ReplacementRule{
 				},
 			},
 			makeSecretPassageFeature(0, 2),
+			makeMasterKeyLockFeature(0, 2),
 			makeOneWayPassagesFeature(0, 2, 3, 1),
 		},
 		OptionalFeatures: []*FeatureAdder{
@@ -416,6 +421,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		OptionalFeatures: []*FeatureAdder{
 			makeOneWayPassagesFeature(0, 1, 2, 0),
+			makeMasterKeyLockFeature(0, 1),
 			{
 				Name: "SecretOrHazard",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -490,6 +496,7 @@ var AllReplacementRules = []*ReplacementRule{
 		MandatoryFeatures: []*FeatureAdder{
 			nil,
 			makeSecretPassageFeature(0, 3),
+			makeMasterKeyLockFeature(0, 3),
 			makeOneKeyTwoLocksFeature(0, 3, 5, 2),
 			makeOneWayPassagesFeature(0, 3, 5, 2),
 			// {

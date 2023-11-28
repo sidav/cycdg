@@ -15,12 +15,12 @@ type FeatureAdder struct {
 	ApplyFeature func(g *Graph, crds ...Coords)
 }
 
-// Should be called BEFORE the nodes/edges with lock are added!
+// In case of keys: it should be called BEFORE the nodes/edges with lock are added!
 // It may end up being behind the lock otherwise.
 // So it must be used with rules which add locked edge, not change an existing to locked
-func addKeyAtRandom(g *Graph) {
+func addTagAtRandomActiveNode(g *Graph, tag TagKind) {
 	crd := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
 		return g.IsNodeActive(x, y)
 	})
-	g.AddNodeTagByCoords(crd, TagKey)
+	g.AddNodeTagByCoords(crd, tag)
 }

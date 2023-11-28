@@ -7,7 +7,8 @@ const (
 	TagStart = iota
 	TagGoal
 	TagKey
-	TagHalfkey // for TagBilockedEdge
+	TagHalfkey   // for TagBilockedEdge
+	TagMasterkey // for TagMasterLockedEdge, only one per map
 	TagBoss
 	TagTreasure
 	TagHazard
@@ -15,10 +16,11 @@ const (
 	TagTeleportBidirectional
 	// Edge tags
 	TagLockedEdge
-	TagBilockedEdge // requires two Halfkeys of same id
-	TagWindowEdge   // can be seen through, but not passable
-	TagOneTimeEdge  // one-time passage
-	TagOneWayEdge   // can be passed only in one direction (or maybe a door that opens from only one side?)
+	TagBilockedEdge     // requires two Halfkeys of same id
+	TagMasterLockedEdge // requires the "master key"
+	TagWindowEdge       // can be seen through, but not passable
+	TagOneTimeEdge      // one-time passage
+	TagOneWayEdge       // can be passed only in one direction (or maybe a door that opens from only one side?)
 	TagSecretEdge
 )
 

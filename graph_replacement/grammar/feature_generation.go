@@ -12,7 +12,7 @@ func makeKeyLockFeature(lockBetweenIndex1, lockBetweenIndex2 int) *FeatureAdder 
 	return &FeatureAdder{
 		Name: "Locked",
 		PrepareFeature: func(g *Graph, crds ...Coords) {
-			addKeyAtRandom(g)
+			addTagAtRandomActiveNode(g, TagKey)
 		},
 		ApplyFeature: func(g *Graph, crds ...Coords) {
 			g.AddEdgeTagByCoords(crds[lockBetweenIndex1], crds[lockBetweenIndex2], TagLockedEdge)
@@ -24,11 +24,26 @@ func makeOneKeyTwoLocksFeature(lock1ind1, lock1ind2, lock2ind1, lock2ind2 int) *
 	return &FeatureAdder{
 		Name: "2x Locked",
 		PrepareFeature: func(g *Graph, crds ...Coords) {
-			addKeyAtRandom(g)
+			addTagAtRandomActiveNode(g, TagKey)
 		},
 		ApplyFeature: func(g *Graph, crds ...Coords) {
 			g.AddEdgeTagByCoords(crds[lock1ind1], crds[lock1ind2], TagLockedEdge)
 			g.AddEdgeTagByCoordsPreserveLastId(crds[lock2ind1], crds[lock2ind2], TagLockedEdge)
+		},
+	}
+}
+
+// Adds a master key ONLY if it's not on the map
+func makeMasterKeyLockFeature(lockBetweenIndex1, lockBetweenIndex2 int) *FeatureAdder {
+	return &FeatureAdder{
+		Name: "Master-locked",
+		PrepareFeature: func(g *Graph, crds ...Coords) {
+			if !doesGraphContainNodeTag(g, TagMasterkey) {
+				addTagAtRandomActiveNode(g, TagMasterkey)
+			}
+		},
+		ApplyFeature: func(g *Graph, crds ...Coords) {
+			g.AddEdgeTagByCoords(crds[lockBetweenIndex1], crds[lockBetweenIndex2], TagMasterLockedEdge)
 		},
 	}
 }

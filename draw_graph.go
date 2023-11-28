@@ -130,10 +130,14 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 	switch tag.Kind {
 	case TagLockedEdge:
 		char = rune(fmt.Sprintf("%d", tag.Id)[0])
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGreen)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorGreen)
 	case TagBilockedEdge:
 		char = rune(fmt.Sprintf("%d", tag.Id)[0])
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkMagenta)
+	case TagMasterLockedEdge:
+		// char = rune(fmt.Sprintf("%d", tag.Id)[0])
+		char = 'M'
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorGreen)
 	case TagWindowEdge:
 		char = '#'
 		cw.SetStyle(tcell.ColorWhite, tcell.ColorBlack)
@@ -142,7 +146,7 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 		cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
 	case TagOneTimeEdge:
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
-		return false, ' '
+		char = '!'
 	case TagOneWayEdge:
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
 		return false, ' '
@@ -167,6 +171,9 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 	case TagHalfkey:
 		str = "HKEY"
 		cw.SetStyle(tcell.ColorDarkMagenta, tcell.ColorDarkBlue)
+	case TagMasterkey:
+		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)
+		return "MSKEY"
 	case TagBoss:
 		str = "BOSS"
 		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
