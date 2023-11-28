@@ -6,7 +6,7 @@ const (
 	// Node tags
 	TagStart = iota
 	TagGoal
-	TagKeyForEdge
+	TagKey
 	TagHalfkey // for TagBilockedEdge
 	TagBoss
 	TagTreasure

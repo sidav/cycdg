@@ -60,3 +60,12 @@ func makeOneTimePassageFeature(edgeIndex1, edgeIndex2 int) *FeatureAdder {
 		},
 	}
 }
+
+func makeRandomHazardFeature(edgeIndex int) *FeatureAdder {
+	return &FeatureAdder{
+		Name: "Random hazard",
+		ApplyFeature: func(g *Graph, crds ...Coords) {
+			AddRandomHazardAt(g, crds[edgeIndex])
+		},
+	}
+}

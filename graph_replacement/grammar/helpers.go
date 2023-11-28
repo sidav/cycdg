@@ -72,6 +72,18 @@ func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geomet
 	return candidates[ind]
 }
 
+func doesGraphContainNodeTag(g *graph.Graph, tag TagKind) bool {
+	w, h := g.GetSize()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			if g.NodeAt(x, y).HasTag(tag) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func AddRandomHazardAt(g *graph.Graph, crds geometry.Coords) {
 	possibleTags := []TagKind{TagBoss, TagTrap, TagHazard}
 	g.AddNodeTagByCoords(crds, possibleTags[rnd.Rand(len(possibleTags))])

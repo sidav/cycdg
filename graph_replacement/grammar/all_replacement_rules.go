@@ -41,12 +41,7 @@ var AllReplacementRules = []*ReplacementRule{
 					g.AddNodeTagByCoords(crds[0], graph_element.TagTreasure)
 				},
 			},
-			{
-				Name: "Danger",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					AddRandomHazardAt(g, crds[0])
-				},
-			},
+			makeRandomHazardFeature(0),
 		},
 	},
 
@@ -203,12 +198,7 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 		},
 		OptionalFeatures: []*FeatureAdder{
-			{
-				Name: "Boss",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.AddNodeTagByCoords(crds[2], graph_element.TagBoss)
-				},
-			},
+			makeRandomHazardFeature(2),
 			{
 				Name: "Treasure",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
@@ -339,12 +329,7 @@ var AllReplacementRules = []*ReplacementRule{
 			makeOneWayPassagesFeature(0, 2, 3, 1),
 		},
 		OptionalFeatures: []*FeatureAdder{
-			{
-				Name: "Danger",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					AddRandomHazardAt(g, crds[3])
-				},
-			},
+			makeRandomHazardFeature(3),
 		},
 	},
 
@@ -516,12 +501,7 @@ var AllReplacementRules = []*ReplacementRule{
 			// },
 		},
 		OptionalFeatures: []*FeatureAdder{
-			{
-				Name: "Danger",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					AddRandomHazardAt(g, crds[4])
-				},
-			},
+			makeRandomHazardFeature(4),
 		},
 	},
 }

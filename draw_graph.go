@@ -161,7 +161,7 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 	case TagGoal:
 		cw.SetStyle(tcell.ColorWhite, tcell.ColorDarkBlue)
 		return "GOAL"
-	case TagKeyForEdge:
+	case TagKey:
 		str = "KEY "
 		cw.SetStyle(tcell.ColorGreen, tcell.ColorDarkBlue)
 	case TagHalfkey:

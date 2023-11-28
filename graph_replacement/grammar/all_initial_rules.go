@@ -121,7 +121,7 @@ var AllInitialRules = []InitialRule{
 					crds1 := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
 						return g.IsNodeActive(i, j) && !startCrd.EqualsPair(i, j) && !startCrd.IsAdjacentToXY(i, j)
 					})
-					g.AddNodeTagByCoords(crds1, TagKeyForEdge)
+					g.AddNodeTagByCoords(crds1, TagKey)
 					g.AddEdgeTagByCoords(startCrd, goalCrd, TagLockedEdge)
 				},
 			},

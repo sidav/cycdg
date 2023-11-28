@@ -22,5 +22,5 @@ func addKeyAtRandom(g *Graph) {
 	crd := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
 		return g.IsNodeActive(x, y)
 	})
-	g.AddNodeTagByCoords(crd, TagKeyForEdge)
+	g.AddNodeTagByCoords(crd, TagKey)
 }
