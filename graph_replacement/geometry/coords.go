@@ -16,6 +16,18 @@ func (c *Coords) EqualsPair(x, y int) bool {
 	return c[0] == x && c[1] == y
 }
 
+func (c *Coords) IsAdjacentToXY(x, y int) bool {
+	return c.ManhattanDistToXY(x, y) == 1
+}
+
+func (c *Coords) IsCardinalToPair(x, y int) bool {
+	return c[0] == x || c[1] == y
+}
+
+func (c *Coords) ManhattanDistToXY(x, y int) int {
+	return intAbs(x-c[0]) + intAbs(y-c[1])
+}
+
 func (c *Coords) VectorTo(c2 Coords) (int, int) {
 	return c2[0] - c[0], c2[1] - c[1]
 }
@@ -63,4 +75,11 @@ func PrintCoordsArray(a [][]Coords) {
 		fmt.Printf(" |  ")
 	}
 	fmt.Printf("\n")
+}
+
+func intAbs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }

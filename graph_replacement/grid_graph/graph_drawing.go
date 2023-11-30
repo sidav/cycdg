@@ -1,5 +1,7 @@
 package graph
 
+import . "cycdg/graph_replacement/geometry"
+
 func (g *Graph) enableAndInterlinkNodeFromCoords(x, y, vx, vy int, directional bool) {
 	if g.IsNodeFinalized(x, y) {
 		panic("Node is finalized!")
@@ -65,7 +67,7 @@ func (g *Graph) DrawConnectedDirectionalRect(x, y, w, h int, ccw bool) {
 // N       N
 // ^       ^
 // O > N > N
-func (g *Graph) DrawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, sinkX, sinkY int) {
+func (g *Graph) drawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, sinkX, sinkY int) {
 	allCoords := GetAllRectCoordsClockwise(x, y, w, h)
 	sourceIndex := findInCoordsArray(sourceX, sourceY, allCoords)
 	sinkIndex := findInCoordsArray(sinkX, sinkY, allCoords)
@@ -93,4 +95,8 @@ func (g *Graph) DrawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, si
 		g.enableAndInterlinkNodeFromCoords(currX, currY, vx, vy, true)
 		index = nextIndex
 	}
+}
+
+func (g *Graph) DrawBiсonnectedDirectionalRect(x, y, w, h int, source, sink Coords) {
+	g.drawBiсonnectedDirectionalRect(x, y, w, h, source[0], source[1], sink[0], sink[1])
 }

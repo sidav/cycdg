@@ -40,6 +40,10 @@ func (g *Graph) EnableNode(x, y int) {
 	g.nodes[x][y].SetActive(true)
 }
 
+func (g *Graph) EnableNodeByCoords(c geometry.Coords) {
+	g.EnableNode(c.Unwrap())
+}
+
 func (g *Graph) FinalizeNode(c geometry.Coords) {
 	g.NodeAt(c.Unwrap()).Finalize()
 }
@@ -61,10 +65,6 @@ func (g *Graph) NodeAt(x, y int) *Node {
 		return nil
 	}
 	return g.nodes[x][y]
-}
-
-func (g *Graph) GetRandomNodeByFunc(appropriate func(int, int) bool) *Node {
-	return g.NodeAt(g.GetRandomCoordsByFunc(appropriate))
 }
 
 func (g *Graph) GetEnabledNodesCount() int {
@@ -91,8 +91,4 @@ func (g *Graph) GetFilledNodesPercentage() int {
 	w, h := g.GetSize()
 	totalNodes := w * h
 	return (100*count + totalNodes/2) / totalNodes
-}
-
-func (g *Graph) DoesNodeHaveAnyTags(x, y int) bool {
-	return g.NodeAt(x, y).HasAnyTags()
 }

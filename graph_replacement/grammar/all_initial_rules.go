@@ -1,90 +1,130 @@
 package grammar
 
 import (
-	"cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/geometry"
 	. "cycdg/graph_replacement/grid_graph"
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
 var AllInitialRules = []InitialRule{
-	// U U    R-R
-	//     >  | |
-	// U U    R-R
-	// random start and goal
+	// random start and non-adjacent goal, biconnected, random size
 	{
-		Name:      "PL 4-CYCLE",
+		Name:      "nAj-CYCLE",
 		AddsCycle: true,
-		IsApplicableAt: func(g *Graph, x, y, _, _ int) bool {
-			if !g.AreCoordsInBounds(x+1, y+1) {
+		IsApplicableAt: func(g *Graph, x, y int) bool {
+			if !g.AreCoordsInBounds(x+3, y+3) || x == 0 || y == 0 {
 				return false
 			}
 			return true
 		},
-		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
-			g.DrawConnectedDirectionalRect(x, y, 2, 2, rnd.OneChanceFrom(2))
-
-			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
-				return g.IsNodeActive(i, j)
+		ApplyOnGraphAt: func(g *Graph, x, y int) {
+			w, h := g.GetSize()
+			rw, rh := rnd.RandInRange(3, w-x-1), rnd.RandInRange(3, h-y-1)
+			start := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+				return areCoordsOnRectangle(i, j, x, y, rw, rh)
 			})
-			g.AddNodeTag(sx, sy, TagStart)
-			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
-				return g.IsNodeActive(i, j) && !g.DoesNodeHaveAnyTags(i, j)
+			goal := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+				return areCoordsOnRectangle(i, j, x, y, rw, rh) && !start.EqualsPair(i, j) && start.ManhattanDistToXY(i, j) >= min(rw, rh)
 			})
-			g.AddNodeTag(gx, gy, TagGoal)
+			g.DrawBiсonnectedDirectionalRect(x, y, rw, rh, start, goal)
+			g.AddNodeTagByCoords(start, TagStart)
+			g.AddNodeTagByCoords(goal, TagGoal)
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Alt paths w hazards",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					goalCrd := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.DoesNodeHaveTag(i, j, TagGoal)
+					})
+					crds1 := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.IsNodeActive(i, j) && goalCrd.IsAdjacentToXY(i, j)
+					})
+					crds2 := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.IsNodeActive(i, j) && goalCrd.IsAdjacentToXY(i, j) && !crds1.EqualsPair(i, j)
+					})
+					AddRandomHazardAt(g, crds1)
+					AddRandomHazardAt(g, crds2)
+					if rnd.Rand(3) == 0 {
+						PushNodeContentsInRandomDirection(g, goalCrd)
+					}
+				},
+			},
+			{
+				Name: "Two keys",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					startCrd := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.DoesNodeHaveTag(i, j, TagStart)
+					})
+					goalCrd := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.DoesNodeHaveTag(i, j, TagGoal)
+					})
+					crds1 := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.IsNodeActive(i, j) && (goalCrd.IsAdjacentToXY(i, j) || startCrd.IsAdjacentToXY(i, j))
+					})
+					crds2 := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.IsNodeActive(i, j) && !crds1.EqualsPair(i, j) && !crds1.IsAdjacentToXY(i, j) &&
+							(goalCrd.IsAdjacentToXY(i, j) || startCrd.IsAdjacentToXY(i, j))
+					})
+					g.AddNodeTagByCoords(crds1, TagHalfkey)
+					g.AddNodeTagByCoordsPreserveLastId(crds2, TagHalfkey)
+					PushNodeContentsInRandomDirectionWithEdgeTag(g, goalCrd, TagBilockedEdge)
+				},
+			},
 		},
 	},
-	// R-R-R
-	// |   |
-	// G   R
-	// |   |
-	// S-R-R
-	// random start, neighbouring goal
+	// random start and adjacent goal, biconnected, random size
 	{
-		Name:      "LONG WAY",
+		Name:      "Aj-CYCLE",
 		AddsCycle: true,
-		IsApplicableAt: func(g *Graph, x, y, _, _ int) bool {
-			if !g.AreCoordsInBounds(x+2, y+2) {
+		IsApplicableAt: func(g *Graph, x, y int) bool {
+			if x == 0 || y == 0 || !g.AreCoordsInBounds(x+2, y+2) {
 				return false
 			}
 			return true
 		},
-		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
-			g.DrawConnectedDirectionalRect(x, y, 3, 3, rnd.OneChanceFrom(2))
-
-			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
-				return g.IsNodeActive(i, j)
+		ApplyOnGraphAt: func(g *Graph, x, y int) {
+			w, h := g.GetSize()
+			rw, rh := rnd.RandInRange(3, w-x), rnd.RandInRange(3, h-y)
+			start := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+				return areCoordsOnRectangle(i, j, x, y, rw, rh)
 			})
-			g.AddNodeTag(sx, sy, TagStart)
-			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
-				return g.IsNodeActive(i, j) && !g.DoesNodeHaveAnyTags(i, j) &&
-					areCoordsAdjacent(i, j, sx, sy) && g.IsEdgeDirectedBetweenCoords(i, j, sx, sy)
+			goal := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+				return areCoordsOnRectangle(i, j, x, y, rw, rh) && start.IsAdjacentToXY(i, j)
 			})
-			g.AddNodeTag(gx, gy, TagGoal)
-			g.AddEdgeTagByVector(sx, sy, gx-sx, gy-sy, TagLockedEdge)
-			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
+			g.DrawBiсonnectedDirectionalRect(x, y, rw, rh, start, goal)
+			g.AddNodeTagByCoords(start, TagStart)
+			g.AddNodeTagByCoords(goal, TagGoal)
 		},
-	},
-	// random start, two paths to goal
-	{
-		Name:      "TWO WAYS",
-		AddsCycle: true,
-		IsApplicableAt: func(g *Graph, x, y, _, _ int) bool {
-			if !g.AreCoordsInBounds(x+2, y+2) {
-				return false
-			}
-			return true
-		},
-		ApplyOnGraphAt: func(g *Graph, x, y, _, _ int) {
-			sx, sy := g.GetRandomCoordsByFunc(func(i, j int) bool {
-				return areCoordsOnRectangle(i, j, x, y, 3, 3)
-			})
-			gx, gy := g.GetRandomCoordsByFunc(func(i, j int) bool {
-				return areCoordsOnRectangle(i, j, x, y, 3, 3) && i != sx && j != sy
-			})
-			g.DrawBiсonnectedDirectionalRect(x, y, 3, 3, sx, sy, gx, gy)
-			g.AddNodeTag(sx, sy, TagStart)
-			g.AddNodeTag(gx, gy, TagGoal)
-			g.FinalizeNode(geometry.NewCoords(x+1, y+1))
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Foresee",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					startCrd := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.DoesNodeHaveTag(i, j, TagStart)
+					})
+					goalCrd := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.DoesNodeHaveTag(i, j, TagGoal)
+					})
+					g.AddEdgeTagByCoords(startCrd, goalCrd, TagWindowEdge)
+				},
+			},
+			{
+				Name: "OpenableShortcut",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					startCrd := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.DoesNodeHaveTag(i, j, TagStart)
+					})
+					goalCrd := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.DoesNodeHaveTag(i, j, TagGoal)
+					})
+					crds1 := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
+						return g.IsNodeActive(i, j) && !startCrd.EqualsPair(i, j) && !startCrd.IsAdjacentToXY(i, j)
+					})
+					g.AddNodeTagByCoords(crds1, TagKey)
+					g.AddEdgeTagByCoords(startCrd, goalCrd, TagLockedEdge)
+				},
+			},
 		},
 	},
 }

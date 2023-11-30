@@ -15,8 +15,11 @@ type ReplacementRule struct {
 
 	// each value is coords index, near which the applicability func will be checked
 	searchNearPrevIndex []int // -1 means "any coords"
-	applicabilityFuncs  []func(g *Graph, x, y int, prevСoords ...Coords) bool
-	ApplyToGraph        func(g *Graph, allCoords ...Coords)
+
+	applicabilityFuncs []func(g *Graph, x, y int, prevСoords ...Coords) bool
+	ApplyToGraph       func(g *Graph, applyAt ...Coords)
+	MandatoryFeatures  []*FeatureAdder // One (and only) of them SHOULD apply! (May have nil though)
+	OptionalFeatures   []*FeatureAdder // One (or more?) of them could be applied. Should NOT conflict with any of the mandatory and optional features.
 }
 
 func (ir *ReplacementRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
@@ -30,6 +33,9 @@ func (ir *ReplacementRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForF
 
 	xFrom, xTo := 0, w-1
 	yFrom, yTo := 0, h-1
+	if len(ir.searchNearPrevIndex) < len(ir.applicabilityFuncs) {
+		debugPanic("Rule %s has wrong searchNearPrevIndex count", ir.Name)
+	}
 	if ir.searchNearPrevIndex[currFuncIndex] != -1 {
 		searchNearX, searchNearY := argsForFunc[ir.searchNearPrevIndex[currFuncIndex]].Unwrap()
 		xFrom, yFrom = maxint(searchNearX-1, 0), maxint(searchNearY-1, 0)

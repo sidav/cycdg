@@ -8,15 +8,16 @@ type InitialRule struct {
 	AddsCycle bool
 
 	// funcs:
-	IsApplicableAt func(g *Graph, x, y, vx, vy int) bool
-	ApplyOnGraphAt func(g *Graph, x, y, vx, vy int)
+	IsApplicableAt    func(g *Graph, x, y int) bool
+	ApplyOnGraphAt    func(g *Graph, x, y int)
+	MandatoryFeatures []*FeatureAdder // One (and only) of them SHOULD apply!
 }
 
 func (r *InitialRule) IsApplicableForGraph(g *Graph) bool {
 	w, h := g.GetSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			if r.IsApplicableAt(g, x, y, 0, 0) {
+			if r.IsApplicableAt(g, x, y) {
 				return true
 			}
 		}
@@ -24,16 +25,16 @@ func (r *InitialRule) IsApplicableForGraph(g *Graph) bool {
 	return false
 }
 
-func (r *InitialRule) GetRandomApplicableCoordsForGraph(g *Graph) (int, int, int, int) {
+func (r *InitialRule) GetRandomApplicableCoordsForGraph(g *Graph) (int, int) {
 	w, h := g.GetSize()
-	var candidates [][4]int
+	var candidates [][2]int
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			if r.IsApplicableAt(g, x, y, 0, 0) {
-				candidates = append(candidates, [4]int{x, y, 0, 0})
+			if r.IsApplicableAt(g, x, y) {
+				candidates = append(candidates, [2]int{x, y})
 			}
 		}
 	}
 	ind := rnd.Rand(len(candidates))
-	return candidates[ind][0], candidates[ind][1], candidates[ind][2], candidates[ind][3]
+	return candidates[ind][0], candidates[ind][1]
 }

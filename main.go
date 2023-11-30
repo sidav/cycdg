@@ -5,16 +5,16 @@ import (
 	"cycdg/lib/random"
 	"cycdg/lib/random/pcgrandom"
 	"cycdg/lib/tcell_console_wrapper"
+	"flag"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 )
 
 var (
-	cw               tcell_console_wrapper.ConsoleWrapper
-	rnd              random.PRNG
-	testResultString string
+	cw                  tcell_console_wrapper.ConsoleWrapper
+	width, height, fill int
+	rnd                 random.PRNG
+	testResultString    string
 )
 
 func main() {
@@ -23,22 +23,8 @@ func main() {
 	rnd = pcgrandom.NewPCG64()
 	rnd.SetSeed(int(time.Now().UnixNano()))
 
-	if len(os.Args) > 1 {
-		if len(os.Args) < 4 {
-			fmt.Println("TEST USAGE: go run *.go [graph size] [total generations] [desired fill percentage]")
-			return
-		}
-		size, err1 := strconv.Atoi(os.Args[1])
-		tests, err2 := strconv.Atoi(os.Args[2])
-		fill, err3 := strconv.Atoi(os.Args[3])
-		if err1 != nil || err2 != nil || err3 != nil {
-			fmt.Println("Please use numbers as args.")
-			return
-		}
-		testGen(size, tests, fill)
+	if execArgs() {
 		return
-	} else {
-		testGen(5, 1000, 100)
 	}
 
 	cw.Init()
@@ -48,37 +34,34 @@ func main() {
 
 	key := ""
 	for key != "ESCAPE" {
-		if key == "" || gen.GetGraph().GetFilledNodesPercentage() > 65 {
-			gen.Init(rnd, 5, 5)
+		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= fill {
+			gen.Init(rnd, width, height)
 		} else {
 			gen.ApplyRandomReplacementRuleToTheGraph()
+			for key == "ENTER" && gen.GetGraph().GetFilledNodesPercentage() < fill {
+				gen.ApplyRandomReplacementRuleToTheGraph()
+			}
 		}
 
-		drawGraph(gen.GetGraph())
+		drawGraph(&gen)
 		cw.FlushScreen()
 		key = cw.ReadKey()
 	}
 }
 
-func testGen(size, tests, fillPerc int) {
-	if fillPerc > 100 {
-		testResultString = "Inadequate fill percentage\n"
-		return
-	}
-	var appliedRules int
-	gen := replacement.GraphReplacementApplier{}
+// returns true if the program should exit
+func execArgs() bool {
+	benchOnly := false
+	var testMapsCount int
+	flag.IntVar(&width, "w", 5, "Graph width")
+	flag.IntVar(&height, "h", 5, "Graph height")
+	flag.IntVar(&fill, "fill", 70, "Fill percentage")
+	flag.BoolVar(&benchOnly, "b", false, "Run benchmark only")
+	flag.IntVar(&testMapsCount, "total", 1000, "Generated maps count")
+	flag.Parse()
 
-	start := time.Now()
-	for i := 0; i < tests; i++ {
-		gen.Init(rnd, size, size) // .InitWithConnectedNodes(size, size)
-		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
-			gen.ApplyRandomReplacementRuleToTheGraph()
-		}
-		appliedRules += gen.GetGraph().AppliedRulesCount
+	if testMapsCount > 0 {
+		testResultString = replacement.TestGen(rnd, width, height, testMapsCount, fill)
 	}
-	totalGenTime := time.Since(start)
-	testResultString = fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, size, size, fillPerc)
-	testResultString += fmt.Sprintf("Total time %v, mean time per single gen %v\n", totalGenTime, totalGenTime/time.Duration(tests))
-	testResultString += fmt.Sprintf("Total rules applied %d, mean time per rule %v\n",
-		appliedRules, totalGenTime/time.Duration(appliedRules))
+	return benchOnly
 }
