@@ -15,21 +15,31 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	}
 	var appliedRules int
 	gen := &GraphReplacementApplier{}
+	var totalGenTime, worstTime, bestTime time.Duration
 
 	progressBarCLI("Benchmarking", 0, tests+1, 20)
-	start := time.Now()
 	for i := 0; i < tests; i++ {
+		start := time.Now()
 		gen.Init(prng, width, height)
 		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
 			gen.ApplyRandomReplacementRuleToTheGraph()
 		}
+		thisGenTime := time.Since(start)
+		totalGenTime += thisGenTime
+		if worstTime < thisGenTime {
+			worstTime = thisGenTime
+		}
+		if bestTime == 0 || bestTime > thisGenTime {
+			bestTime = thisGenTime
+		}
 		appliedRules += gen.AppliedRulesCount
 		progressBarCLI("Benchmarking", i+1, tests+1, 20)
 	}
-	totalGenTime := time.Since(start)
 	testResultString = showRulesInfo()
+	testResultString += "=========================\n"
 	testResultString += fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, width, height, fillPerc)
 	testResultString += fmt.Sprintf("Total time %v, mean time per single gen %v\n", totalGenTime, totalGenTime/time.Duration(tests))
+	testResultString += fmt.Sprintf("Worst gen time %v, best gen time %v\n", worstTime, bestTime)
 	testResultString += fmt.Sprintf("Total rules applied %d, mean %d rules per map, mean time per rule %v\n",
 		appliedRules, (appliedRules+tests/2)/tests, totalGenTime/time.Duration(appliedRules))
 
