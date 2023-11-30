@@ -338,6 +338,51 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
+	// 0   2       0 < 2
+	// V       >   V   ^
+	// 1   3       1 > 3
+	// {
+	// 	Name:                "RET-LOOP",
+	// 	AddsCycle:           true,
+	// 	searchNearPrevIndex: []int{-1, 0, 0, 1},
+	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+	// 		// node 0
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return g.IsNodeActive(x, y)
+	// 		},
+	// 		// node 1
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			x1, y1 := prevСoords[0].Unwrap()
+	// 			return areCoordsAdjacent(x, y, x1, y1) && g.IsNodeActive(x, y) && g.IsEdgeDirectedBetweenCoords(x1, y1, x, y)
+	// 		},
+	// 		// node 2
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			x1, y1 := prevСoords[0].Unwrap()
+	// 			return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x1, y1)
+	// 		},
+	// 		// node 3
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			x2, y2 := prevСoords[1].Unwrap()
+	// 			x3, y3 := prevСoords[2].Unwrap()
+	// 			return !g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x2, y2) && areCoordsAdjacent(x, y, x3, y3)
+	// 		},
+	// 	},
+	// 	ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+	// 		g.EnableNode(applyAt[2][0], applyAt[2][1])
+	// 		g.EnableNode(applyAt[3][0], applyAt[3][1])
+	// 		g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[0])
+	// 		g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[2])
+	// 		g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[3])
+	// 	},
+	// 	MandatoryFeatures: []*FeatureAdder{
+	// 		makeTwoMasterKeyLocksFeature(1, 3, 2, 0),
+	// 		makeOneWayPassagesFeature(1, 3, 2, 0),
+	// 	},
+	// 	OptionalFeatures: []*FeatureAdder{
+	// 		makeRandomHazardFeature(3),
+	// 	},
+	// },
+
 	// 1   3       1 > 3
 	// V       >       V
 	// 0 > 2       U   2
