@@ -10,7 +10,10 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0  X  ; just finalize disabled node
 	{
-		Name:                "DISABLE",
+		Name: "DISABLE",
+		Metadata: ruleMetadata{
+			AdditionalWeight: 1,
+		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -25,7 +28,10 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0; just add someting to empty active node
 	{
-		Name:                "THING",
+		Name: "THING",
+		Metadata: ruleMetadata{
+			AdditionalWeight: 2,
+		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -47,8 +53,10 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0   1       0 > 1  ; where both are active
 	{
-		Name:                "CONNECT",
-		AddsCycle:           true, // it's not guaranteed, but should be more possible than not
+		Name: "CONNECT",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		}, // it's not guaranteed, but should be more possible than not
 		searchNearPrevIndex: []int{-1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -161,8 +169,10 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0   2   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
 	{
-		Name:                "CONNROOM",
-		AddsCycle:           true, // it's not guaranteed, but should be more possible than not
+		Name: "CONNROOM",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		}, // it's not guaranteed, but should be more possible than not
 		searchNearPrevIndex: []int{-1, -1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -289,8 +299,10 @@ var AllReplacementRules = []*ReplacementRule{
 	// V       >   V   V
 	// 1   3       1 < 3
 	{
-		Name:                "LOOP-RULE",
-		AddsCycle:           true,
+		Name: "LOOP-RULE",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		},
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -343,7 +355,9 @@ var AllReplacementRules = []*ReplacementRule{
 	// 1   3       1 > 3
 	// {
 	// 	Name:                "RET-LOOP",
-	// 	AddsCycle:           true,
+	// 	Metadata: ruleMetadata{
+	//		AddsCycle: true,
+	//	},
 	// 	searchNearPrevIndex: []int{-1, 0, 0, 1},
 	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 	// 		// node 0
@@ -429,8 +443,10 @@ var AllReplacementRules = []*ReplacementRule{
 	//         >   ^   V    0 is active, others not
 	// 2   3       2 < 3
 	{
-		Name:                "CORNERLOOP",
-		AddsCycle:           true,
+		Name: "CORNERLOOP",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		},
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -496,8 +512,10 @@ var AllReplacementRules = []*ReplacementRule{
 	// V           >   V       V
 	// 1 > 2   5       1 > 2 < 5
 	{
-		Name:                "ALTWAY",
-		AddsCycle:           true,
+		Name: "ALTWAY",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		},
 		searchNearPrevIndex: []int{-1, 0, 1, 0, 3, 2},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0

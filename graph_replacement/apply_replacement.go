@@ -10,7 +10,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 	index := rnd.SelectRandomIndexFromWeighted(len(AllReplacementRules),
 		func(i int) int {
 			r := AllReplacementRules[i]
-			if r.AddsCycle {
+			if r.Metadata.AddsCycle {
 				if ra.MinCycles > ra.CyclesCount {
 					return 2 // ra.graph.AppliedRulesCount
 				}
@@ -18,7 +18,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 					return 0
 				}
 			}
-			return 1
+			return r.Metadata.AdditionalWeight + 1
 		})
 	return AllReplacementRules[index]
 }
@@ -74,7 +74,7 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 	}
 
 	// update stats
-	if rule.AddsCycle {
+	if rule.Metadata.AddsCycle {
 		ra.CyclesCount++
 	}
 	ra.AppliedRulesCount++
