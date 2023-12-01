@@ -18,6 +18,9 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 					return 0
 				}
 			}
+			if r.Metadata.AddsTeleport && ra.TeleportsCount >= ra.MaxTeleports {
+				return 0
+			}
 			return r.Metadata.AdditionalWeight + 1
 		})
 	return AllReplacementRules[index]
@@ -76,6 +79,9 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 	// update stats
 	if rule.Metadata.AddsCycle {
 		ra.CyclesCount++
+	}
+	if rule.Metadata.AddsTeleport {
+		ra.TeleportsCount++
 	}
 	ra.AppliedRulesCount++
 	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(

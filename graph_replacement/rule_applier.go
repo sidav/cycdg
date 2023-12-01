@@ -12,11 +12,13 @@ type GraphReplacementApplier struct {
 	graph                *graph.Graph
 	MinCycles, MaxCycles int
 	DesiredFeatures      int
+	MaxTeleports         int
 
 	// Some meta-info on applied rules
 	CyclesCount          int
 	AppliedRulesCount    int
 	AppliedFeaturesCount int
+	TeleportsCount       int
 	AppliedRules         []*AppliedRuleInfo
 }
 
@@ -34,14 +36,20 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	if gra.DesiredFeatures == 0 {
 		gra.DesiredFeatures = 5
 	}
+	if gra.MaxTeleports == 0 {
+		gra.MaxTeleports = 2
+	}
 	gra.AppliedRules = nil
 	gra.AppliedRulesCount = 0
 	gra.AppliedFeaturesCount = 0
+	gra.TeleportsCount = 0
 	gra.CyclesCount = 0
+
 	rnd = r
 	grammar.SetRandom(rnd)
+
 	gra.graph = &graph.Graph{}
 	gra.graph.Init(width, height)
+
 	gra.ApplyRandomInitialRule()
-	// gra.graph.ap
 }

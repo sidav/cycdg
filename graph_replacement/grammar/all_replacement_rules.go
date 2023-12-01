@@ -125,7 +125,10 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0 ...  1  2       0 (teleport)> 1 > 2  ; where 1 and 2 are inactive
 	{
-		Name:                "TELEPORT",
+		Name: "TELEPORT",
+		Metadata: ruleMetadata{
+			AddsTeleport: true,
+		},
 		searchNearPrevIndex: []int{-1, -1, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
