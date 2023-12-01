@@ -1,10 +1,10 @@
 package replacement
 
 import (
-	"cycdg/graph_replacement/grammar"
+	. "cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/grammar"
 	"cycdg/lib/random"
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -16,14 +16,15 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	var appliedRules int
 	gen := &GraphReplacementApplier{}
 	var totalGenTime, worstTime, bestTime time.Duration
+	worstRules := make(map[string]time.Duration, 0)
 
 	progressBarCLI("Benchmarking", 0, tests+1, 20)
 	for i := 0; i < tests; i++ {
 		start := time.Now()
 		gen.Init(prng, width, height)
-		for gen.GetGraph().GetFilledNodesPercentage() < fillPerc {
-			gen.ApplyRandomReplacementRuleToTheGraph()
-		}
+
+		gen.BenchGenerate(fillPerc, worstRules)
+
 		thisGenTime := time.Since(start)
 		totalGenTime += thisGenTime
 		if worstTime < thisGenTime {
@@ -42,43 +43,59 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	testResultString += fmt.Sprintf("Worst gen time %v, best gen time %v\n", worstTime, bestTime)
 	testResultString += fmt.Sprintf("Total rules applied %d, mean %d rules per map, mean time per rule %v\n",
 		appliedRules, (appliedRules+tests/2)/tests, totalGenTime/time.Duration(appliedRules))
+	testResultString += fmt.Sprintf("Worst rule coords pick times:\n")
+	testResultString += formatDurationMap(worstRules)
 
 	return
 }
 
+func (ra *GraphReplacementApplier) BenchGenerate(fillPerc int, worstRules map[string]time.Duration) map[string]time.Duration {
+	for ra.GetGraph().GetFilledNodesPercentage() < fillPerc {
+		var rule *ReplacementRule
+		var applicableCoords [][]Coords
+		try := 0
+		for {
+			rule = ra.SelectRandomRuleToApply()
+			start := time.Now()
+
+			applicableCoords = rule.FindAllApplicableCoordVariantsRecursively(ra.graph)
+
+			took := time.Since(start)
+			if worstRules[rule.Name] < took {
+				worstRules[rule.Name] = took
+			}
+
+			if len(applicableCoords) > 0 {
+				break
+			}
+			try++
+			if try > 10000 {
+				panic("No applicable coords even after 10000 tries!")
+			}
+		}
+		ra.applyReplacementRule(rule, applicableCoords)
+	}
+	return worstRules
+}
+
 func showRulesInfo() string {
 	variants := 0
-	for _, r := range grammar.AllInitialRules {
+	for _, r := range AllInitialRules {
 		variants++
 		variants += len(r.MandatoryFeatures)
 	}
-	str := fmt.Sprintf("Total initial rules %d (%d counting all the features)\n", len(grammar.AllInitialRules), variants)
+	str := fmt.Sprintf("Total initial rules %d (%d counting all the features)\n", len(AllInitialRules), variants)
 
 	mandatory := 0
 	features := 0
 	totalVariants := 0
-	for _, r := range grammar.AllReplacementRules {
+	for _, r := range AllReplacementRules {
 		mandatory += max(1, len(r.MandatoryFeatures))
 		features += len(r.OptionalFeatures)
 		totalVariants += max(1, len(r.MandatoryFeatures)) * (1 + len(r.OptionalFeatures))
 	}
 	str += fmt.Sprintf("Total replacement rules %d (%d with variants), total %d optional features\n",
-		len(grammar.AllReplacementRules), mandatory, features)
+		len(AllReplacementRules), mandatory, features)
 	str += fmt.Sprintf("Total replacement rules variants: %d\n", totalVariants)
 	return str
-}
-
-func progressBarCLI(title string, value, endvalue, bar_length int) { // because I can
-	endvalue -= 1
-	percent := float64(value) / float64(endvalue)
-	arrow := ">"
-	for i := 0; i < int(percent*float64(bar_length)); i++ {
-		arrow = "-" + arrow
-	}
-	spaces := strings.Repeat(" ", bar_length-len(arrow)+1)
-	percent_with_dec := fmt.Sprintf("%.1f", percent*100.0)
-	fmt.Printf("\r%s [%s%s] %s%% (%d out of %d)", title, arrow, spaces, percent_with_dec, value, endvalue)
-	if value == endvalue {
-		fmt.Printf("\n")
-	}
 }
