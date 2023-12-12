@@ -6,13 +6,15 @@ import (
 	"strings"
 )
 
+const baseRuleWeight = 10
+
 func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 	index := rnd.SelectRandomIndexFromWeighted(len(AllReplacementRules),
 		func(i int) int {
 			r := AllReplacementRules[i]
 			if r.Metadata.AddsCycle {
 				if ra.MinCycles > ra.CyclesCount {
-					return 2 // ra.graph.AppliedRulesCount
+					return 2 * baseRuleWeight // ra.graph.AppliedRulesCount
 				}
 				if ra.MaxCycles <= ra.CyclesCount {
 					return 0
@@ -21,7 +23,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 			if r.Metadata.AddsTeleport && ra.TeleportsCount >= ra.MaxTeleports {
 				return 0
 			}
-			return r.Metadata.AdditionalWeight + 1
+			return r.Metadata.AdditionalWeight + baseRuleWeight
 		})
 	return AllReplacementRules[index]
 }

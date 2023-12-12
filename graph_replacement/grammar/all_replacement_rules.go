@@ -127,7 +127,8 @@ var AllReplacementRules = []*ReplacementRule{
 	{
 		Name: "TELEPORT",
 		Metadata: ruleMetadata{
-			AddsTeleport: true,
+			AddsTeleport:     true,
+			AdditionalWeight: -5,
 		},
 		searchNearPrevIndex: []int{-1, -1, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
