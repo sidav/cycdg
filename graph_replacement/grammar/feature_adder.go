@@ -8,7 +8,8 @@ import (
 
 // Features are anything that add something tag-related to the graph. Key/door pairs, bosses etc.
 type FeatureAdder struct {
-	Name string
+	Name             string
+	AdditionalWeight int
 	// applied before the rule itself, can be nil
 	PrepareFeature func(g *Graph, crds ...Coords)
 	// applied after the rule itself, can be nil too (but why?)

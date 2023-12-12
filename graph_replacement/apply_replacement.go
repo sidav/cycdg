@@ -100,7 +100,10 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 func (ra *GraphReplacementApplier) SelectRandomOptionalFeatureToApply(rule *ReplacementRule) *FeatureAdder {
 	var selectedOptionalFeature *FeatureAdder
 	if ra.shouldFeatureBeAdded() && len(rule.OptionalFeatures) > 0 {
-		selectedOptionalFeature = rule.OptionalFeatures[rnd.Rand(len(rule.OptionalFeatures))]
+		index := rnd.SelectRandomIndexFromWeighted(len(rule.OptionalFeatures), func(x int) int {
+			return baseRuleWeight + rule.OptionalFeatures[x].AdditionalWeight
+		})
+		selectedOptionalFeature = rule.OptionalFeatures[index]
 	}
 	return selectedOptionalFeature
 }
