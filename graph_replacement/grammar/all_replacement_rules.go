@@ -10,19 +10,70 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0  X  ; just finalize disabled node
 	{
-		Name: "DISABLE",
+		Name: "DISAB-1",
 		Metadata: ruleMetadata{
-			AdditionalWeight: 1,
+			AdditionalWeight: 0,
 		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.FinalizeNode(applyAt[0])
+		},
+	},
+
+	// Disable two neighbouring nodes
+	{
+		Name: "DISAB-2",
+		Metadata: ruleMetadata{
+			AdditionalWeight: -2,
+		},
+		searchNearPrevIndex: []int{-1, 0},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.FinalizeNode(applyAt[0])
+			g.FinalizeNode(applyAt[1])
+		},
+	},
+
+	// Disable three neighbouring nodes
+	{
+		Name: "DISAB-3",
+		Metadata: ruleMetadata{
+			AdditionalWeight: -4,
+		},
+		searchNearPrevIndex: []int{-1, 0, 1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.FinalizeNode(applyAt[0])
+			g.FinalizeNode(applyAt[1])
+			g.FinalizeNode(applyAt[2])
 		},
 	},
 
@@ -76,6 +127,7 @@ var AllReplacementRules = []*ReplacementRule{
 			makeKeyLockFeature(0, 1),
 			makeMasterKeyLockFeature(0, 1),
 			makeSecretPassageFeature(0, 1),
+			makeWindowFeature(0, 1),
 			makeOneTimePassageFeature(0, 1),
 			makeOneWayPassagesFeature(0, 1, 0, 1), // repeat on purpose
 		},
@@ -289,13 +341,7 @@ var AllReplacementRules = []*ReplacementRule{
 					g.AddNodeTagByCoords(crds[ind], graph_element.TagBoss)
 				},
 			},
-			{
-				Name: "Window",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.EnableDirectionalLinkBetweenCoords(crds[0], crds[1])
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagWindowEdge)
-				},
-			},
+			makeWindowFeature(0, 1),
 		},
 	},
 
@@ -303,7 +349,7 @@ var AllReplacementRules = []*ReplacementRule{
 	// V       >   V   V
 	// 1   3       1 < 3
 	{
-		Name: "LOOP-RULE",
+		Name: "D-RULE",
 		Metadata: ruleMetadata{
 			AddsCycle: true,
 		},
@@ -405,7 +451,7 @@ var AllReplacementRules = []*ReplacementRule{
 	// V       >       V
 	// 0 > 2       U   2
 	{
-		Name:                "FLIP",
+		Name:                "L-FLIP",
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0

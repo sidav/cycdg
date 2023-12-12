@@ -94,6 +94,16 @@ func makeOneTimePassageFeature(edgeIndex1, edgeIndex2 int) *FeatureAdder {
 	}
 }
 
+func makeWindowFeature(edgeIndex1, edgeIndex2 int) *FeatureAdder {
+	return &FeatureAdder{
+		Name: "Window",
+		ApplyFeature: func(g *Graph, crds ...Coords) {
+			g.EnableDirectionalLinkBetweenCoords(crds[edgeIndex1], crds[edgeIndex2])
+			g.AddEdgeTagByCoords(crds[edgeIndex1], crds[edgeIndex2], TagWindowEdge)
+		},
+	}
+}
+
 func makeRandomHazardFeature(edgeIndex int) *FeatureAdder {
 	return &FeatureAdder{
 		Name: "Random hazard",
