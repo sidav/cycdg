@@ -76,7 +76,7 @@ func (g *Graph) EnableDirLinkByVector(x, y, vx, vy int) {
 		vy = 1
 		reverse = true
 	}
-	g.NodeAt(x, y).SetLinkByVector(vx, vy, true, true, reverse)
+	g.NodeAt(x, y).SetLinkByVector(vx, vy, true, reverse)
 }
 
 func (g *Graph) EnableDirectionalLinkBetweenCoords(from, to geometry.Coords) {

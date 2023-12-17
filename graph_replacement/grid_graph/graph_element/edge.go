@@ -2,14 +2,12 @@ package graph_element
 
 type Edge struct {
 	enabled     bool
-	directional bool
 	dirReversed bool
 	tags        []*Tag
 }
 
 func (e *Edge) Reset() {
 	e.enabled = false
-	e.directional = false
 	e.dirReversed = false
 	// if len(e.tags) > 0 {
 	// 	panic("Tagged node being reset!")
@@ -17,7 +15,7 @@ func (e *Edge) Reset() {
 }
 
 func (e *Edge) IsDirectional() bool {
-	return e.directional
+	return true
 }
 
 func (e *Edge) IsReverse() bool {

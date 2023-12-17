@@ -75,7 +75,7 @@ func (g *Graph) setLinkByVector(x, y, vx, vy int, link bool) {
 		y--
 		vy = 1
 	}
-	g.NodeAt(x, y).SetLinkByVector(vx, vy, link, false, false)
+	g.NodeAt(x, y).SetLinkByVector(vx, vy, link, false)
 }
 
 func (g *Graph) SetLinkBetweenCoords(fromx, fromy, x, y int, link bool) {

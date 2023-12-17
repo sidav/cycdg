@@ -27,10 +27,10 @@ func (g *Graph) Init(w, h int) {
 	// removing links for border nodes
 	for x := range g.nodes {
 		// g.nodes[x][0].setLinkByVector(false, 0, -1)
-		g.nodes[x][h-1].SetLinkByVector(0, 1, false, false, false)
+		g.nodes[x][h-1].SetLinkByVector(0, 1, false, false)
 	}
 	for y := range g.nodes[0] {
 		// g.nodes[0][y].setLinkByVector(false, -1, 0)
-		g.nodes[w-1][y].SetLinkByVector(1, 0, false, false, false)
+		g.nodes[w-1][y].SetLinkByVector(1, 0, false, false)
 	}
 }
