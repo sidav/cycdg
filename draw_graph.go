@@ -146,7 +146,7 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 		char = '!'
 	case TagOneWayEdge:
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorMaroon)
 		return false, ' '
 	default:
 		panic("Unknown edge tag!")
@@ -185,8 +185,8 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 		str = "TRSR"
 		cw.SetStyle(tcell.ColorYellow, tcell.ColorDarkBlue)
 	case TagTeleportBidirectional:
-		str = "TELE"
-		cw.SetStyle(tcell.ColorDarkCyan, tcell.ColorDarkBlue)
+		str = "TEL-"
+		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
 	default:
 		panic("Unknown node tag!")
 	}
