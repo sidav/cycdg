@@ -24,11 +24,6 @@ func (e *Edge) IsReverse() bool {
 	return e.dirReversed
 }
 
-func (e *Edge) SetDirection(r bool) {
-	e.directional = true
-	e.dirReversed = r
-}
-
 func (e *Edge) IsActive() bool {
 	return e.enabled
 }

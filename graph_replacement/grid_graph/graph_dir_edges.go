@@ -39,13 +39,13 @@ func (g *Graph) isEdgeByVectorDirectionalAndActive(x, y, vx, vy int) bool {
 
 func (g *Graph) IsEdgeDirectedByVector(x, y, vx, vy int) bool {
 	n := g.GetEdgeByVector(x, y, vx, vy)
-	return n.IsDirectional() && (n.IsReverse() == (vx < 0 || vy < 0))
+	return n.IsActive() && n.IsReverse() == (vx < 0 || vy < 0)
 }
 
 func (g *Graph) IsEdgeDirectedBetweenCoords(x, y, tox, toy int) bool {
 	vx, vy := tox-x, toy-y
 	n := g.GetEdgeByVector(x, y, vx, vy)
-	return n.IsDirectional() && (n.IsReverse() == (vx < 0 || vy < 0))
+	return n.IsActive() && n.IsReverse() == (vx < 0 || vy < 0)
 }
 
 func (g *Graph) doCoordsHaveIngoingLinksOnly(x, y int) bool {
