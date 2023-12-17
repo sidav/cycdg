@@ -6,19 +6,24 @@ import (
 	"strings"
 )
 
+const baseRuleWeight = 10
+
 func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 	index := rnd.SelectRandomIndexFromWeighted(len(AllReplacementRules),
 		func(i int) int {
 			r := AllReplacementRules[i]
-			if r.AddsCycle {
+			if r.Metadata.AddsCycle {
 				if ra.MinCycles > ra.CyclesCount {
-					return 2 // ra.graph.AppliedRulesCount
+					return 2 * baseRuleWeight // ra.graph.AppliedRulesCount
 				}
 				if ra.MaxCycles <= ra.CyclesCount {
 					return 0
 				}
 			}
-			return 1
+			if r.Metadata.AddsTeleport && ra.TeleportsCount >= ra.MaxTeleports {
+				return 0
+			}
+			return r.Metadata.AdditionalWeight + baseRuleWeight
 		})
 	return AllReplacementRules[index]
 }
@@ -74,8 +79,11 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 	}
 
 	// update stats
-	if rule.AddsCycle {
+	if rule.Metadata.AddsCycle {
 		ra.CyclesCount++
+	}
+	if rule.Metadata.AddsTeleport {
+		ra.TeleportsCount++
 	}
 	ra.AppliedRulesCount++
 	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(
@@ -92,7 +100,10 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 func (ra *GraphReplacementApplier) SelectRandomOptionalFeatureToApply(rule *ReplacementRule) *FeatureAdder {
 	var selectedOptionalFeature *FeatureAdder
 	if ra.shouldFeatureBeAdded() && len(rule.OptionalFeatures) > 0 {
-		selectedOptionalFeature = rule.OptionalFeatures[rnd.Rand(len(rule.OptionalFeatures))]
+		index := rnd.SelectRandomIndexFromWeighted(len(rule.OptionalFeatures), func(x int) int {
+			return baseRuleWeight + rule.OptionalFeatures[x].AdditionalWeight
+		})
+		selectedOptionalFeature = rule.OptionalFeatures[index]
 	}
 	return selectedOptionalFeature
 }

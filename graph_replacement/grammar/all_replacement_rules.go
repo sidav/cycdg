@@ -10,12 +10,15 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0  X  ; just finalize disabled node
 	{
-		Name:                "DISABLE",
+		Name: "DISAB-1",
+		Metadata: ruleMetadata{
+			AdditionalWeight: 0,
+		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -23,9 +26,63 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
+	// Disable two neighbouring nodes
+	{
+		Name: "DISAB-2",
+		Metadata: ruleMetadata{
+			AdditionalWeight: -2,
+		},
+		searchNearPrevIndex: []int{-1, 0},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.FinalizeNode(applyAt[0])
+			g.FinalizeNode(applyAt[1])
+		},
+	},
+
+	// Disable three neighbouring nodes
+	{
+		Name: "DISAB-3",
+		Metadata: ruleMetadata{
+			AdditionalWeight: -4,
+		},
+		searchNearPrevIndex: []int{-1, 0, 1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.FinalizeNode(applyAt[0])
+			g.FinalizeNode(applyAt[1])
+			g.FinalizeNode(applyAt[2])
+		},
+	},
+
 	// 0; just add someting to empty active node
 	{
-		Name:                "THING",
+		Name: "THING",
+		Metadata: ruleMetadata{
+			AdditionalWeight: 2,
+		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -47,8 +104,10 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0   1       0 > 1  ; where both are active
 	{
-		Name:                "CONNECT",
-		AddsCycle:           true, // it's not guaranteed, but should be more possible than not
+		Name: "CONNECT",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		}, // it's not guaranteed, but should be more possible than not
 		searchNearPrevIndex: []int{-1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -68,6 +127,7 @@ var AllReplacementRules = []*ReplacementRule{
 			makeKeyLockFeature(0, 1),
 			makeMasterKeyLockFeature(0, 1),
 			makeSecretPassageFeature(0, 1),
+			makeWindowFeature(0, 1),
 			makeOneTimePassageFeature(0, 1),
 			makeOneWayPassagesFeature(0, 1, 0, 1), // repeat on purpose
 		},
@@ -117,7 +177,11 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0 ...  1  2       0 (teleport)> 1 > 2  ; where 1 and 2 are inactive
 	{
-		Name:                "TELEPORT",
+		Name: "TELEPORT",
+		Metadata: ruleMetadata{
+			AddsTeleport:     true,
+			AdditionalWeight: -5,
+		},
 		searchNearPrevIndex: []int{-1, -1, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -161,8 +225,10 @@ var AllReplacementRules = []*ReplacementRule{
 
 	// 0   2   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
 	{
-		Name:                "CONNROOM",
-		AddsCycle:           true, // it's not guaranteed, but should be more possible than not
+		Name: "CONNROOM",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		}, // it's not guaranteed, but should be more possible than not
 		searchNearPrevIndex: []int{-1, -1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -275,13 +341,7 @@ var AllReplacementRules = []*ReplacementRule{
 					g.AddNodeTagByCoords(crds[ind], graph_element.TagBoss)
 				},
 			},
-			{
-				Name: "Window",
-				ApplyFeature: func(g *Graph, crds ...Coords) {
-					g.EnableDirectionalLinkBetweenCoords(crds[0], crds[1])
-					g.AddEdgeTagByCoords(crds[0], crds[1], graph_element.TagWindowEdge)
-				},
-			},
+			makeWindowFeature(0, 1),
 		},
 	},
 
@@ -289,8 +349,10 @@ var AllReplacementRules = []*ReplacementRule{
 	// V       >   V   V
 	// 1   3       1 < 3
 	{
-		Name:                "LOOP-RULE",
-		AddsCycle:           true,
+		Name: "D-RULE",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		},
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -343,7 +405,9 @@ var AllReplacementRules = []*ReplacementRule{
 	// 1   3       1 > 3
 	// {
 	// 	Name:                "RET-LOOP",
-	// 	AddsCycle:           true,
+	// 	Metadata: ruleMetadata{
+	//		AddsCycle: true,
+	//	},
 	// 	searchNearPrevIndex: []int{-1, 0, 0, 1},
 	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 	// 		// node 0
@@ -387,7 +451,7 @@ var AllReplacementRules = []*ReplacementRule{
 	// V       >       V
 	// 0 > 2       U   2
 	{
-		Name:                "FLIP",
+		Name:                "L-FLIP",
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -429,8 +493,10 @@ var AllReplacementRules = []*ReplacementRule{
 	//         >   ^   V    0 is active, others not
 	// 2   3       2 < 3
 	{
-		Name:                "CORNERLOOP",
-		AddsCycle:           true,
+		Name: "CORNERLOOP",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		},
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
@@ -496,8 +562,10 @@ var AllReplacementRules = []*ReplacementRule{
 	// V           >   V       V
 	// 1 > 2   5       1 > 2 < 5
 	{
-		Name:                "ALTWAY",
-		AddsCycle:           true,
+		Name: "ALTWAY",
+		Metadata: ruleMetadata{
+			AddsCycle: true,
+		},
 		searchNearPrevIndex: []int{-1, 0, 1, 0, 3, 2},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0

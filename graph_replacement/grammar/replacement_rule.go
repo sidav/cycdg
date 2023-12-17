@@ -10,8 +10,7 @@ import (
 type ReplacementRule struct {
 	Name string
 
-	// metadata:
-	AddsCycle bool
+	Metadata ruleMetadata
 
 	// each value is coords index, near which the applicability func will be checked
 	searchNearPrevIndex []int // -1 means "any coords"
