@@ -14,10 +14,6 @@ func (e *Edge) Reset() {
 	// }
 }
 
-func (e *Edge) IsDirectional() bool {
-	return true
-}
-
 func (e *Edge) IsReverse() bool {
 	return e.dirReversed
 }

@@ -93,23 +93,21 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 		if g.IsEdgeByVectorActive(nx, ny, dir[0], dir[1]) {
 			cw.SetStyle(tcell.ColorDarkGreen, background)
 			char := ' '
-			if g.IsEdgeByVectorDirectional(nx, ny, dir[0], dir[1]) {
-				if g.IsEdgeDirectedByVector(nx, ny, dir[0], dir[1]) {
-					if dir[0] == 1 {
-						char = '>'
-					} else if dir[1] == 1 {
-						char = 'V'
-					} else {
-						panic(fmt.Sprintf("Strange directon - %v", dir))
-					}
+			if g.IsEdgeDirectedByVector(nx, ny, dir[0], dir[1]) {
+				if dir[0] == 1 {
+					char = '>'
+				} else if dir[1] == 1 {
+					char = 'V'
 				} else {
-					if dir[0] == 1 {
-						char = '<'
-					} else if dir[1] == 1 {
-						char = '^'
-					} else {
-						panic(fmt.Sprintf("Strange directon - %v", dir))
-					}
+					panic(fmt.Sprintf("Strange directon - %v", dir))
+				}
+			} else {
+				if dir[0] == 1 {
+					char = '<'
+				} else if dir[1] == 1 {
+					char = '^'
+				} else {
+					panic(fmt.Sprintf("Strange directon - %v", dir))
 				}
 			}
 			if len(g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()) > 0 {
