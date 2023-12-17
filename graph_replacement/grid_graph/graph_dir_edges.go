@@ -27,11 +27,6 @@ func (g *Graph) CountDirEdgesAt(x, y int, countIn, countOut bool) int {
 	return count
 }
 
-func (g *Graph) isEdgeByVectorDirectionalAndActive(x, y, vx, vy int) bool {
-	n := g.GetEdgeByVector(x, y, vx, vy)
-	return n.IsActive()
-}
-
 func (g *Graph) IsEdgeDirectedByVector(x, y, vx, vy int) bool {
 	n := g.GetEdgeByVector(x, y, vx, vy)
 	return n.IsActive() && n.IsReverse() == (vx < 0 || vy < 0)
@@ -47,7 +42,7 @@ func (g *Graph) doCoordsHaveIngoingLinksOnly(x, y int) bool {
 	for i := range cardinalDirections {
 		vx, vy := unwrapCoords(cardinalDirections[i])
 		if g.AreCoordsInBounds(x+vx, y+vy) {
-			if g.isEdgeByVectorDirectionalAndActive(x, y, vx, vy) {
+			if g.IsEdgeByVectorActive(x, y, vx, vy) {
 				if g.IsEdgeDirectedByVector(x, y, vx, vy) {
 					return false
 				}

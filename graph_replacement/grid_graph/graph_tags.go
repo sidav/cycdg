@@ -43,7 +43,7 @@ func (g *Graph) AddEdgeTagByCoordsPreserveLastId(c1, c2 Coords, tag TagKind) {
 func (g *Graph) AddTagToAllActiveEdgesAtCoords(t TagKind, crds Coords) {
 	x, y := crds.Unwrap()
 	for _, dir := range cardinalDirections {
-		if g.AreCoordsInBounds(x+dir[0], y+dir[1]) && g.isEdgeByVectorDirectionalAndActive(x, y, dir[0], dir[1]) {
+		if g.AreCoordsInBounds(x+dir[0], y+dir[1]) && g.IsEdgeByVectorActive(x, y, dir[0], dir[1]) {
 			g.AddEdgeTagByVector(x, y, dir[0], dir[1], t)
 		}
 	}
