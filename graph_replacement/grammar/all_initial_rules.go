@@ -12,19 +12,20 @@ var AllInitialRules = []InitialRule{
 		Name:      "nAj-CYCLE",
 		AddsCycle: true,
 		IsApplicableAt: func(g *Graph, x, y int) bool {
-			if !g.AreCoordsInBounds(x+3, y+3) || x == 0 || y == 0 {
+			if !g.AreCoordsInBounds(x+2, y+2) {
 				return false
 			}
 			return true
 		},
 		ApplyOnGraphAt: func(g *Graph, x, y int) {
 			w, h := g.GetSize()
-			rw, rh := rnd.RandInRange(3, w-x-1), rnd.RandInRange(3, h-y-1)
+			rw, rh := rnd.RandInRange(3, w-x), rnd.RandInRange(3, h-y)
 			start := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
 				return areCoordsOnRectangle(i, j, x, y, rw, rh)
 			})
 			goal := getRandomGraphCoordsByFunc(g, func(i, j int) bool {
-				return areCoordsOnRectangle(i, j, x, y, rw, rh) && !start.EqualsPair(i, j) && start.ManhattanDistToXY(i, j) >= min(rw, rh)
+				return areCoordsOnRectangle(i, j, x, y, rw, rh) && !areCoordsOnRectangleCorner(i, j, 0, 0, w, h) &&
+					!start.EqualsPair(i, j) && start.ManhattanDistToXY(i, j) >= min(rw, rh)
 			})
 			g.DrawBiсonnectedDirectionalRect(x, y, rw, rh, start, goal)
 			g.AddNodeTagByCoords(start, TagStart)
@@ -78,7 +79,7 @@ var AllInitialRules = []InitialRule{
 		Name:      "Aj-CYCLE",
 		AddsCycle: true,
 		IsApplicableAt: func(g *Graph, x, y int) bool {
-			if x == 0 || y == 0 || !g.AreCoordsInBounds(x+2, y+2) {
+			if !g.AreCoordsInBounds(x+2, y+2) {
 				return false
 			}
 			return true

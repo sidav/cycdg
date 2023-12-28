@@ -24,6 +24,10 @@ func areCoordsOnRectangle(x, y, rx, ry, w, h int) bool {
 	return x == rx || x == rx+w-1 || y == ry || y == ry+h-1
 }
 
+func areCoordsOnRectangleCorner(x, y, rx, ry, w, h int) bool {
+	return (x == rx || x == rx+w-1) && (y == ry || y == ry+h-1)
+}
+
 func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
 	dx := intabs(x2 - x1)
 	dy := intabs(y2 - y1)
