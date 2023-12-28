@@ -75,6 +75,9 @@ func (g *Graph) EnableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
 }
 
 func (g *Graph) DisableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
+	if !g.IsEdgeDirectedBetweenCoords(from[0], from[1], to[0], to[1]) {
+		debugPanic("Direction unsatisfied")
+	}
 	vx, vy := from.VectorTo(to)
 	g.setLinkByVector(from[0], from[1], vx, vy, false)
 }

@@ -311,7 +311,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[3])
 			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
-			g.SetLinkBetweenCoords(applyAt[0][0], applyAt[0][1], applyAt[1][0], applyAt[1][1], false)
+			g.DisableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			{
