@@ -69,12 +69,12 @@ func (g *Graph) EnableDirLinkByVector(x, y, vx, vy int) {
 	g.NodeAt(x, y).SetLinkByVector(vx, vy, true, reverse)
 }
 
-func (g *Graph) EnableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
+func (g *Graph) EnableDirLinkByCoords(from, to geometry.Coords) {
 	vx, vy := from.VectorTo(to)
 	g.EnableDirLinkByVector(from[0], from[1], vx, vy)
 }
 
-func (g *Graph) DisableDirectionalLinkBetweenCoords(from, to geometry.Coords) {
+func (g *Graph) DisableDirLinkByCoords(from, to geometry.Coords) {
 	if !g.IsEdgeDirectedBetweenCoords(from[0], from[1], to[0], to[1]) {
 		debugPanic("Direction unsatisfied")
 	}

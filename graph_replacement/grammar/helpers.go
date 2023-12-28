@@ -152,7 +152,7 @@ func PushNodeContentsInRandomDirection(g *graph.Graph, crds geometry.Coords) {
 		return
 	}
 	g.EnableNodeByCoords(pushTo)
-	g.EnableDirectionalLinkBetweenCoords(crds, pushTo)
+	g.EnableDirLinkByCoords(crds, pushTo)
 	g.SwapNodeTags(crds, pushTo)
 }
 
@@ -164,7 +164,7 @@ func PushNodeContentsInRandomDirectionWithEdgeTag(g *graph.Graph, crds geometry.
 		return
 	}
 	g.EnableNodeByCoords(pushTo)
-	g.EnableDirectionalLinkBetweenCoords(crds, pushTo)
+	g.EnableDirLinkByCoords(crds, pushTo)
 	g.AddEdgeTagByCoords(crds, pushTo, tag)
 	g.SwapNodeTags(crds, pushTo)
 }

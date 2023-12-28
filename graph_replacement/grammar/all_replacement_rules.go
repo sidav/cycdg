@@ -121,7 +121,7 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
-			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			makeKeyLockFeature(0, 1),
@@ -150,7 +150,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableNodeByCoords(applyAt[1])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[1])
 			moveRandomNodeTag(g, applyAt[0], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
@@ -202,7 +202,7 @@ var AllReplacementRules = []*ReplacementRule{
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableNodeByCoords(applyAt[1])
 			g.EnableNodeByCoords(applyAt[2])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[1], applyAt[2])
 			moveRandomNodeTag(g, applyAt[0], applyAt[2])
 			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidirectional)
 			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidirectional)
@@ -246,8 +246,8 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableNodeByCoords(applyAt[2])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[1])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[2], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			makeOneTimePassageFeature(0, 2),
@@ -308,10 +308,10 @@ var AllReplacementRules = []*ReplacementRule{
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableNode(applyAt[2][0], applyAt[2][1])
 			g.EnableNode(applyAt[3][0], applyAt[3][1])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[3])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
-			g.DisableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[2], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[1])
+			g.DisableDirLinkByCoords(applyAt[0], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			{
@@ -379,9 +379,9 @@ var AllReplacementRules = []*ReplacementRule{
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableNode(applyAt[2][0], applyAt[2][1])
 			g.EnableNode(applyAt[3][0], applyAt[3][1])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[3])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[1])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[2], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[1])
 		},
 		MandatoryFeatures: []*FeatureAdder{
 			{
@@ -478,10 +478,10 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.EnableNode(applyAt[3][0], applyAt[3][1])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[3])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[2])
-			g.DisableDirectionalLinkBetweenCoords(applyAt[1], applyAt[0])
-			g.DisableDirectionalLinkBetweenCoords(applyAt[0], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[1], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[2])
+			g.DisableDirLinkByCoords(applyAt[1], applyAt[0])
+			g.DisableDirLinkByCoords(applyAt[0], applyAt[2])
 			g.SwapNodeTags(applyAt[3], applyAt[0])
 			g.CopyEdgeTagsPreservingIds(applyAt[1], applyAt[0], applyAt[1], applyAt[3])
 			g.CopyEdgeTagsPreservingIds(applyAt[0], applyAt[2], applyAt[3], applyAt[2])
@@ -525,10 +525,10 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableNode(applyAt[1].Unwrap())
 			g.EnableNode(applyAt[2].Unwrap())
 			g.EnableNode(applyAt[3].Unwrap())
-			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[1])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[1], applyAt[3])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[2])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[2], applyAt[0])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[1])
+			g.EnableDirLinkByCoords(applyAt[1], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[2], applyAt[0])
 		},
 		OptionalFeatures: []*FeatureAdder{
 			makeOneWayPassagesFeature(0, 1, 2, 0),
@@ -599,10 +599,10 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableNode(applyAt[3].Unwrap())
 			g.EnableNode(applyAt[4].Unwrap())
 			g.EnableNode(applyAt[5].Unwrap())
-			g.EnableDirectionalLinkBetweenCoords(applyAt[0], applyAt[3])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[3], applyAt[4])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[4], applyAt[5])
-			g.EnableDirectionalLinkBetweenCoords(applyAt[5], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[4], applyAt[5])
+			g.EnableDirLinkByCoords(applyAt[5], applyAt[2])
 			if !g.DoesNodeHaveAnyTags(applyAt[1].Unwrap()) {
 				AddRandomHazardAt(g, applyAt[1])
 			}
