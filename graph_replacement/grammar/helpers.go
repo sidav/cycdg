@@ -111,7 +111,9 @@ func doesGraphContainNodeTag(g *graph.Graph, tag TagKind) bool {
 
 func isTagMovable(tag *Tag) bool {
 	t := tag.Kind
-	return !(t == TagKey || t == TagHalfkey || t == TagMasterkey || t == TagStart)
+	// TODO: allow moving teleports somehow.
+	// currently they're disabled because it causes unreachable keys sometimes (teleport is moved behind a door, which is then locked).
+	return !(t == TagKey || t == TagHalfkey || t == TagMasterkey || t == TagStart || t == TagTeleportBidirectional)
 }
 
 func areAllNodeTagsMovable(g *graph.Graph, crds geometry.Coords) bool {
