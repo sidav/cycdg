@@ -12,6 +12,7 @@ var (
 )
 
 func debugPanic(msg string, args ...interface{}) {
+	fmt.Println()
 	panic(sprintf(msg, args...))
 }
 
@@ -65,7 +66,7 @@ func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geomet
 		}
 	}
 	if len(candidates) == 0 {
-		panic("No candidates!")
+		debugPanic("No candidates!")
 		// return geometry.NewCoords(-1, -1)
 	}
 	ind := rnd.Rand(len(candidates))
