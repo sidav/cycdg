@@ -13,6 +13,7 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 			NewValueSelectorEntry("Min cycles", "", 0, 1, 100, 1),
 			NewValueSelectorEntry("Max cycles", "", 0, 4, 100, 1),
 			NewValueSelectorEntry("Desired features", "", 0, 5, 1000, 1),
+			NewValueSelectorEntry("Max teleports", "", 0, 2, 1000, 1),
 		},
 	}
 	menu.Init()
@@ -34,6 +35,7 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 	gra.MinCycles = menu.GetValueByIndex(3)
 	gra.MaxCycles = menu.GetValueByIndex(4)
 	gra.DesiredFeatures = menu.GetValueByIndex(5)
+	gra.MaxTeleports = menu.GetValueByIndex(6)
 
 	return gra
 }

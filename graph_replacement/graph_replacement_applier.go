@@ -42,9 +42,6 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	if gra.DesiredFeatures == 0 {
 		gra.DesiredFeatures = 5
 	}
-	if gra.MaxTeleports == 0 {
-		gra.MaxTeleports = 2
-	}
 	gra.AppliedRules = nil
 	gra.AppliedRulesCount = 0
 	gra.AppliedFeaturesCount = 0

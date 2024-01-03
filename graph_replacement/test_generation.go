@@ -14,7 +14,9 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 		return
 	}
 	var appliedRules int
-	gen := &GraphReplacementApplier{}
+	gen := &GraphReplacementApplier{
+		MaxTeleports: 2,
+	}
 	var totalGenTime, worstTime, bestTime time.Duration
 	worstRules := make(map[string]time.Duration, 0)
 
