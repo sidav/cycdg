@@ -2,18 +2,6 @@ package graph
 
 import . "cycdg/graph_replacement/geometry"
 
-func (g *Graph) enableAndInterlinkNodeFromCoords(x, y, vx, vy int, directional bool) {
-	if g.IsNodeFinalized(x, y) {
-		panic("Node is finalized!")
-	}
-	g.EnableNode(x+vx, y+vy)
-	if directional {
-		g.EnableDirLinkByVector(x, y, vx, vy)
-	} else {
-		g.setLinkByVector(x, y, vx, vy, true)
-	}
-}
-
 func (g *Graph) drawCardinalConnectedLine(x1, y1, x2, y2 int, directed bool) {
 	vx := 0
 	if x2 != x1 {
@@ -27,24 +15,18 @@ func (g *Graph) drawCardinalConnectedLine(x1, y1, x2, y2 int, directed bool) {
 	x := x1
 	y := y1
 	for vx != 0 && x != x2 {
-		g.enableAndInterlinkNodeFromCoords(x, y, vx, vy, directed)
+		g.EnableNodeByVector(x, y, vx, vy)
+		g.EnableDirLinkByVector(x, y, vx, vy)
 		x += vx
 	}
 	for vy != 0 && y != y2 {
-		g.enableAndInterlinkNodeFromCoords(x, y, vx, vy, directed)
+		g.EnableNodeByVector(x, y, vx, vy)
+		g.EnableDirLinkByVector(x, y, vx, vy)
 		y += vy
 	}
 }
 
 // Should only add links/nodes, not remove!
-func (g *Graph) drawConnectedNodeRect(x, y, w, h int) {
-	rghX, botY := x+w-1, y+h-1
-	g.drawCardinalConnectedLine(x, y, rghX, y, false)
-	g.drawCardinalConnectedLine(rghX, y, rghX, botY, false)
-	g.drawCardinalConnectedLine(rghX, botY, x, botY, false)
-	g.drawCardinalConnectedLine(x, botY, x, y, false)
-}
-
 func (g *Graph) DrawConnectedDirectionalRect(x, y, w, h int, ccw bool) {
 	rghX, botY := x+w-1, y+h-1
 	if ccw {
@@ -79,7 +61,8 @@ func (g *Graph) drawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, si
 		currX, currY := unwrapCoords(allCoords[index])
 		nextX, nextY := unwrapCoords(allCoords[nextIndex])
 		vx, vy := nextX-currX, nextY-currY
-		g.enableAndInterlinkNodeFromCoords(currX, currY, vx, vy, true)
+		g.EnableNodeByVector(currX, currY, vx, vy)
+		g.EnableDirLinkByVector(currX, currY, vx, vy)
 		index = nextIndex
 	}
 	// second path: counter-clockwise
@@ -92,7 +75,8 @@ func (g *Graph) drawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, si
 		currX, currY := unwrapCoords(allCoords[index])
 		nextX, nextY := unwrapCoords(allCoords[nextIndex])
 		vx, vy := nextX-currX, nextY-currY
-		g.enableAndInterlinkNodeFromCoords(currX, currY, vx, vy, true)
+		g.EnableNodeByVector(currX, currY, vx, vy)
+		g.EnableDirLinkByVector(currX, currY, vx, vy)
 		index = nextIndex
 	}
 }

@@ -66,10 +66,9 @@ func (gn *Node) ResetTags() {
 	gn.tags = nil
 }
 
-func (gn *Node) SetLinkByVector(vx, vy int, enabled, diectional, reverse bool) {
+func (gn *Node) SetLinkByVector(vx, vy int, enabled, reverse bool) {
 	e := gn.GetEdgeByVector(vx, vy)
 	e.enabled = enabled
-	e.directional = diectional
 	e.dirReversed = reverse
 }
 

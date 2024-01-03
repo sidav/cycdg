@@ -7,7 +7,10 @@ import (
 	"cycdg/lib/tcell_console_wrapper"
 	"flag"
 	"fmt"
+	"os"
 	"time"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 var (
@@ -34,6 +37,14 @@ func main() {
 
 	key := ""
 	for key != "ESCAPE" {
+		if key == "e" {
+			logName := exportRulesLog(&gen)
+			cw.SetStyle(tcell.ColorYellow, tcell.ColorBlack)
+			cw.PutString("Exported the log to file "+logName, 0, 0)
+			cw.FlushScreen()
+			key = cw.ReadKey()
+			continue
+		}
 		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= fill {
 			gen.Init(rnd, width, height)
 		} else {
@@ -64,4 +75,20 @@ func execArgs() bool {
 		testResultString = replacement.TestGen(rnd, width, height, testMapsCount, fill)
 	}
 	return benchOnly
+}
+
+func exportRulesLog(gen *replacement.GraphReplacementApplier) string {
+	rlog := ""
+	for i := range gen.AppliedRules {
+		if i == 0 {
+			rlog += "Initial rule:\n"
+		} else {
+			rlog += fmt.Sprintf("Rule %d:\n", i+1)
+		}
+		rlog += fmt.Sprintf("  %s\n", gen.AppliedRules[i].StringifyRule())
+		rlog += fmt.Sprintf("  %s\n", gen.AppliedRules[i].StringifyCoords())
+	}
+	fileName := time.Now().Format("2006-01-02_15-04-05") + ".log"
+	os.WriteFile(fileName, []byte(rlog), 0644)
+	return fileName
 }

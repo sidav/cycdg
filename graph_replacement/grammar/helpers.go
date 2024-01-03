@@ -12,6 +12,7 @@ var (
 )
 
 func debugPanic(msg string, args ...interface{}) {
+	fmt.Println()
 	panic(sprintf(msg, args...))
 }
 
@@ -21,6 +22,10 @@ func areCoordsOnRectangle(x, y, rx, ry, w, h int) bool {
 		return false
 	}
 	return x == rx || x == rx+w-1 || y == ry || y == ry+h-1
+}
+
+func areCoordsOnRectangleCorner(x, y, rx, ry, w, h int) bool {
+	return (x == rx || x == rx+w-1) && (y == ry || y == ry+h-1)
 }
 
 func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
@@ -65,7 +70,7 @@ func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geomet
 		}
 	}
 	if len(candidates) == 0 {
-		panic("No candidates!")
+		debugPanic("No candidates!")
 		// return geometry.NewCoords(-1, -1)
 	}
 	ind := rnd.Rand(len(candidates))
@@ -106,7 +111,9 @@ func doesGraphContainNodeTag(g *graph.Graph, tag TagKind) bool {
 
 func isTagMovable(tag *Tag) bool {
 	t := tag.Kind
-	return !(t == TagKey || t == TagHalfkey || t == TagMasterkey || t == TagStart)
+	// TODO: allow moving teleports somehow.
+	// currently they're disabled because it causes unreachable keys sometimes (teleport is moved behind a door, which is then locked).
+	return !(t == TagKey || t == TagHalfkey || t == TagMasterkey || t == TagStart || t == TagTeleportBidirectional)
 }
 
 func areAllNodeTagsMovable(g *graph.Graph, crds geometry.Coords) bool {
@@ -147,7 +154,7 @@ func PushNodeContentsInRandomDirection(g *graph.Graph, crds geometry.Coords) {
 		return
 	}
 	g.EnableNodeByCoords(pushTo)
-	g.EnableDirectionalLinkBetweenCoords(crds, pushTo)
+	g.EnableDirLinkByCoords(crds, pushTo)
 	g.SwapNodeTags(crds, pushTo)
 }
 
@@ -159,7 +166,7 @@ func PushNodeContentsInRandomDirectionWithEdgeTag(g *graph.Graph, crds geometry.
 		return
 	}
 	g.EnableNodeByCoords(pushTo)
-	g.EnableDirectionalLinkBetweenCoords(crds, pushTo)
+	g.EnableDirLinkByCoords(crds, pushTo)
 	g.AddEdgeTagByCoords(crds, pushTo, tag)
 	g.SwapNodeTags(crds, pushTo)
 }

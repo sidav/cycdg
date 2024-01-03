@@ -27,6 +27,9 @@ func (gra *GraphReplacementApplier) GetGraph() *graph.Graph {
 }
 
 func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
+	if width < 4 || height < 4 {
+		debugPanic("Minimum allowed size violation: at least 4x4 is allowed.")
+	}
 	if gra.MinCycles == 0 {
 		gra.MinCycles = 1
 	}

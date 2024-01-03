@@ -10,6 +10,7 @@ var (
 )
 
 func debugPanic(msg string, args ...interface{}) {
+	fmt.Println()
 	panic(sprintf(msg, args...))
 }
 

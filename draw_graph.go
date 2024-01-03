@@ -93,23 +93,21 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 		if g.IsEdgeByVectorActive(nx, ny, dir[0], dir[1]) {
 			cw.SetStyle(tcell.ColorDarkGreen, background)
 			char := ' '
-			if g.IsEdgeByVectorDirectional(nx, ny, dir[0], dir[1]) {
-				if g.IsEdgeDirectedByVector(nx, ny, dir[0], dir[1]) {
-					if dir[0] == 1 {
-						char = '>'
-					} else if dir[1] == 1 {
-						char = 'V'
-					} else {
-						panic(fmt.Sprintf("Strange directon - %v", dir))
-					}
+			if g.IsEdgeDirectedByVector(nx, ny, dir[0], dir[1]) {
+				if dir[0] == 1 {
+					char = '>'
+				} else if dir[1] == 1 {
+					char = 'V'
 				} else {
-					if dir[0] == 1 {
-						char = '<'
-					} else if dir[1] == 1 {
-						char = '^'
-					} else {
-						panic(fmt.Sprintf("Strange directon - %v", dir))
-					}
+					panic(fmt.Sprintf("Strange directon - %v", dir))
+				}
+			} else {
+				if dir[0] == 1 {
+					char = '<'
+				} else if dir[1] == 1 {
+					char = '^'
+				} else {
+					panic(fmt.Sprintf("Strange directon - %v", dir))
 				}
 			}
 			if len(g.GetEdgeByVector(nx, ny, dir[0], dir[1]).GetTags()) > 0 {
@@ -148,7 +146,7 @@ func GetEdgeTagCharAndSetColor(tag *Tag) (bool, rune) {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorYellow)
 		char = '!'
 	case TagOneWayEdge:
-		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkRed)
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorMaroon)
 		return false, ' '
 	default:
 		panic("Unknown edge tag!")
@@ -187,8 +185,8 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 		str = "TRSR"
 		cw.SetStyle(tcell.ColorYellow, tcell.ColorDarkBlue)
 	case TagTeleportBidirectional:
-		str = "TELE"
-		cw.SetStyle(tcell.ColorDarkCyan, tcell.ColorDarkBlue)
+		str = "TEL-"
+		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
 	default:
 		panic("Unknown node tag!")
 	}
