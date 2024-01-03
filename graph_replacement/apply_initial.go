@@ -9,6 +9,7 @@ func (gra *GraphReplacementApplier) ApplyRandomInitialRule() {
 	} else {
 		debugPanic("Initial rule %s failed!", rule.Name)
 	}
+	gra.EnabledNodesCount = gra.graph.GetEnabledNodesCount()
 }
 
 func (gra *GraphReplacementApplier) applyInitialRule(rule *InitialRule) {

@@ -35,9 +35,13 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 }
 
 func (ra *GraphReplacementApplier) canLeaveEmptyNodes(emptyCount int) bool {
+	// TODO: remove (it's debug)
+	if ra.graph.GetFinalizedEmptyNodesCount() != ra.FinalizedDisabledNodesCount {
+		debugPanic("Error in debug: finalized-disabled counter != calculated value")
+	}
+
 	allowedEmptyNodesPercentage := 100 - ra.desiredFillPercentage
-	currentEmptyFinalizedNodes := ra.graph.GetFinalizedEmptyNodesCount()
-	return getIntPercentage(currentEmptyFinalizedNodes+emptyCount, ra.graph.GetTotalNodesCount()) > allowedEmptyNodesPercentage
+	return getIntPercentage(ra.FinalizedDisabledNodesCount+emptyCount, ra.graph.GetTotalNodesCount()) > allowedEmptyNodesPercentage
 }
 
 func (ra *GraphReplacementApplier) shouldFeatureBeAdded() bool {
@@ -87,22 +91,13 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 		selectedMandatoryFeature.ApplyFeature(ra.graph, crds...)
 	}
 	if selectedOptionalFeature != nil {
-		ra.AppliedFeaturesCount++
 		if selectedOptionalFeature.ApplyFeature != nil {
 			selectedOptionalFeature.ApplyFeature(ra.graph, crds...)
 		}
 	}
 
 	// update stats
-	if rule.Metadata.AddsCycle {
-		ra.CyclesCount++
-	}
-	if rule.Metadata.AddsTeleport {
-		ra.TeleportsCount++
-	}
-	ra.AppliedRulesCount++
-	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(
-		rule, selectedMandatoryFeature, selectedOptionalFeature, crds))
+	ra.updateMetadataOnRuleApply(rule, selectedMandatoryFeature, selectedOptionalFeature, crds)
 
 	// checking graph sanity (are there any bad graph patterns after the rule?)
 	sane, errs := ra.graph.TestSanity()
@@ -110,6 +105,26 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 		panic(sprintf("Rule %s has caused the graph to have following problems:\n%v\nCoords: %v",
 			rule.Name, strings.Join(errs, ";\n"), crds))
 	}
+}
+
+func (ra *GraphReplacementApplier) updateMetadataOnRuleApply(rule *ReplacementRule,
+	appliedMandatory, appliedOptional *FeatureAdder, crds []Coords) {
+
+	if rule.Metadata.AddsCycle {
+		ra.CyclesCount++
+	}
+	if rule.Metadata.AddsTeleport {
+		ra.TeleportsCount++
+	}
+	if appliedOptional != nil {
+		ra.AppliedFeaturesCount++
+	}
+	ra.EnabledNodesCount += rule.Metadata.EnablesNodes
+	ra.FinalizedDisabledNodesCount += rule.Metadata.FinalizesDisabledNodes
+
+	ra.AppliedRulesCount++
+	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(
+		rule, appliedMandatory, appliedOptional, crds))
 }
 
 func (ra *GraphReplacementApplier) SelectRandomOptionalFeatureToApply(rule *ReplacementRule) *FeatureAdder {

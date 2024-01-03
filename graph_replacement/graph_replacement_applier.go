@@ -4,6 +4,7 @@ import (
 	"cycdg/graph_replacement/grammar"
 	graph "cycdg/graph_replacement/grid_graph"
 	"cycdg/lib/random"
+	"fmt"
 )
 
 var rnd random.PRNG
@@ -17,11 +18,13 @@ type GraphReplacementApplier struct {
 	MaxTeleports                             int
 
 	// Some meta-info on applied rules
-	CyclesCount          int
-	AppliedRulesCount    int
-	AppliedFeaturesCount int
-	TeleportsCount       int
-	AppliedRules         []*AppliedRuleInfo
+	CyclesCount                 int
+	AppliedRulesCount           int
+	AppliedFeaturesCount        int
+	TeleportsCount              int
+	EnabledNodesCount           int
+	FinalizedDisabledNodesCount int
+	AppliedRules                []*AppliedRuleInfo
 }
 
 func (gra *GraphReplacementApplier) GetGraph() *graph.Graph {
@@ -47,18 +50,11 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	if gra.DesiredFeatures == 0 {
 		gra.DesiredFeatures = 5
 	}
-	gra.desiredFillPercentage = rnd.RandInRange(gra.MinFilledPercentage, gra.MaxFilledPercentage)
-
-	gra.AppliedRules = nil
-	gra.AppliedRulesCount = 0
-	gra.AppliedFeaturesCount = 0
-	gra.TeleportsCount = 0
-	gra.CyclesCount = 0
 
 	gra.graph = &graph.Graph{}
 	gra.graph.Init(width, height)
 
-	gra.ApplyRandomInitialRule()
+	gra.Reset()
 }
 
 func (gra *GraphReplacementApplier) Reset() {
@@ -68,6 +64,8 @@ func (gra *GraphReplacementApplier) Reset() {
 	gra.AppliedFeaturesCount = 0
 	gra.TeleportsCount = 0
 	gra.CyclesCount = 0
+	gra.EnabledNodesCount = 0
+	gra.FinalizedDisabledNodesCount = 0
 
 	width, height := gra.graph.GetSize()
 	gra.graph = &graph.Graph{}
@@ -81,4 +79,9 @@ func (gra *GraphReplacementApplier) FilledEnough() bool {
 		debugPanic("Zero DesiredFillPercentage!")
 	}
 	return gra.graph.GetFilledNodesPercentage() >= gra.desiredFillPercentage
+}
+
+func (gra *GraphReplacementApplier) StringifyGenerationMetadata() string {
+	return fmt.Sprintf("%d rules %d cycles %d forced-empty, fill %d%%", gra.AppliedRulesCount, gra.CyclesCount,
+		gra.FinalizedDisabledNodesCount, gra.graph.GetFilledNodesPercentage())
 }

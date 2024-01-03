@@ -4,5 +4,6 @@ type ruleMetadata struct {
 	AddsCycle              bool
 	AddsTeleport           bool
 	AdditionalWeight       int
+	EnablesNodes           int
 	FinalizesDisabledNodes int
 }
