@@ -9,10 +9,11 @@ import (
 var rnd random.PRNG
 
 type GraphReplacementApplier struct {
-	graph                *graph.Graph
-	MinCycles, MaxCycles int
-	DesiredFeatures      int
-	MaxTeleports         int
+	graph                 *graph.Graph
+	MinCycles, MaxCycles  int
+	DesiredFeatures       int
+	DesiredFillPercentage int // The real resulting value will most likely be bigger than this
+	MaxTeleports          int
 
 	// Some meta-info on applied rules
 	CyclesCount          int
@@ -69,4 +70,11 @@ func (gra *GraphReplacementApplier) Reset() {
 	gra.graph.Init(width, height)
 
 	gra.ApplyRandomInitialRule()
+}
+
+func (gra *GraphReplacementApplier) FilledEnough() bool {
+	if gra.DesiredFillPercentage == 0 {
+		debugPanic("Zero DesiredFillPercentage!")
+	}
+	return gra.graph.GetFilledNodesPercentage() >= gra.DesiredFillPercentage
 }

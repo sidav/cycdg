@@ -24,8 +24,9 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	for i := 0; i < tests; i++ {
 		start := time.Now()
 		gen.Init(prng, width, height)
+		gen.DesiredFillPercentage = fillPerc
 
-		gen.BenchGenerate(fillPerc, worstRules)
+		gen.BenchGenerate(worstRules)
 
 		thisGenTime := time.Since(start)
 		totalGenTime += thisGenTime
@@ -51,8 +52,8 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	return
 }
 
-func (ra *GraphReplacementApplier) BenchGenerate(fillPerc int, worstRules map[string]time.Duration) map[string]time.Duration {
-	for ra.GetGraph().GetFilledNodesPercentage() < fillPerc {
+func (ra *GraphReplacementApplier) BenchGenerate(worstRules map[string]time.Duration) map[string]time.Duration {
+	for !ra.FilledEnough() {
 		var rule *ReplacementRule
 		var applicableCoords [][]Coords
 		try := 0
@@ -72,7 +73,14 @@ func (ra *GraphReplacementApplier) BenchGenerate(fillPerc int, worstRules map[st
 			}
 			try++
 			if try > 10000 {
-				panic("No applicable coords even after 10000 tries!")
+				message := "No applicable coords even after 10000 tries!\n"
+				message += " Applied rules:\n"
+				for i, rul := range ra.AppliedRules {
+					message += fmt.Sprintf(" %-2d: %s\n", i, rul.StringifyRule())
+				}
+				message += fmt.Sprintf("Fill percentage: %d\n", ra.graph.GetFilledNodesPercentage())
+				message += fmt.Sprintf("Empty-fin percentage: %d", ra.graph.GetFinalizedEmptyNodesPercentage())
+				debugPanic(message)
 			}
 		}
 		ra.applyReplacementRule(rule, applicableCoords)

@@ -83,7 +83,7 @@ func (g *Graph) GetEnabledNodesCount() int {
 	return total
 }
 
-func (g *Graph) GetFilledNodesPercentage() int {
+func (g *Graph) GetFilledNodesCount() int {
 	count := 0
 	for x := range g.nodes {
 		for y := range g.nodes[x] {
@@ -92,7 +92,25 @@ func (g *Graph) GetFilledNodesPercentage() int {
 			}
 		}
 	}
-	w, h := g.GetSize()
-	totalNodes := w * h
-	return (100*count + totalNodes/2) / totalNodes
+	return count
+}
+
+func (g *Graph) GetFilledNodesPercentage() int {
+	return getIntPercentage(g.GetFilledNodesCount(), g.GetTotalNodesCount())
+}
+
+func (g *Graph) GetFinalizedEmptyNodesCount() int {
+	emptyFinsCount := 0
+	for x := range g.nodes {
+		for y := range g.nodes[x] {
+			if !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y) {
+				emptyFinsCount++
+			}
+		}
+	}
+	return emptyFinsCount
+}
+
+func (g *Graph) GetFinalizedEmptyNodesPercentage() int {
+	return getIntPercentage(g.GetFinalizedEmptyNodesCount(), g.GetTotalNodesCount())
 }

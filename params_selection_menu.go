@@ -27,10 +27,9 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 
 	gra := &replacement.GraphReplacementApplier{}
 
-	width = menu.GetValueByIndex(0)
-	height = menu.GetValueByIndex(1)
-	fill = menu.GetValueByIndex(2)
-
+	width := menu.GetValueByIndex(0)
+	height := menu.GetValueByIndex(1)
+	gra.DesiredFillPercentage = menu.GetValueByIndex(2)
 	gra.Init(rnd, width, height)
 	gra.MinCycles = menu.GetValueByIndex(3)
 	gra.MaxCycles = menu.GetValueByIndex(4)

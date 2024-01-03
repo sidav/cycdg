@@ -13,6 +13,7 @@ var AllReplacementRules = []*ReplacementRule{
 		Name: "DISAB-1",
 		Metadata: ruleMetadata{
 			AdditionalWeight: 0,
+			DisablesNodes:    1,
 		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -31,6 +32,7 @@ var AllReplacementRules = []*ReplacementRule{
 		Name: "DISAB-2",
 		Metadata: ruleMetadata{
 			AdditionalWeight: -2,
+			DisablesNodes:    2,
 		},
 		searchNearPrevIndex: []int{-1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -54,6 +56,7 @@ var AllReplacementRules = []*ReplacementRule{
 		Name: "DISAB-3",
 		Metadata: ruleMetadata{
 			AdditionalWeight: -4,
+			DisablesNodes:    3,
 		},
 		searchNearPrevIndex: []int{-1, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -486,7 +489,7 @@ var AllReplacementRules = []*ReplacementRule{
 			g.CopyEdgeTagsPreservingIds(applyAt[1], applyAt[0], applyAt[1], applyAt[3])
 			g.CopyEdgeTagsPreservingIds(applyAt[0], applyAt[2], applyAt[3], applyAt[2])
 			g.ResetNodeAndConnections(applyAt[0])
-			g.FinalizeNode(applyAt[0])
+			// g.FinalizeNode(applyAt[0])
 		},
 	},
 	// 0   1       0 > 1

@@ -14,10 +14,9 @@ import (
 )
 
 var (
-	cw                  tcell_console_wrapper.ConsoleWrapper
-	width, height, fill int
-	rnd                 random.PRNG
-	testResultString    string
+	cw               tcell_console_wrapper.ConsoleWrapper
+	rnd              random.PRNG
+	testResultString string
 )
 
 func main() {
@@ -45,11 +44,11 @@ func main() {
 			key = cw.ReadKey()
 			continue
 		}
-		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= fill {
+		if key == "" || gen.FilledEnough() {
 			gen.Reset()
 		} else {
 			gen.ApplyRandomReplacementRuleToTheGraph()
-			for key == "ENTER" && gen.GetGraph().GetFilledNodesPercentage() < fill {
+			for key == "ENTER" && !gen.FilledEnough() {
 				gen.ApplyRandomReplacementRuleToTheGraph()
 			}
 		}
@@ -62,6 +61,7 @@ func main() {
 
 // returns true if the program should exit
 func execArgs() bool {
+	var width, height, fill int
 	benchOnly := false
 	var testMapsCount int
 	flag.IntVar(&width, "w", 5, "Graph width")
