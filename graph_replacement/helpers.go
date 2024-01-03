@@ -16,6 +16,10 @@ func sprintf(str string, args ...interface{}) string {
 	return fmt.Sprintf(str, args...)
 }
 
+func getIntPercentage(value, max int) int {
+	return (100*value + max/2) / max
+}
+
 func formatDurationMap(dmap map[string]time.Duration) string {
 	keys := make([]string, 0)
 	for k, _ := range dmap {

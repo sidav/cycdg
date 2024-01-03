@@ -87,6 +87,7 @@ func (g *Graph) GetFilledNodesCount() int {
 	count := 0
 	for x := range g.nodes {
 		for y := range g.nodes[x] {
+			// TODO: remove g.IsNodeFinalized(x, y) from here
 			if g.IsNodeActive(x, y) || g.IsNodeFinalized(x, y) {
 				count++
 			}

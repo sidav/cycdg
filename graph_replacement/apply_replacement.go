@@ -12,6 +12,12 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 	index := rnd.SelectRandomIndexFromWeighted(len(AllReplacementRules),
 		func(i int) int {
 			r := AllReplacementRules[i]
+
+			if r.Metadata.FinalizesDisabledNodes > 0 {
+				if ra.canLeaveEmptyNodes(r.Metadata.FinalizesDisabledNodes) {
+					return 0
+				}
+			}
 			if r.Metadata.AddsCycle {
 				if ra.MinCycles > ra.CyclesCount {
 					return 2 * baseRuleWeight // ra.graph.AppliedRulesCount
@@ -26,6 +32,12 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 			return r.Metadata.AdditionalWeight + baseRuleWeight
 		})
 	return AllReplacementRules[index]
+}
+
+func (ra *GraphReplacementApplier) canLeaveEmptyNodes(emptyCount int) bool {
+	allowedEmptyNodesPercentage := 100 - ra.DesiredFillPercentage
+	currentEmptyFinalizedNodes := ra.graph.GetFinalizedEmptyNodesCount()
+	return getIntPercentage(currentEmptyFinalizedNodes+emptyCount, ra.graph.GetTotalNodesCount()) > allowedEmptyNodesPercentage
 }
 
 func (ra *GraphReplacementApplier) shouldFeatureBeAdded() bool {

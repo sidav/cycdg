@@ -9,7 +9,7 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 		Entries: []*ValueSelectorEntry{
 			NewValueSelectorEntry("Width", "", 4, 4, 25, 1),
 			NewValueSelectorEntry("Height", "", 4, 4, 25, 1),
-			NewValueSelectorEntry("Fill percentage", "%", 25, 100, 100, 5),
+			NewValueSelectorEntry("Fill percentage", "%", 25, 75, 100, 5),
 			NewValueSelectorEntry("Min cycles", "", 0, 1, 100, 1),
 			NewValueSelectorEntry("Max cycles", "", 0, 4, 100, 1),
 			NewValueSelectorEntry("Desired features", "", 0, 5, 1000, 1),
