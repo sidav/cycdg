@@ -33,12 +33,12 @@ func main() {
 	cw.Init()
 	defer cw.Close()
 
-	gen := replacement.GraphReplacementApplier{}
+	gen := CreateGraWithParamsMenu()
 
 	key := ""
 	for key != "ESCAPE" {
 		if key == "e" {
-			logName := exportRulesLog(&gen)
+			logName := exportRulesLog(gen)
 			cw.SetStyle(tcell.ColorYellow, tcell.ColorBlack)
 			cw.PutString("Exported the log to file "+logName, 0, 0)
 			cw.FlushScreen()
@@ -46,7 +46,7 @@ func main() {
 			continue
 		}
 		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= fill {
-			gen.Init(rnd, width, height)
+			gen.Reset()
 		} else {
 			gen.ApplyRandomReplacementRuleToTheGraph()
 			for key == "ENTER" && gen.GetGraph().GetFilledNodesPercentage() < fill {
@@ -54,7 +54,7 @@ func main() {
 			}
 		}
 
-		drawGraph(&gen)
+		drawGraph(gen)
 		cw.FlushScreen()
 		key = cw.ReadKey()
 	}

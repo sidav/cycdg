@@ -56,3 +56,17 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 
 	gra.ApplyRandomInitialRule()
 }
+
+func (gra *GraphReplacementApplier) Reset() {
+	gra.AppliedRules = nil
+	gra.AppliedRulesCount = 0
+	gra.AppliedFeaturesCount = 0
+	gra.TeleportsCount = 0
+	gra.CyclesCount = 0
+
+	width, height := gra.graph.GetSize()
+	gra.graph = &graph.Graph{}
+	gra.graph.Init(width, height)
+
+	gra.ApplyRandomInitialRule()
+}
