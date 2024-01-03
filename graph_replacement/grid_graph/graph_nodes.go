@@ -115,3 +115,23 @@ func (g *Graph) GetFinalizedEmptyNodesCount() int {
 func (g *Graph) GetFinalizedEmptyNodesPercentage() int {
 	return getIntPercentage(g.GetFinalizedEmptyNodesCount(), g.GetTotalNodesCount())
 }
+
+func (g *Graph) CountEmptyEditableNodesNearEnabledOnes() int {
+	count := 0
+	for x := 0; x < len(g.nodes); x++ {
+		for y := 0; y < len(g.nodes[x]); y++ {
+			currNode := g.NodeAt(x, y)
+			if currNode != nil && !currNode.IsActive() && !currNode.IsFinalized() {
+				// check if any neighbour is active
+				for i := range cardinalDirections {
+					neighbour := g.NodeAt(x+cardinalDirections[i][0], y+cardinalDirections[i][1])
+					if neighbour != nil && neighbour.IsActive() {
+						count++
+						break
+					}
+				}
+			}
+		}
+	}
+	return count
+}
