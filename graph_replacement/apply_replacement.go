@@ -74,8 +74,11 @@ func (ra *GraphReplacementApplier) applyReplacementRule(rule *ReplacementRule, a
 	if selectedMandatoryFeature != nil && selectedMandatoryFeature.ApplyFeature != nil {
 		selectedMandatoryFeature.ApplyFeature(ra.graph, crds...)
 	}
-	if selectedOptionalFeature != nil && selectedOptionalFeature.ApplyFeature != nil {
-		selectedOptionalFeature.ApplyFeature(ra.graph, crds...)
+	if selectedOptionalFeature != nil {
+		ra.AppliedFeaturesCount++
+		if selectedOptionalFeature.ApplyFeature != nil {
+			selectedOptionalFeature.ApplyFeature(ra.graph, crds...)
+		}
 	}
 
 	// update stats
