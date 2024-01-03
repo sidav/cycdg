@@ -23,8 +23,10 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	progressBarCLI("Benchmarking", 0, tests+1, 20)
 	for i := 0; i < tests; i++ {
 		start := time.Now()
+		gen.MinFilledPercentage = fillPerc
+		gen.MaxFilledPercentage = fillPerc
+
 		gen.Init(prng, width, height)
-		gen.DesiredFillPercentage = fillPerc
 
 		gen.BenchGenerate(worstRules)
 

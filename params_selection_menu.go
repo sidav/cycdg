@@ -9,7 +9,8 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 		Entries: []*ValueSelectorEntry{
 			NewValueSelectorEntry("Width", "", 4, 4, 25, 1),
 			NewValueSelectorEntry("Height", "", 4, 4, 25, 1),
-			NewValueSelectorEntry("Fill percentage", "%", 25, 75, 100, 5),
+			NewValueSelectorEntry("Min fill percentage", "%", 25, 75, 100, 5),
+			NewValueSelectorEntry("Max fill percentage", "%", 25, 100, 100, 5),
 			NewValueSelectorEntry("Min cycles", "", 0, 1, 100, 1),
 			NewValueSelectorEntry("Max cycles", "", 0, 4, 100, 1),
 			NewValueSelectorEntry("Desired features", "", 0, 5, 1000, 1),
@@ -29,12 +30,13 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 
 	width := menu.GetValueByIndex(0)
 	height := menu.GetValueByIndex(1)
-	gra.DesiredFillPercentage = menu.GetValueByIndex(2)
+	gra.MinFilledPercentage = menu.GetValueByIndex(2)
+	gra.MaxFilledPercentage = menu.GetValueByIndex(3)
 	gra.Init(rnd, width, height)
-	gra.MinCycles = menu.GetValueByIndex(3)
-	gra.MaxCycles = menu.GetValueByIndex(4)
-	gra.DesiredFeatures = menu.GetValueByIndex(5)
-	gra.MaxTeleports = menu.GetValueByIndex(6)
+	gra.MinCycles = menu.GetValueByIndex(4)
+	gra.MaxCycles = menu.GetValueByIndex(5)
+	gra.DesiredFeatures = menu.GetValueByIndex(6)
+	gra.MaxTeleports = menu.GetValueByIndex(7)
 
 	return gra
 }

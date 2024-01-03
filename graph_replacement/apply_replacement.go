@@ -35,7 +35,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 }
 
 func (ra *GraphReplacementApplier) canLeaveEmptyNodes(emptyCount int) bool {
-	allowedEmptyNodesPercentage := 100 - ra.DesiredFillPercentage
+	allowedEmptyNodesPercentage := 100 - ra.desiredFillPercentage
 	currentEmptyFinalizedNodes := ra.graph.GetFinalizedEmptyNodesCount()
 	return getIntPercentage(currentEmptyFinalizedNodes+emptyCount, ra.graph.GetTotalNodesCount()) > allowedEmptyNodesPercentage
 }

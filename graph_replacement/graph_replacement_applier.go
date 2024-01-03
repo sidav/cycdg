@@ -9,11 +9,12 @@ import (
 var rnd random.PRNG
 
 type GraphReplacementApplier struct {
-	graph                 *graph.Graph
-	MinCycles, MaxCycles  int
-	DesiredFeatures       int
-	DesiredFillPercentage int // The real resulting value will most likely be bigger than this
-	MaxTeleports          int
+	graph                                    *graph.Graph
+	MinCycles, MaxCycles                     int
+	DesiredFeatures                          int
+	MinFilledPercentage, MaxFilledPercentage int
+	desiredFillPercentage                    int // The real resulting value will most likely be bigger than this
+	MaxTeleports                             int
 
 	// Some meta-info on applied rules
 	CyclesCount          int
@@ -28,6 +29,9 @@ func (gra *GraphReplacementApplier) GetGraph() *graph.Graph {
 }
 
 func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
+	rnd = r
+	grammar.SetRandom(rnd)
+
 	if width < 4 || height < 4 {
 		debugPanic("Minimum allowed size violation: at least 4x4 is allowed.")
 	}
@@ -43,14 +47,13 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	if gra.DesiredFeatures == 0 {
 		gra.DesiredFeatures = 5
 	}
+	gra.desiredFillPercentage = rnd.RandInRange(gra.MinFilledPercentage, gra.MaxFilledPercentage)
+
 	gra.AppliedRules = nil
 	gra.AppliedRulesCount = 0
 	gra.AppliedFeaturesCount = 0
 	gra.TeleportsCount = 0
 	gra.CyclesCount = 0
-
-	rnd = r
-	grammar.SetRandom(rnd)
 
 	gra.graph = &graph.Graph{}
 	gra.graph.Init(width, height)
@@ -59,6 +62,7 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 }
 
 func (gra *GraphReplacementApplier) Reset() {
+	gra.desiredFillPercentage = rnd.RandInRange(gra.MinFilledPercentage, gra.MaxFilledPercentage)
 	gra.AppliedRules = nil
 	gra.AppliedRulesCount = 0
 	gra.AppliedFeaturesCount = 0
@@ -73,8 +77,8 @@ func (gra *GraphReplacementApplier) Reset() {
 }
 
 func (gra *GraphReplacementApplier) FilledEnough() bool {
-	if gra.DesiredFillPercentage == 0 {
+	if gra.desiredFillPercentage == 0 {
 		debugPanic("Zero DesiredFillPercentage!")
 	}
-	return gra.graph.GetFilledNodesPercentage() >= gra.DesiredFillPercentage
+	return gra.graph.GetFilledNodesPercentage() >= gra.desiredFillPercentage
 }
