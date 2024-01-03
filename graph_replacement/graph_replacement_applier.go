@@ -36,6 +36,9 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	if gra.MaxCycles == 0 {
 		gra.MaxCycles = 4
 	}
+	if gra.MaxCycles < gra.MinCycles {
+		gra.MaxCycles = gra.MinCycles
+	}
 	if gra.DesiredFeatures == 0 {
 		gra.DesiredFeatures = 5
 	}
