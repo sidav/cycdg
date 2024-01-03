@@ -37,7 +37,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 func (ra *GraphReplacementApplier) canLeaveEmptyNodes(emptyCount int) bool {
 	// TODO: remove (it's debug)
 	if ra.graph.GetFinalizedEmptyNodesCount() != ra.FinalizedDisabledNodesCount {
-		debugPanic("Error in debug: finalized-disabled counter != calculated value")
+		ra.debugPanic("Error in debug: finalized-disabled counter != calculated value")
 	}
 
 	allowedEmptyNodesPercentage := 100 - ra.desiredFillPercentage

@@ -7,11 +7,6 @@ import (
 	"time"
 )
 
-func debugPanic(msg string, args ...interface{}) {
-	fmt.Println()
-	panic(sprintf(msg, args...))
-}
-
 func sprintf(str string, args ...interface{}) string {
 	return fmt.Sprintf(str, args...)
 }

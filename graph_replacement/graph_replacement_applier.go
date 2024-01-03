@@ -36,7 +36,7 @@ func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
 	grammar.SetRandom(rnd)
 
 	if width < 4 || height < 4 {
-		debugPanic("Minimum allowed size violation: at least 4x4 is allowed.")
+		gra.debugPanic("Minimum allowed size violation: at least 4x4 is allowed.")
 	}
 	if gra.MinCycles == 0 {
 		gra.MinCycles = 1
@@ -76,12 +76,30 @@ func (gra *GraphReplacementApplier) Reset() {
 
 func (gra *GraphReplacementApplier) FilledEnough() bool {
 	if gra.desiredFillPercentage == 0 {
-		debugPanic("Zero DesiredFillPercentage!")
+		gra.debugPanic("Zero DesiredFillPercentage!")
 	}
-	return gra.graph.GetFilledNodesPercentage() >= gra.desiredFillPercentage
+	if (gra.EnabledNodesCount + gra.FinalizedDisabledNodesCount) != gra.graph.GetFilledNodesCount() {
+		gra.debugPanic("Debug error: gra.EnabledNodesCount (%d) != gra.graph.GetFilledNodesCount() (%d)",
+			(gra.EnabledNodesCount + gra.FinalizedDisabledNodesCount), gra.graph.GetFilledNodesCount())
+	}
+	return getIntPercentage(gra.EnabledNodesCount+gra.FinalizedDisabledNodesCount, gra.graph.GetTotalNodesCount()) >= gra.desiredFillPercentage
 }
 
 func (gra *GraphReplacementApplier) StringifyGenerationMetadata() string {
 	return fmt.Sprintf("%d rules %d cycles %d forced-empty, fill %d%%", gra.AppliedRulesCount, gra.CyclesCount,
 		gra.FinalizedDisabledNodesCount, gra.graph.GetFilledNodesPercentage())
+}
+
+func (gra *GraphReplacementApplier) debugPanic(msg string, args ...interface{}) {
+	fmt.Println()
+	message := fmt.Sprintf(msg+"\n", args...)
+	if gra.graph != nil {
+		message += " Applied rules:\n"
+		for i, rul := range gra.AppliedRules {
+			message += fmt.Sprintf(" %-2d: %s\n", i, rul.StringifyRule())
+		}
+		message += fmt.Sprintf("Fill percentage: %d\n", gra.graph.GetFilledNodesPercentage())
+		message += fmt.Sprintf("Empty-fin percentage: %d", gra.graph.GetFinalizedEmptyNodesPercentage())
+	}
+	panic(message)
 }

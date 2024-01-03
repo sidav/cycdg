@@ -75,14 +75,7 @@ func (ra *GraphReplacementApplier) BenchGenerate(worstRules map[string]time.Dura
 			}
 			try++
 			if try > 10000 {
-				message := "No applicable coords even after 10000 tries!\n"
-				message += " Applied rules:\n"
-				for i, rul := range ra.AppliedRules {
-					message += fmt.Sprintf(" %-2d: %s\n", i, rul.StringifyRule())
-				}
-				message += fmt.Sprintf("Fill percentage: %d\n", ra.graph.GetFilledNodesPercentage())
-				message += fmt.Sprintf("Empty-fin percentage: %d", ra.graph.GetFinalizedEmptyNodesPercentage())
-				debugPanic(message)
+				ra.debugPanic("No applicable coords even after 10000 tries!")
 			}
 		}
 		ra.applyReplacementRule(rule, applicableCoords)
