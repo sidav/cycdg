@@ -39,11 +39,12 @@ func (ra *GraphReplacementApplier) canFinalizeEmptyNodes(howMany int) bool {
 	}
 
 	// check if empty editable nodes near active ones count is bigger than the number of nodes to disable:
-	if ra.graph.CountEmptyEditableNodesNearEnabledOnes() <= 2*howMany {
+	if ra.graph.CountEmptyEditableNodesNearEnabledOnes() <= howMany {
 		return false
 	}
-	allowedEmptyNodesPercentage := 100 - ra.desiredFillPercentage
-	return getIntPercentage(ra.FinalizedDisabledNodesCount+howMany, ra.graph.GetTotalNodesCount()) < allowedEmptyNodesPercentage
+	allowedFinEmptyNodesPercentage := 2 * (100 - ra.MaxFilledPercentage) / 3
+	allowedFinalizedEmptyNodesCount := (ra.graph.GetTotalNodesCount() * allowedFinEmptyNodesPercentage) / 100
+	return ra.FinalizedDisabledNodesCount+howMany <= allowedFinalizedEmptyNodesCount
 }
 
 func (ra *GraphReplacementApplier) shouldFeatureBeAdded() bool {
