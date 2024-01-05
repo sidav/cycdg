@@ -80,6 +80,36 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
+	// WORKAROUND RULE
+	// just unfinalize disabled node adjacent to an active one
+	// Used as a workaround, so that DISABLE-rules won't "wall up" the nodes' growth.
+	{
+		Name:                    "~~UNDISABLE",
+		WorksWithFinalizedNodes: true,
+		Metadata: ruleMetadata{
+			AdditionalWeight:         -8,
+			UnfinalizesDisabledNodes: 1,
+		},
+		searchNearPrevIndex: []int{-1, 0, -1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2 (not an actual node, just an applicability check)
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return x == 0 && y == 0 && g.CountEmptyEditableNodesNearEnabledOnes() < 3
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.UnsafeUnfinalizeNode(applyAt[0])
+		},
+	},
+
 	// 0; just add someting to empty active node
 	{
 		Name: "THING",

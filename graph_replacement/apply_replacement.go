@@ -42,7 +42,7 @@ func (ra *GraphReplacementApplier) canFinalizeEmptyNodes(howMany int) bool {
 	if ra.graph.CountEmptyEditableNodesNearEnabledOnes() <= howMany {
 		return false
 	}
-	allowedFinEmptyNodesPercentage := 2 * (100 - ra.MaxFilledPercentage) / 3
+	allowedFinEmptyNodesPercentage := 100 - ra.MaxFilledPercentage
 	allowedFinalizedEmptyNodesCount := (ra.graph.GetTotalNodesCount() * allowedFinEmptyNodesPercentage) / 100
 	return ra.FinalizedDisabledNodesCount+howMany <= allowedFinalizedEmptyNodesCount
 }
@@ -124,6 +124,7 @@ func (ra *GraphReplacementApplier) updateMetadataOnRuleApply(rule *ReplacementRu
 	}
 	ra.EnabledNodesCount += rule.Metadata.EnablesNodes
 	ra.FinalizedDisabledNodesCount += rule.Metadata.FinalizesDisabledNodes
+	ra.FinalizedDisabledNodesCount -= rule.Metadata.UnfinalizesDisabledNodes
 
 	ra.AppliedRulesCount++
 	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(

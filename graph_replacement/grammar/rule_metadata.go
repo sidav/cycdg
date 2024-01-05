@@ -1,9 +1,10 @@
 package grammar
 
 type ruleMetadata struct {
-	AddsCycle              bool
-	AddsTeleport           bool
-	AdditionalWeight       int
-	EnablesNodes           int
-	FinalizesDisabledNodes int
+	AddsCycle                bool
+	AddsTeleport             bool
+	AdditionalWeight         int
+	EnablesNodes             int
+	FinalizesDisabledNodes   int
+	UnfinalizesDisabledNodes int
 }

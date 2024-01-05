@@ -21,6 +21,10 @@ func (gn *Node) Finalize() {
 	gn.finalized = true
 }
 
+func (gn *Node) UnsafeUnfinalize() {
+	gn.finalized = false
+}
+
 func (gn *Node) SwapTagsWith(gn2 *Node) {
 	gn.tags, gn2.tags = gn2.tags, gn.tags
 }

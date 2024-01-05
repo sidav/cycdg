@@ -52,6 +52,11 @@ func (g *Graph) FinalizeNode(c geometry.Coords) {
 	g.NodeAt(c.Unwrap()).Finalize()
 }
 
+// Used for workarounds... Use cautiously
+func (g *Graph) UnsafeUnfinalizeNode(c geometry.Coords) {
+	g.NodeAt(c.Unwrap()).UnsafeUnfinalize()
+}
+
 func (g *Graph) IsNodeEditable(x, y int) bool {
 	return !g.IsNodeFinalized(x, y)
 }
