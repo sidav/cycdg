@@ -19,7 +19,7 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+				return !g.IsNodeActive(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -38,11 +38,11 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+				return !g.IsNodeActive(x, y)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -62,15 +62,15 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+				return !g.IsNodeActive(x, y)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
 			},
 			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {

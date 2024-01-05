@@ -78,10 +78,6 @@ func (gra *GraphReplacementApplier) FilledEnough() bool {
 	if gra.desiredFillPercentage == 0 {
 		gra.debugPanic("Zero DesiredFillPercentage!")
 	}
-	if gra.EnabledNodesCount != gra.graph.GetEnabledNodesCount() {
-		gra.debugPanic("Debug error: gra.EnabledNodesCount (%d) != gra.graph.GetFilledNodesCount() (%d)",
-			gra.EnabledNodesCount, gra.graph.GetEnabledNodesCount())
-	}
 	return getIntPercentage(gra.EnabledNodesCount, gra.graph.GetTotalNodesCount()) >= gra.desiredFillPercentage
 }
 

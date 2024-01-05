@@ -33,11 +33,6 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 }
 
 func (ra *GraphReplacementApplier) canFinalizeEmptyNodes(howMany int) bool {
-	// TODO: remove (it's debug)
-	if ra.graph.GetFinalizedEmptyNodesCount() != ra.FinalizedDisabledNodesCount {
-		ra.debugPanic("Error in debug: finalized-disabled counter != calculated value")
-	}
-
 	// check if empty editable nodes near active ones count is bigger than the number of nodes to disable:
 	if ra.graph.CountEmptyEditableNodesNearEnabledOnes() <= howMany {
 		return false
@@ -129,6 +124,15 @@ func (ra *GraphReplacementApplier) updateMetadataOnRuleApply(rule *ReplacementRu
 	ra.AppliedRulesCount++
 	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(
 		rule, appliedMandatory, appliedOptional, crds))
+
+	// TODO: remove (it's debug)
+	if ra.graph.GetFinalizedEmptyNodesCount() != ra.FinalizedDisabledNodesCount {
+		ra.debugPanic("Error in debug: finalized-disabled counter != calculated value")
+	}
+	if ra.EnabledNodesCount != ra.graph.GetEnabledNodesCount() {
+		ra.debugPanic("Debug error: gra.EnabledNodesCount (%d) != gra.graph.GetFilledNodesCount() (%d)",
+			ra.EnabledNodesCount, ra.graph.GetEnabledNodesCount())
+	}
 }
 
 func (ra *GraphReplacementApplier) SelectRandomOptionalFeatureToApply(rule *ReplacementRule) *FeatureAdder {
