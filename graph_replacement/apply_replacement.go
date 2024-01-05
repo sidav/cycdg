@@ -13,6 +13,9 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 		func(i int) int {
 			r := AllReplacementRules[i]
 
+			if r.Metadata.EnablesNodes > 0 && !ra.canEnableNodes(r.Metadata.EnablesNodes) {
+				return 0
+			}
 			if r.Metadata.FinalizesDisabledNodes > 0 && !ra.canFinalizeEmptyNodes(r.Metadata.FinalizesDisabledNodes) {
 				return 0
 			}
@@ -30,6 +33,11 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 			return r.Metadata.AdditionalWeight + baseRuleWeight
 		})
 	return AllReplacementRules[index]
+}
+
+func (ra *GraphReplacementApplier) canEnableNodes(howMany int) bool {
+	allowedEnabledNodesCount := getIntValueOfPercent(ra.graph.GetTotalNodesCount(), ra.desiredFillPercentage)
+	return ra.EnabledNodesCount+howMany <= allowedEnabledNodesCount
 }
 
 func (ra *GraphReplacementApplier) canFinalizeEmptyNodes(howMany int) bool {
