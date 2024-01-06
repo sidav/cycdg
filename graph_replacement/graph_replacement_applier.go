@@ -78,13 +78,14 @@ func (gra *GraphReplacementApplier) FilledEnough() bool {
 	if gra.desiredFillPercentage == 0 {
 		gra.debugPanic("Zero DesiredFillPercentage!")
 	}
+	currentPercentage := getIntPercentage(gra.EnabledNodesCount, gra.graph.GetTotalNodesCount())
 	currentPlusOnePercentage := getIntPercentage(gra.EnabledNodesCount+1, gra.graph.GetTotalNodesCount())
-	return currentPlusOnePercentage > gra.desiredFillPercentage
+	return currentPercentage == gra.desiredFillPercentage || currentPlusOnePercentage > gra.desiredFillPercentage
 }
 
 func (gra *GraphReplacementApplier) StringifyGenerationMetadata() string {
-	return fmt.Sprintf("RLS:%d CYC:%d F-E:%d, FIL:%d%%, FREE-ADJ:%d", gra.AppliedRulesCount, gra.CyclesCount,
-		gra.FinalizedDisabledNodesCount, gra.graph.GetEnabledNodesPercentage(), gra.graph.CountEmptyEditableNodesNearEnabledOnes())
+	return fmt.Sprintf("RLS:%d CYC:%d F-E:%d, FIL:%d%%/%d%%, FREE-ADJ:%d", gra.AppliedRulesCount, gra.CyclesCount,
+		gra.FinalizedDisabledNodesCount, gra.graph.GetEnabledNodesPercentage(), gra.desiredFillPercentage, gra.graph.CountEmptyEditableNodesNearEnabledOnes())
 }
 
 func (gra *GraphReplacementApplier) debugPanic(msg string, args ...interface{}) {
