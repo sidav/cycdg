@@ -1,20 +1,25 @@
 package main
 
-import . "cycdg/lib/tcell_console_wrapper/console_menus"
-import replacement "cycdg/graph_replacement"
+import (
+	replacement "cycdg/graph_replacement"
+	. "cycdg/lib/tcell_console_wrapper/console_menus"
+)
 
 func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
+	gra := &replacement.GraphReplacementApplier{}
+	var width, height int
+
 	menu := ConsoleIntValuesSelection{
 		Title: "SELECT GENERATION PARAMS",
 		Entries: []*ValueSelectorEntry{
-			NewValueSelectorEntry("Width", "", 4, 4, 25, 1),
-			NewValueSelectorEntry("Height", "", 4, 4, 25, 1),
-			NewValueSelectorEntry("Min fill percentage", "%", 25, 75, 100, 5),
-			NewValueSelectorEntry("Max fill percentage", "%", 25, 100, 100, 5),
-			NewValueSelectorEntry("Min cycles", "", 0, 1, 100, 1),
-			NewValueSelectorEntry("Max cycles", "", 0, 4, 100, 1),
-			NewValueSelectorEntry("Desired features", "", 0, 5, 1000, 1),
-			NewValueSelectorEntry("Max teleports", "", 0, 2, 1000, 1),
+			NewPointerSelectorEntry(&width, "Width", "", 4, 4, 25, 1),
+			NewPointerSelectorEntry(&height, "Height", "", 4, 4, 25, 1),
+			NewPointerSelectorEntry(&gra.MinFilledPercentage, "Min fill percentage", "%", 25, 75, 100, 5),
+			NewPointerSelectorEntry(&gra.MaxFilledPercentage, "Max fill percentage", "%", 25, 100, 100, 5),
+			NewPointerSelectorEntry(&gra.MinCycles, "Min cycles", "", 0, 1, 100, 1),
+			NewPointerSelectorEntry(&gra.MaxCycles, "Max cycles", "", 0, 4, 100, 1),
+			NewPointerSelectorEntry(&gra.DesiredFeatures, "Desired features", "", 0, 5, 1000, 1),
+			NewPointerSelectorEntry(&gra.MaxTeleports, "Max teleports", "", 0, 2, 1000, 1),
 		},
 	}
 	menu.Init()
@@ -24,19 +29,15 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 		cw.FlushScreen()
 		key = cw.ReadKey()
 		menu.UpdateForKeypress(key)
+
+		if gra.MaxFilledPercentage < gra.MinFilledPercentage {
+			gra.MaxFilledPercentage = gra.MinFilledPercentage
+		}
+		if gra.MaxCycles < gra.MinCycles {
+			gra.MaxCycles = gra.MinCycles
+		}
 	}
 
-	gra := &replacement.GraphReplacementApplier{}
-
-	width := menu.GetValueByIndex(0)
-	height := menu.GetValueByIndex(1)
-	gra.MinFilledPercentage = menu.GetValueByIndex(2)
-	gra.MaxFilledPercentage = menu.GetValueByIndex(3)
 	gra.Init(rnd, width, height)
-	gra.MinCycles = menu.GetValueByIndex(4)
-	gra.MaxCycles = menu.GetValueByIndex(5)
-	gra.DesiredFeatures = menu.GetValueByIndex(6)
-	gra.MaxTeleports = menu.GetValueByIndex(7)
-
 	return gra
 }
