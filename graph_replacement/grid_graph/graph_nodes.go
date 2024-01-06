@@ -65,6 +65,24 @@ func (g *Graph) IsNodeFinalized(x, y int) bool {
 	return g.NodeAt(x, y).IsFinalized()
 }
 
+func (g *Graph) HasNoFinalizedNodesNearXY(x, y int, allowDiagonal bool) bool {
+	if !allowDiagonal {
+		debugPanic("Not implemented!")
+	}
+	for vx := -1; vx <= 1; vx++ {
+		for vy := -1; vy <= 1; vy++ {
+			if vx == vy && vx == 0 {
+				continue
+			}
+			nodeHere := g.NodeAt(x+vx, y+vy)
+			if nodeHere != nil && nodeHere.IsFinalized() {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func (g *Graph) IsNodeActive(x, y int) bool {
 	return g.NodeAt(x, y).IsActive()
 }

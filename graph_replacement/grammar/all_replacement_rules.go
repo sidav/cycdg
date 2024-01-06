@@ -8,7 +8,7 @@ import (
 
 var AllReplacementRules = []*ReplacementRule{
 
-	// 0  X  ; just finalize disabled node
+	// 0  X  ; just finalize disabled node.
 	{
 		Name: "DISAB-1",
 		Metadata: ruleMetadata{
@@ -19,7 +19,7 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -27,7 +27,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
-	// Disable two neighbouring nodes
+	// Finalize two adjacent disabled nodes.
 	{
 		Name: "DISAB-2",
 		Metadata: ruleMetadata{
@@ -38,11 +38,11 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -51,26 +51,37 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
-	// Disable three neighbouring nodes
+	// Finalize three adjacent disabled nodes. Prevents a node from being locked by a finalized L-shape in a corner.
 	{
 		Name: "DISAB-3",
 		Metadata: ruleMetadata{
-			AdditionalWeight:       -4,
+			AdditionalWeight:       -7,
 			FinalizesDisabledNodes: 3,
 		},
 		searchNearPrevIndex: []int{-1, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+				// Additional check:
+				w, h := g.GetSize()
+				x0, y0 := prevСoords[0].Unwrap()
+				x1, y1 := prevСoords[1].Unwrap()
+				// Prevent a not yet used node from being locked by a finalized L-shape in a corner.
+				// Removal of this check causes a creation of unfillable nodes.
+				if areCoordsAdjacentToRectangleCorner(x0, y0, 0, 0, w, h) && !areCoordsOnRectangle(x1, y1, 0, 0, w, h) {
+					if areCoordsAdjacentToRectangleCorner(x, y, 0, 0, w, h) {
+						return false
+					}
+				}
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -83,32 +94,32 @@ var AllReplacementRules = []*ReplacementRule{
 	// WORKAROUND RULE
 	// just unfinalize disabled node adjacent to an active one
 	// Used as a workaround, so that DISABLE-rules won't "wall up" the nodes' growth.
-	{
-		Name:                    "~~UNDISABLE",
-		WorksWithFinalizedNodes: true,
-		Metadata: ruleMetadata{
-			AdditionalWeight:         -8,
-			UnfinalizesDisabledNodes: 1,
-		},
-		searchNearPrevIndex: []int{-1, 0, -1},
-		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
-			// node 0
-			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y)
-			},
-			// node 1
-			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
-			},
-			// node 2 (not an actual node, just an applicability check)
-			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return x == 0 && y == 0 && g.CountEmptyEditableNodesNearEnabledOnes() < 3
-			},
-		},
-		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
-			g.UnsafeUnfinalizeNode(applyAt[0])
-		},
-	},
+	// {
+	// 	Name:                    "~~UNDISABLE",
+	// 	WorksWithFinalizedNodes: true,
+	// 	Metadata: ruleMetadata{
+	// 		AdditionalWeight:         -8,
+	// 		UnfinalizesDisabledNodes: 1,
+	// 	},
+	// 	searchNearPrevIndex: []int{-1, 0, -1},
+	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+	// 		// node 0
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y)
+	// 		},
+	// 		// node 1
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+	// 		},
+	// 		// node 2 (not an actual node, just an applicability check)
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return x == 0 && y == 0 && g.CountEmptyEditableNodesNearEnabledOnes() < 3
+	// 		},
+	// 	},
+	// 	ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+	// 		g.UnsafeUnfinalizeNode(applyAt[0])
+	// 	},
+	// },
 
 	// 0; just add someting to empty active node
 	{
