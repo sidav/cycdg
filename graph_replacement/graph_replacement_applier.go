@@ -83,7 +83,7 @@ func (gra *GraphReplacementApplier) FilledEnough() bool {
 }
 
 func (gra *GraphReplacementApplier) StringifyGenerationMetadata() string {
-	return fmt.Sprintf("%d rules %d cycles %d forced-empty, fill %d%%, neigh %d", gra.AppliedRulesCount, gra.CyclesCount,
+	return fmt.Sprintf("RLS:%d CYC:%d F-E:%d, FIL:%d%%, FREE-ADJ:%d", gra.AppliedRulesCount, gra.CyclesCount,
 		gra.FinalizedDisabledNodesCount, gra.graph.GetEnabledNodesPercentage(), gra.graph.CountEmptyEditableNodesNearEnabledOnes())
 }
 
@@ -93,7 +93,7 @@ func (gra *GraphReplacementApplier) debugPanic(msg string, args ...interface{}) 
 	if gra.graph != nil {
 		message += " Applied rules:\n"
 		for i, rul := range gra.AppliedRules {
-			message += fmt.Sprintf(" %-2d: %s\n", i, rul.StringifyRule())
+			message += fmt.Sprintf(" %-2d: %s - %s\n", i, rul.StringifyRule(), rul.StringifyCoords())
 		}
 		message += fmt.Sprintf("Fill percentage: %d\n", gra.graph.GetEnabledNodesPercentage())
 		message += fmt.Sprintf("Empty-fin percentage: %d", gra.graph.GetFinalizedEmptyNodesPercentage())
