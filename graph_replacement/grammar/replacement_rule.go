@@ -12,6 +12,8 @@ type ReplacementRule struct {
 
 	Metadata ruleMetadata
 
+	WorksWithFinalizedNodes bool // true if coords search should not skip finalized nodes; USE CAUTIOUSLY
+
 	// each value is coords index, near which the applicability func will be checked
 	searchNearPrevIndex []int // -1 means "any coords"
 
@@ -45,9 +47,10 @@ func (ir *ReplacementRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForF
 	for x := xFrom; x <= xTo; x++ {
 		for y := yFrom; y <= yTo; y++ {
 
-			// TODO: maybe some rules should want to ignore that?..
-			if g.IsNodeFinalized(x, y) {
-				continue
+			if !ir.WorksWithFinalizedNodes {
+				if g.IsNodeFinalized(x, y) {
+					continue
+				}
 			}
 
 			if geometry.AreXYCoordsInCoordsArray(x, y, argsForFunc) {

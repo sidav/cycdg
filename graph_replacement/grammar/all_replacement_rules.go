@@ -19,7 +19,7 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+				return !g.IsNodeActive(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -38,11 +38,11 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+				return !g.IsNodeActive(x, y)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -62,21 +62,51 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y)
+				return !g.IsNodeActive(x, y)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
 			},
 			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && !g.IsNodeFinalized(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
 			g.FinalizeNode(applyAt[0])
 			g.FinalizeNode(applyAt[1])
 			g.FinalizeNode(applyAt[2])
+		},
+	},
+
+	// WORKAROUND RULE
+	// just unfinalize disabled node adjacent to an active one
+	// Used as a workaround, so that DISABLE-rules won't "wall up" the nodes' growth.
+	{
+		Name:                    "~~UNDISABLE",
+		WorksWithFinalizedNodes: true,
+		Metadata: ruleMetadata{
+			AdditionalWeight:         -8,
+			UnfinalizesDisabledNodes: 1,
+		},
+		searchNearPrevIndex: []int{-1, 0, -1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2 (not an actual node, just an applicability check)
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return x == 0 && y == 0 && g.CountEmptyEditableNodesNearEnabledOnes() < 3
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.UnsafeUnfinalizeNode(applyAt[0])
 		},
 	},
 
@@ -471,7 +501,7 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return g.IsNodeActive(x, y) && g.CountEdgesAt(x, y) == 2
+				return g.IsNodeActive(x, y) && g.CountEdgesAt(x, y) == 2 && !g.NodeAt(x, y).IsFlagged()
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
@@ -485,10 +515,7 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 			// node 3
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				x1, y1 := prevСoords[1].Unwrap()
-				x2, y2 := prevСoords[2].Unwrap()
-				return !g.IsNodeActive(x, y) &&
-					areCoordsAdjacent(x, y, x1, y1) && areCoordsAdjacent(x, y, x2, y2)
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y) && prevСoords[2].IsAdjacentToXY(x, y)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -498,10 +525,10 @@ var AllReplacementRules = []*ReplacementRule{
 			g.DisableDirLinkByCoords(applyAt[1], applyAt[0])
 			g.DisableDirLinkByCoords(applyAt[0], applyAt[2])
 			g.SwapNodeTags(applyAt[3], applyAt[0])
+			g.NodeAt(applyAt[3].Unwrap()).MarkFlagged() // so there will be no need to finalize the node 0
 			g.CopyEdgeTagsPreservingIds(applyAt[1], applyAt[0], applyAt[1], applyAt[3])
 			g.CopyEdgeTagsPreservingIds(applyAt[0], applyAt[2], applyAt[3], applyAt[2])
 			g.ResetNodeAndConnections(applyAt[0])
-			// g.FinalizeNode(applyAt[0]) disabled so that it won't affect fill percentage.
 		},
 	},
 	// 0   1       0 > 1

@@ -50,7 +50,3 @@ func (menu *ConsoleIntValuesSelection) UpdateForKeypress(key string) {
 		menu.Entries[menu.cursorPos].increase()
 	}
 }
-
-func (menu *ConsoleIntValuesSelection) GetValueByIndex(index int) int {
-	return menu.Entries[index].currentValue
-}

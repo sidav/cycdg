@@ -63,15 +63,29 @@ func main() {
 func execArgs() bool {
 	var width, height, fill int
 	benchOnly := false
+	fullBenchmark := false
 	var testMapsCount int
 	flag.IntVar(&width, "w", 5, "Graph width")
 	flag.IntVar(&height, "h", 5, "Graph height")
 	flag.IntVar(&fill, "fill", 70, "Fill percentage")
 	flag.BoolVar(&benchOnly, "b", false, "Run benchmark only")
+	flag.BoolVar(&fullBenchmark, "fullbench", false, "Run full benchmark for many sizes and fills; overrides benchOnly")
 	flag.IntVar(&testMapsCount, "total", 1000, "Generated maps count")
 	flag.Parse()
 
 	if testMapsCount > 0 {
+		if fullBenchmark {
+			benchOnly = true
+			minFill := fill
+			for fill := minFill; fill <= 100; fill += 5 {
+				for width := 4; width <= 8; width++ {
+					for height := 4; height <= width; height++ {
+						fmt.Printf("Benchmarking %dx%d map generation filled for %d%%\n", width, height, fill)
+						replacement.TestGen(rnd, width, height, testMapsCount, fill)
+					}
+				}
+			}
+		}
 		testResultString = replacement.TestGen(rnd, width, height, testMapsCount, fill)
 	}
 	return benchOnly

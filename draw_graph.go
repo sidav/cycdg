@@ -78,6 +78,10 @@ func drawNodeAt(g *graph.Graph, nx, ny int) {
 		str := GetNodeTagIdiomAndSetColor(tag)
 		cw.PutStringCenteredAt(str, x+halfNodeWidth, y+i)
 	}
+	if g.NodeAt(nx, ny).IsFlagged() {
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkBlue)
+		cw.PutChar('x', x+nodeWidth-1, y+nodeHeight-1)
+	}
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d", g.CountEdgesAt(nx, ny)), x+halfNodeWidth, y+nodeHeight-2)
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d-%d",
 	// 	g.CountDirEdgesAt(nx, ny, true, false), g.CountDirEdgesAt(nx, ny, false, true)),

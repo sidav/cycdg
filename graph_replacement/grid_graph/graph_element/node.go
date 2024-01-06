@@ -9,16 +9,24 @@ type Node struct {
 	finalized bool    // if true, restrict changing this node
 	edges     [2]Edge // to the right and to the down
 	tags      []*Tag
+
+	// Can't use tags for this, as it breaks hasAnyTags() logic:
+	flagged bool // for internal use with rules, has no gameplay-ish effect.
 }
 
 func (gn *Node) Init() {
 	// gn.finalized = false
 	gn.ResetActiveAndLinks()
 	gn.tags = nil
+	gn.flagged = false
 }
 
 func (gn *Node) Finalize() {
 	gn.finalized = true
+}
+
+func (gn *Node) UnsafeUnfinalize() {
+	gn.finalized = false
 }
 
 func (gn *Node) SwapTagsWith(gn2 *Node) {
@@ -64,6 +72,17 @@ func (gn *Node) HasTag(t TagKind) bool {
 
 func (gn *Node) ResetTags() {
 	gn.tags = nil
+}
+
+func (gn *Node) MarkFlagged() {
+	if gn.finalized {
+		panic("Node is finalized!")
+	}
+	gn.flagged = true
+}
+
+func (gn *Node) IsFlagged() bool {
+	return gn.flagged
 }
 
 func (gn *Node) SetLinkByVector(vx, vy int, enabled, reverse bool) {

@@ -15,6 +15,10 @@ func getIntPercentage(value, max int) int {
 	return (100*value + max/2) / max
 }
 
+func getIntValueOfPercent(total, percent int) int {
+	return (total*percent + 50) / 100
+}
+
 func formatDurationMap(dmap map[string]time.Duration) string {
 	keys := make([]string, 0)
 	for k, _ := range dmap {

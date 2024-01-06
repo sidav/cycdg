@@ -52,6 +52,11 @@ func (g *Graph) FinalizeNode(c geometry.Coords) {
 	g.NodeAt(c.Unwrap()).Finalize()
 }
 
+// Used for workarounds... Use cautiously
+func (g *Graph) UnsafeUnfinalizeNode(c geometry.Coords) {
+	g.NodeAt(c.Unwrap()).UnsafeUnfinalize()
+}
+
 func (g *Graph) IsNodeEditable(x, y int) bool {
 	return !g.IsNodeFinalized(x, y)
 }
@@ -83,22 +88,25 @@ func (g *Graph) GetEnabledNodesCount() int {
 	return total
 }
 
-func (g *Graph) GetFilledNodesCount() int {
-	count := 0
-	for x := range g.nodes {
-		for y := range g.nodes[x] {
-			// TODO: remove g.IsNodeFinalized(x, y) from here
-			if g.IsNodeActive(x, y) || g.IsNodeFinalized(x, y) {
-				count++
-			}
-		}
-	}
-	return count
+func (g *Graph) GetEnabledNodesPercentage() int {
+	return getIntPercentage(g.GetEnabledNodesCount(), g.GetTotalNodesCount())
 }
 
-func (g *Graph) GetFilledNodesPercentage() int {
-	return getIntPercentage(g.GetFilledNodesCount(), g.GetTotalNodesCount())
-}
+// func (g *Graph) GetFilledNodesCount() int {
+// 	count := 0
+// 	for x := range g.nodes {
+// 		for y := range g.nodes[x] {
+// 			// TODO: remove g.IsNodeFinalized(x, y) from here
+// 			if g.IsNodeActive(x, y) || g.IsNodeFinalized(x, y) {
+// 				count++
+// 			}
+// 		}
+// 	}
+// 	return count
+// }
+// func (g *Graph) GetFilledNodesPercentage() int {
+// 	return getIntPercentage(g.GetFilledNodesCount(), g.GetTotalNodesCount())
+// }
 
 func (g *Graph) GetFinalizedEmptyNodesCount() int {
 	emptyFinsCount := 0

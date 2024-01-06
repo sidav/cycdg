@@ -78,16 +78,14 @@ func (gra *GraphReplacementApplier) FilledEnough() bool {
 	if gra.desiredFillPercentage == 0 {
 		gra.debugPanic("Zero DesiredFillPercentage!")
 	}
-	if (gra.EnabledNodesCount + gra.FinalizedDisabledNodesCount) != gra.graph.GetFilledNodesCount() {
-		gra.debugPanic("Debug error: gra.EnabledNodesCount (%d) != gra.graph.GetFilledNodesCount() (%d)",
-			(gra.EnabledNodesCount + gra.FinalizedDisabledNodesCount), gra.graph.GetFilledNodesCount())
-	}
-	return getIntPercentage(gra.EnabledNodesCount+gra.FinalizedDisabledNodesCount, gra.graph.GetTotalNodesCount()) >= gra.desiredFillPercentage
+	currentPercentage := getIntPercentage(gra.EnabledNodesCount, gra.graph.GetTotalNodesCount())
+	currentPlusOnePercentage := getIntPercentage(gra.EnabledNodesCount+1, gra.graph.GetTotalNodesCount())
+	return currentPercentage == gra.desiredFillPercentage || currentPlusOnePercentage > gra.desiredFillPercentage
 }
 
 func (gra *GraphReplacementApplier) StringifyGenerationMetadata() string {
-	return fmt.Sprintf("%d rules %d cycles %d forced-empty, fill %d%%", gra.AppliedRulesCount, gra.CyclesCount,
-		gra.FinalizedDisabledNodesCount, gra.graph.GetFilledNodesPercentage())
+	return fmt.Sprintf("RLS:%d CYC:%d F-E:%d, FIL:%d%%/%d%%, FREE-ADJ:%d", gra.AppliedRulesCount, gra.CyclesCount,
+		gra.FinalizedDisabledNodesCount, gra.graph.GetEnabledNodesPercentage(), gra.desiredFillPercentage, gra.graph.CountEmptyEditableNodesNearEnabledOnes())
 }
 
 func (gra *GraphReplacementApplier) debugPanic(msg string, args ...interface{}) {
@@ -96,9 +94,9 @@ func (gra *GraphReplacementApplier) debugPanic(msg string, args ...interface{}) 
 	if gra.graph != nil {
 		message += " Applied rules:\n"
 		for i, rul := range gra.AppliedRules {
-			message += fmt.Sprintf(" %-2d: %s\n", i, rul.StringifyRule())
+			message += fmt.Sprintf(" %-2d: %s - %s\n", i, rul.StringifyRule(), rul.StringifyCoords())
 		}
-		message += fmt.Sprintf("Fill percentage: %d\n", gra.graph.GetFilledNodesPercentage())
+		message += fmt.Sprintf("Fill percentage: %d\n", gra.graph.GetEnabledNodesPercentage())
 		message += fmt.Sprintf("Empty-fin percentage: %d", gra.graph.GetFinalizedEmptyNodesPercentage())
 	}
 	panic(message)

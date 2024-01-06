@@ -13,6 +13,9 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 		func(i int) int {
 			r := AllReplacementRules[i]
 
+			if r.Metadata.EnablesNodes > 0 && !ra.canEnableNodes(r.Metadata.EnablesNodes) {
+				return 0
+			}
 			if r.Metadata.FinalizesDisabledNodes > 0 && !ra.canFinalizeEmptyNodes(r.Metadata.FinalizesDisabledNodes) {
 				return 0
 			}
@@ -32,18 +35,19 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 	return AllReplacementRules[index]
 }
 
-func (ra *GraphReplacementApplier) canFinalizeEmptyNodes(howMany int) bool {
-	// TODO: remove (it's debug)
-	if ra.graph.GetFinalizedEmptyNodesCount() != ra.FinalizedDisabledNodesCount {
-		ra.debugPanic("Error in debug: finalized-disabled counter != calculated value")
-	}
+func (ra *GraphReplacementApplier) canEnableNodes(howMany int) bool {
+	allowedEnabledNodesCount := getIntValueOfPercent(ra.graph.GetTotalNodesCount(), ra.desiredFillPercentage)
+	return ra.EnabledNodesCount+howMany <= allowedEnabledNodesCount
+}
 
+func (ra *GraphReplacementApplier) canFinalizeEmptyNodes(howMany int) bool {
 	// check if empty editable nodes near active ones count is bigger than the number of nodes to disable:
-	if ra.graph.CountEmptyEditableNodesNearEnabledOnes() <= 2*howMany {
+	if ra.graph.CountEmptyEditableNodesNearEnabledOnes() <= howMany {
 		return false
 	}
-	allowedEmptyNodesPercentage := 100 - ra.desiredFillPercentage
-	return getIntPercentage(ra.FinalizedDisabledNodesCount+howMany, ra.graph.GetTotalNodesCount()) < allowedEmptyNodesPercentage
+	allowedFinEmptyNodesPercentage := 100 - ra.MaxFilledPercentage
+	allowedFinalizedEmptyNodesCount := (ra.graph.GetTotalNodesCount() * allowedFinEmptyNodesPercentage) / 100
+	return ra.FinalizedDisabledNodesCount+howMany <= allowedFinalizedEmptyNodesCount
 }
 
 func (ra *GraphReplacementApplier) shouldFeatureBeAdded() bool {
@@ -123,10 +127,20 @@ func (ra *GraphReplacementApplier) updateMetadataOnRuleApply(rule *ReplacementRu
 	}
 	ra.EnabledNodesCount += rule.Metadata.EnablesNodes
 	ra.FinalizedDisabledNodesCount += rule.Metadata.FinalizesDisabledNodes
+	ra.FinalizedDisabledNodesCount -= rule.Metadata.UnfinalizesDisabledNodes
 
 	ra.AppliedRulesCount++
 	ra.AppliedRules = append(ra.AppliedRules, newAppliedRuleInfo(
 		rule, appliedMandatory, appliedOptional, crds))
+
+	// TODO: remove (it's debug)
+	if ra.graph.GetFinalizedEmptyNodesCount() != ra.FinalizedDisabledNodesCount {
+		ra.debugPanic("Error in debug: finalized-disabled counter != calculated value")
+	}
+	if ra.EnabledNodesCount != ra.graph.GetEnabledNodesCount() {
+		ra.debugPanic("Debug error: gra.EnabledNodesCount (%d) != gra.graph.GetFilledNodesCount() (%d)",
+			ra.EnabledNodesCount, ra.graph.GetEnabledNodesCount())
+	}
 }
 
 func (ra *GraphReplacementApplier) SelectRandomOptionalFeatureToApply(rule *ReplacementRule) *FeatureAdder {
