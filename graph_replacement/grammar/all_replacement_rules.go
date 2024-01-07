@@ -227,7 +227,7 @@ var AllReplacementRules = []*ReplacementRule{
 		Name: "TELEPORT",
 		Metadata: ruleMetadata{
 			AddsTeleport:     true,
-			AdditionalWeight: -5,
+			AdditionalWeight: -2,
 			EnablesNodes:     2,
 		},
 		searchNearPrevIndex: []int{-1, -1, 1},
