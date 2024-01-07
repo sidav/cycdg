@@ -18,6 +18,7 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 		MaxTeleports: 2,
 	}
 	var totalGenTime, worstTime, bestTime time.Duration
+	ruleUsages := make(map[string]int, 0)
 	worstRules := make(map[string]time.Duration, 0)
 
 	progressBarCLI("Benchmarking", 0, tests+1, 20)
@@ -28,7 +29,7 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 
 		gen.Init(prng, width, height)
 
-		gen.BenchGenerate(worstRules)
+		gen.BenchGenerate(ruleUsages, worstRules)
 
 		thisGenTime := time.Since(start)
 		totalGenTime += thisGenTime
@@ -49,12 +50,12 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 	testResultString += fmt.Sprintf("Total rules applied %d, mean %d rules per map, mean time per rule %v\n",
 		appliedRules, (appliedRules+tests/2)/tests, totalGenTime/time.Duration(appliedRules))
 	testResultString += fmt.Sprintf("Worst rule coords pick times:\n")
-	testResultString += formatDurationMap(worstRules)
+	testResultString += formatUsageAndDurationMaps(ruleUsages, worstRules)
 
 	return
 }
 
-func (ra *GraphReplacementApplier) BenchGenerate(worstRules map[string]time.Duration) map[string]time.Duration {
+func (ra *GraphReplacementApplier) BenchGenerate(ruleUsages map[string]int, worstRules map[string]time.Duration) map[string]time.Duration {
 	for !ra.FilledEnough() {
 		var rule *ReplacementRule
 		var applicableCoords [][]Coords
@@ -71,6 +72,7 @@ func (ra *GraphReplacementApplier) BenchGenerate(worstRules map[string]time.Dura
 			}
 
 			if len(applicableCoords) > 0 {
+				ruleUsages[rule.Name] = ruleUsages[rule.Name] + 1
 				break
 			}
 			try++
