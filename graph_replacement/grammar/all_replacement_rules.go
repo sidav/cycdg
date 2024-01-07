@@ -681,4 +681,69 @@ var AllReplacementRules = []*ReplacementRule{
 			makeRandomHazardFeature(4),
 		},
 	},
+
+	//  X   X   X     2 > 3 > 4
+	//            >>  ^       V
+	//  0 > 1   X     0 > 1 < 5
+	{
+		Name: "ADJ-CYCL+4",
+		Metadata: ruleMetadata{
+			AddsCycle:    true,
+			EnablesNodes: 4,
+		},
+		searchNearPrevIndex: []int{-1, 0, 0, 2, 3, 1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				x0, y0 := prevСoords[0].Unwrap()
+				return prevСoords[0].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) && g.IsEdgeDirectedBetweenCoords(x0, y0, x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 3
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[2].IsAdjacentToXY(x, y)
+			},
+			// node 4
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[3].IsAdjacentToXY(x, y)
+			},
+			// node 5
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y) && prevСoords[4].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNodeByCoords(applyAt[2])
+			g.EnableNodeByCoords(applyAt[3])
+			g.EnableNodeByCoords(applyAt[4])
+			g.EnableNodeByCoords(applyAt[5])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[2], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[4], applyAt[5])
+			g.EnableDirLinkByCoords(applyAt[5], applyAt[1])
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Copy 01-02",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.CopyEdgeTagsPreservingIds(crds[0], crds[1], crds[0], crds[2])
+				},
+			},
+			makeSecretPassageFeature(0, 2),
+			makeMasterKeyLockFeature(0, 2),
+			makeTwoMasterKeyLocksFeature(0, 2, 5, 1),
+			makeOneWayPassagesFeature(0, 2, 5, 1),
+		},
+		OptionalFeatures: []*FeatureAdder{
+			makeRandomHazardFeature(2),
+		},
+	},
 }
