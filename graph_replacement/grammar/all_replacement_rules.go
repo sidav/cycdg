@@ -686,7 +686,7 @@ var AllReplacementRules = []*ReplacementRule{
 	//            >>  ^       V
 	//  0 > 1   X     0 > 1 < 5
 	{
-		Name: "ADJ-CYCL+4",
+		Name: "2ADJ-CYCL+4",
 		Metadata: ruleMetadata{
 			AddsCycle:    true,
 			EnablesNodes: 4,
@@ -699,8 +699,8 @@ var AllReplacementRules = []*ReplacementRule{
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				x0, y0 := prevСoords[0].Unwrap()
-				return prevСoords[0].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) && g.IsEdgeDirectedBetweenCoords(x0, y0, x, y)
+				return prevСoords[0].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedFromCoordsToPair(prevСoords[0], x, y)
 			},
 			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
