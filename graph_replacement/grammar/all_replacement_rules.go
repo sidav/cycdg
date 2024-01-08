@@ -235,7 +235,7 @@ var AllReplacementRules = []*ReplacementRule{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				return g.IsNodeActive(x, y) && g.DoesNodeHaveAnyTags(x, y) &&
-					!g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidirectional) &&
+					!g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidir) &&
 					!g.DoesNodeHaveTag(x, y, graph_element.TagStart)
 			},
 			// node 1
@@ -252,8 +252,8 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableNodeByCoords(applyAt[2])
 			g.EnableDirLinkByCoords(applyAt[1], applyAt[2])
 			moveRandomNodeTag(g, applyAt[0], applyAt[2])
-			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidirectional)
-			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidirectional)
+			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidir)
+			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidir)
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
@@ -809,9 +809,55 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
+	///////////////////////////////////////////////////////
+	// EXPERIMENTAL RULES BELOW
+	///////////////////////////////////////////////////////
+
+	// Add a random straight line with the length at least of 3 and with return one-dir teleport at the end.
+	// 0  X ... X   ->   0 > 1 > ... > 2
+	{
+		Name: "RND-LINE",
+		Metadata: ruleMetadata{
+			AddsTeleport:        true,
+			EnablesNodesUnknown: true,
+		},
+		searchNearPrevIndex: []int{-1, 0, -1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0 - just a node near which the cycle will be appended
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2 - cardinal to 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsCardinalToPair(x, y) &&
+					prevСoords[1].ManhattanDistToXY(x, y) >= 3 &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[1][0], prevСoords[1][1],
+					)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.DrawEnabledConnectedCardinalLine(applyAt[1], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[1])
+			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportTo)
+			g.AddNodeTagByCoords(applyAt[2], graph_element.TagTeleportFrom)
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			makeMasterKeyLockFeature(0, 1),
+			makeKeyLockFeature(0, 1),
+		},
+	},
+
 	// Add a random adjacent to 0 cycle, size is at least 3x3
 	// 0             0 > 1 > ... > 2
-	//     >             V         V
+	//     ->            V         V
 	//                  ...       ...
 	//                   V         V
 	//                   3 > ... > 4
@@ -821,7 +867,7 @@ var AllReplacementRules = []*ReplacementRule{
 			AddsCycle:           true,
 			EnablesNodesUnknown: true,
 		},
-		searchNearPrevIndex: []int{-1, -1, -1, -1, -1},
+		searchNearPrevIndex: []int{-1, 0, -1, -1, -1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0 - just a node near which the cycle will be appended
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {

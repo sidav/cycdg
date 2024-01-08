@@ -117,7 +117,17 @@ func isTagMovable(tag *Tag) bool {
 	t := tag.Kind
 	// TODO: allow moving teleports somehow.
 	// currently they're disabled because it causes unreachable keys sometimes (teleport is moved behind a door, which is then locked).
-	return !(t == TagKey || t == TagHalfkey || t == TagMasterkey || t == TagStart || t == TagTeleportBidirectional)
+	restrictedTags := [...]TagKind{
+		TagKey, TagHalfkey, TagMasterkey,
+		TagStart,
+		TagTeleportBidir, TagTeleportFrom, TagTeleportTo,
+	}
+	for i := range restrictedTags {
+		if t == restrictedTags[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func areAllNodeTagsMovable(g *graph.Graph, crds geometry.Coords) bool {

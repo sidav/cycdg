@@ -187,9 +187,15 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 	case TagTreasure:
 		str = "TRSR"
 		cw.SetStyle(tcell.ColorYellow, tcell.ColorDarkBlue)
-	case TagTeleportBidirectional:
+	case TagTeleportBidir:
 		str = "TEL-"
 		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
+	case TagTeleportFrom:
+		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
+		return fmt.Sprintf("TL%d->", t.Id)
+	case TagTeleportTo:
+		cw.SetStyle(tcell.ColorGray, tcell.ColorDarkBlue)
+		return fmt.Sprintf("->TL%d", t.Id)
 	default:
 		panic("Unknown node tag!")
 	}
