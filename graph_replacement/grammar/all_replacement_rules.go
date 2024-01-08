@@ -125,7 +125,7 @@ var AllReplacementRules = []*ReplacementRule{
 	{
 		Name: "THING",
 		Metadata: ruleMetadata{
-			AdditionalWeight: 2,
+			AdditionalWeight: -4,
 		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -744,6 +744,137 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		OptionalFeatures: []*FeatureAdder{
 			makeRandomHazardFeature(2),
+		},
+	},
+
+	//  X   X   X   X     3 > 4 > 5 > 6
+	//                >>  ^           V
+	//  0 > 1 > 2   X     0 > 1 > 2 < 7
+	{
+		Name: "3ADJ-CYCL+5",
+		Metadata: ruleMetadata{
+			AddsCycle:        true,
+			EnablesNodes:     5,
+			AdditionalWeight: -2,
+		},
+		searchNearPrevIndex: []int{-1, 0, 1, 0, 3, 4, 5, 2},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[0].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedFromCoordsToPair(prevСoords[0], x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[1].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedFromCoordsToPair(prevСoords[1], x, y)
+			},
+			// node 3
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 4
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[3].IsAdjacentToXY(x, y)
+			},
+			// node 5
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[4].IsAdjacentToXY(x, y)
+			},
+			// node 6
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[5].IsAdjacentToXY(x, y)
+			},
+			// node 7
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[2].IsAdjacentToXY(x, y) && prevСoords[6].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNodeByCoords(applyAt[3])
+			g.EnableNodeByCoords(applyAt[4])
+			g.EnableNodeByCoords(applyAt[5])
+			g.EnableNodeByCoords(applyAt[6])
+			g.EnableNodeByCoords(applyAt[7])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[4], applyAt[5])
+			g.EnableDirLinkByCoords(applyAt[5], applyAt[6])
+			g.EnableDirLinkByCoords(applyAt[6], applyAt[7])
+			g.EnableDirLinkByCoords(applyAt[7], applyAt[2])
+		},
+	},
+
+	// Add a random adjacent to 0 cycle, size is at least 3x3
+	// 0             0 > 1 > ... > 2
+	//     >             V         V
+	//                  ...       ...
+	//                   V         V
+	//                   3 > ... > 4
+	{
+		Name: "RND-ADJ-CYCL",
+		Metadata: ruleMetadata{
+			AddsCycle:           true,
+			EnablesNodesUnknown: true,
+		},
+		searchNearPrevIndex: []int{-1, -1, -1, -1, -1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0 - just a node near which the cycle will be appended
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1 - corners
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2 - cardinal to 1 corner
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsCardinalToPair(x, y) &&
+					prevСoords[1].ManhattanDistToXY(x, y) >= 3 &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[1][0], prevСoords[1][1],
+					)
+			},
+			// node 3 - another cardinal to 1 corner, should NOT be cardinal to 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsCardinalToPair(x, y) &&
+					prevСoords[1].ManhattanDistToXY(x, y) >= 3 && !prevСoords[2].IsCardinalToPair(x, y) &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[1][0], prevСoords[1][1],
+					)
+			},
+			// node 4 - cardinal to both 2 and 3, diaginal (NOT cardinal) to 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[2].IsCardinalToPair(x, y) &&
+					prevСoords[3].IsCardinalToPair(x, y) && !prevСoords[1].IsCardinalToPair(x, y) &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[2][0], prevСoords[2][1],
+					) &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[3][0], prevСoords[3][1],
+					)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			x, y, w, h := applyAt[1].GetRectangleForAnotherCornerCoords(applyAt[4])
+			g.DrawBiсonnectedDirectionalRect(x, y, w, h, applyAt[1], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[1])
 		},
 	},
 }
