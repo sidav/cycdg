@@ -8,7 +8,7 @@ import (
 
 var AllReplacementRules = []*ReplacementRule{
 
-	// 0  X  ; just finalize disabled node
+	// 0  X  ; just finalize disabled node.
 	{
 		Name: "DISAB-1",
 		Metadata: ruleMetadata{
@@ -19,7 +19,7 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -27,7 +27,7 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
-	// Disable two neighbouring nodes
+	// Finalize two adjacent disabled nodes.
 	{
 		Name: "DISAB-2",
 		Metadata: ruleMetadata{
@@ -38,11 +38,11 @@ var AllReplacementRules = []*ReplacementRule{
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -51,26 +51,37 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 	},
 
-	// Disable three neighbouring nodes
+	// Finalize three adjacent disabled nodes. Prevents a node from being locked by a finalized L-shape in a corner.
 	{
 		Name: "DISAB-3",
 		Metadata: ruleMetadata{
-			AdditionalWeight:       -4,
+			AdditionalWeight:       -7,
 			FinalizesDisabledNodes: 3,
 		},
 		searchNearPrevIndex: []int{-1, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y)
+				return !g.IsNodeActive(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 			// node 1
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 			// node 2
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y)
+				// Additional check:
+				w, h := g.GetSize()
+				x0, y0 := prevСoords[0].Unwrap()
+				x1, y1 := prevСoords[1].Unwrap()
+				// Prevent a not yet used node from being locked by a finalized L-shape in a corner.
+				// Removal of this check causes a creation of unfillable nodes.
+				if areCoordsAdjacentToRectangleCorner(x0, y0, 0, 0, w, h) && !areCoordsOnRectangle(x1, y1, 0, 0, w, h) {
+					if areCoordsAdjacentToRectangleCorner(x, y, 0, 0, w, h) {
+						return false
+					}
+				}
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y) && g.HasNoFinalizedNodesNearXY(x, y, true)
 			},
 		},
 		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
@@ -83,38 +94,38 @@ var AllReplacementRules = []*ReplacementRule{
 	// WORKAROUND RULE
 	// just unfinalize disabled node adjacent to an active one
 	// Used as a workaround, so that DISABLE-rules won't "wall up" the nodes' growth.
-	{
-		Name:                    "~~UNDISABLE",
-		WorksWithFinalizedNodes: true,
-		Metadata: ruleMetadata{
-			AdditionalWeight:         -8,
-			UnfinalizesDisabledNodes: 1,
-		},
-		searchNearPrevIndex: []int{-1, 0, -1},
-		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
-			// node 0
-			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y)
-			},
-			// node 1
-			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
-			},
-			// node 2 (not an actual node, just an applicability check)
-			func(g *Graph, x, y int, prevСoords ...Coords) bool {
-				return x == 0 && y == 0 && g.CountEmptyEditableNodesNearEnabledOnes() < 3
-			},
-		},
-		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
-			g.UnsafeUnfinalizeNode(applyAt[0])
-		},
-	},
+	// {
+	// 	Name:                    "~~UNDISABLE",
+	// 	WorksWithFinalizedNodes: true,
+	// 	Metadata: ruleMetadata{
+	// 		AdditionalWeight:         -8,
+	// 		UnfinalizesDisabledNodes: 1,
+	// 	},
+	// 	searchNearPrevIndex: []int{-1, 0, -1},
+	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+	// 		// node 0
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y)
+	// 		},
+	// 		// node 1
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+	// 		},
+	// 		// node 2 (not an actual node, just an applicability check)
+	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
+	// 			return x == 0 && y == 0 && g.CountEmptyEditableNodesNearEnabledOnes() < 3
+	// 		},
+	// 	},
+	// 	ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+	// 		g.UnsafeUnfinalizeNode(applyAt[0])
+	// 	},
+	// },
 
 	// 0; just add someting to empty active node
 	{
 		Name: "THING",
 		Metadata: ruleMetadata{
-			AdditionalWeight: 2,
+			AdditionalWeight: -4,
 		},
 		searchNearPrevIndex: []int{-1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -216,7 +227,7 @@ var AllReplacementRules = []*ReplacementRule{
 		Name: "TELEPORT",
 		Metadata: ruleMetadata{
 			AddsTeleport:     true,
-			AdditionalWeight: -5,
+			AdditionalWeight: -2,
 			EnablesNodes:     2,
 		},
 		searchNearPrevIndex: []int{-1, -1, 1},
@@ -224,7 +235,7 @@ var AllReplacementRules = []*ReplacementRule{
 			// node 0
 			func(g *Graph, x, y int, prevСoords ...Coords) bool {
 				return g.IsNodeActive(x, y) && g.DoesNodeHaveAnyTags(x, y) &&
-					!g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidirectional) &&
+					!g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidir) &&
 					!g.DoesNodeHaveTag(x, y, graph_element.TagStart)
 			},
 			// node 1
@@ -241,8 +252,8 @@ var AllReplacementRules = []*ReplacementRule{
 			g.EnableNodeByCoords(applyAt[2])
 			g.EnableDirLinkByCoords(applyAt[1], applyAt[2])
 			moveRandomNodeTag(g, applyAt[0], applyAt[2])
-			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidirectional)
-			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidirectional)
+			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportBidir)
+			g.AddNodeTagByCoordsPreserveLastId(applyAt[1], graph_element.TagTeleportBidir)
 		},
 		OptionalFeatures: []*FeatureAdder{
 			{
@@ -668,6 +679,248 @@ var AllReplacementRules = []*ReplacementRule{
 		},
 		OptionalFeatures: []*FeatureAdder{
 			makeRandomHazardFeature(4),
+		},
+	},
+
+	//  X   X   X     2 > 3 > 4
+	//            >>  ^       V
+	//  0 > 1   X     0 > 1 < 5
+	{
+		Name: "2ADJ-CYCL+4",
+		Metadata: ruleMetadata{
+			AddsCycle:    true,
+			EnablesNodes: 4,
+		},
+		searchNearPrevIndex: []int{-1, 0, 0, 2, 3, 1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[0].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedFromCoordsToPair(prevСoords[0], x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 3
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[2].IsAdjacentToXY(x, y)
+			},
+			// node 4
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[3].IsAdjacentToXY(x, y)
+			},
+			// node 5
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsAdjacentToXY(x, y) && prevСoords[4].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNodeByCoords(applyAt[2])
+			g.EnableNodeByCoords(applyAt[3])
+			g.EnableNodeByCoords(applyAt[4])
+			g.EnableNodeByCoords(applyAt[5])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[2], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[4], applyAt[5])
+			g.EnableDirLinkByCoords(applyAt[5], applyAt[1])
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			{
+				Name: "Copy 01-02",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.CopyEdgeTagsPreservingIds(crds[0], crds[1], crds[0], crds[2])
+				},
+			},
+			makeSecretPassageFeature(0, 2),
+			makeMasterKeyLockFeature(0, 2),
+			makeTwoMasterKeyLocksFeature(0, 2, 5, 1),
+			makeOneWayPassagesFeature(0, 2, 5, 1),
+		},
+		OptionalFeatures: []*FeatureAdder{
+			makeRandomHazardFeature(2),
+		},
+	},
+
+	//  X   X   X   X     3 > 4 > 5 > 6
+	//                >>  ^           V
+	//  0 > 1 > 2   X     0 > 1 > 2 < 7
+	{
+		Name: "3ADJ-CYCL+5",
+		Metadata: ruleMetadata{
+			AddsCycle:        true,
+			EnablesNodes:     5,
+			AdditionalWeight: -2,
+		},
+		searchNearPrevIndex: []int{-1, 0, 1, 0, 3, 4, 5, 2},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[0].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedFromCoordsToPair(prevСoords[0], x, y)
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return prevСoords[1].IsAdjacentToXY(x, y) && g.IsNodeActive(x, y) &&
+					g.IsEdgeDirectedFromCoordsToPair(prevСoords[1], x, y)
+			},
+			// node 3
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 4
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[3].IsAdjacentToXY(x, y)
+			},
+			// node 5
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[4].IsAdjacentToXY(x, y)
+			},
+			// node 6
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[5].IsAdjacentToXY(x, y)
+			},
+			// node 7
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[2].IsAdjacentToXY(x, y) && prevСoords[6].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNodeByCoords(applyAt[3])
+			g.EnableNodeByCoords(applyAt[4])
+			g.EnableNodeByCoords(applyAt[5])
+			g.EnableNodeByCoords(applyAt[6])
+			g.EnableNodeByCoords(applyAt[7])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[4], applyAt[5])
+			g.EnableDirLinkByCoords(applyAt[5], applyAt[6])
+			g.EnableDirLinkByCoords(applyAt[6], applyAt[7])
+			g.EnableDirLinkByCoords(applyAt[7], applyAt[2])
+		},
+	},
+
+	///////////////////////////////////////////////////////
+	// EXPERIMENTAL RULES BELOW
+	///////////////////////////////////////////////////////
+
+	// Add a random straight line with the length at least of 3 and with return one-dir teleport at the end.
+	// 0  X ... X   ->   0 > 1 > ... > 2
+	{
+		Name: "RND-LINE",
+		Metadata: ruleMetadata{
+			AddsTeleport:        true,
+			EnablesNodesUnknown: true,
+		},
+		searchNearPrevIndex: []int{-1, 0, -1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0 - just a node near which the cycle will be appended
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2 - cardinal to 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsCardinalToPair(x, y) &&
+					prevСoords[1].ManhattanDistToXY(x, y) >= 3 &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[1][0], prevСoords[1][1],
+					)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.DrawEnabledConnectedCardinalLine(applyAt[1], applyAt[2])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[1])
+			g.AddNodeTagByCoords(applyAt[0], graph_element.TagTeleportTo)
+			g.AddNodeTagByCoords(applyAt[2], graph_element.TagTeleportFrom)
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			makeMasterKeyLockFeature(0, 1),
+			makeKeyLockFeature(0, 1),
+		},
+	},
+
+	// Add a random adjacent to 0 cycle, size is at least 3x3
+	// 0             0 > 1 > ... > 2
+	//     ->            V         V
+	//                  ...       ...
+	//                   V         V
+	//                   3 > ... > 4
+	{
+		Name: "RND-ADJ-CYCL",
+		Metadata: ruleMetadata{
+			AddsCycle:           true,
+			EnablesNodesUnknown: true,
+		},
+		searchNearPrevIndex: []int{-1, 0, -1, -1, -1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0 - just a node near which the cycle will be appended
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1 - corners
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
+			},
+			// node 2 - cardinal to 1 corner
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsCardinalToPair(x, y) &&
+					prevСoords[1].ManhattanDistToXY(x, y) >= 3 &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[1][0], prevСoords[1][1],
+					)
+			},
+			// node 3 - another cardinal to 1 corner, should NOT be cardinal to 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[1].IsCardinalToPair(x, y) &&
+					prevСoords[1].ManhattanDistToXY(x, y) >= 3 && !prevСoords[2].IsCardinalToPair(x, y) &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[1][0], prevСoords[1][1],
+					)
+			},
+			// node 4 - cardinal to both 2 and 3, diaginal (NOT cardinal) to 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return !g.IsNodeActive(x, y) && prevСoords[2].IsCardinalToPair(x, y) &&
+					prevСoords[3].IsCardinalToPair(x, y) && !prevСoords[1].IsCardinalToPair(x, y) &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[2][0], prevСoords[2][1],
+					) &&
+					g.CheckFuncForAllNodesInCardinalLine(
+						func(xc, yc int) bool {
+							return !g.IsNodeActive(xc, yc) && !g.IsNodeFinalized(xc, yc)
+						},
+						x, y, prevСoords[3][0], prevСoords[3][1],
+					)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			x, y, w, h := applyAt[1].GetRectangleForAnotherCornerCoords(applyAt[4])
+			g.DrawBiсonnectedDirectionalRect(x, y, w, h, applyAt[1], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[0], applyAt[1])
 		},
 	},
 }

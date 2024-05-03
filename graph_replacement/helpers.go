@@ -19,18 +19,18 @@ func getIntValueOfPercent(total, percent int) int {
 	return (total*percent + 50) / 100
 }
 
-func formatDurationMap(dmap map[string]time.Duration) string {
+func formatUsageAndDurationMaps(usages map[string]int, dmap map[string]time.Duration) string {
 	keys := make([]string, 0)
 	for k, _ := range dmap {
 		keys = append(keys, k)
 	}
 	// sort.Strings(keys)
 	sort.Slice(keys, func(i, j int) bool {
-		return dmap[keys[i]] > dmap[keys[j]]
+		return usages[keys[i]] > usages[keys[j]]
 	})
-	res := ""
+	res := fmt.Sprintf(" %-13s: TOTAL USES  WORST TIME\n", "RULE NAME")
 	for _, k := range keys {
-		res += fmt.Sprintf("  %-12s: %v\n", k, dmap[k])
+		res += fmt.Sprintf("  %-12s: %-10d  %-8v\n", k, usages[k], dmap[k])
 	}
 	return res
 }

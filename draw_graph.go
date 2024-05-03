@@ -119,6 +119,8 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 				if change {
 					char = newChar
 				}
+			} else {
+				char = ' '
 			}
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+1), cy+dir[1]*(halfNodeHeight+1))
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+2), cy+dir[1]*(halfNodeHeight+2))
@@ -182,14 +184,20 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 		str = "TRAP"
 		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
 	case TagHazard:
-		str = "HZRD"
 		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
+		return "HAZRD"
 	case TagTreasure:
-		str = "TRSR"
 		cw.SetStyle(tcell.ColorYellow, tcell.ColorDarkBlue)
-	case TagTeleportBidirectional:
+		return "TRESR"
+	case TagTeleportBidir:
 		str = "TEL-"
 		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
+	case TagTeleportFrom:
+		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
+		return fmt.Sprintf("TL%d->", t.Id)
+	case TagTeleportTo:
+		cw.SetStyle(tcell.ColorGray, tcell.ColorDarkBlue)
+		return fmt.Sprintf("->TL%d", t.Id)
 	default:
 		panic("Unknown node tag!")
 	}

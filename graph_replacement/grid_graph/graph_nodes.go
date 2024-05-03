@@ -65,6 +65,24 @@ func (g *Graph) IsNodeFinalized(x, y int) bool {
 	return g.NodeAt(x, y).IsFinalized()
 }
 
+func (g *Graph) HasNoFinalizedNodesNearXY(x, y int, allowDiagonal bool) bool {
+	if !allowDiagonal {
+		debugPanic("Not implemented!")
+	}
+	for vx := -1; vx <= 1; vx++ {
+		for vy := -1; vy <= 1; vy++ {
+			if vx == vy && vx == 0 {
+				continue
+			}
+			nodeHere := g.NodeAt(x+vx, y+vy)
+			if nodeHere != nil && nodeHere.IsFinalized() {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func (g *Graph) IsNodeActive(x, y int) bool {
 	return g.NodeAt(x, y).IsActive()
 }
@@ -142,4 +160,25 @@ func (g *Graph) CountEmptyEditableNodesNearEnabledOnes() int {
 		}
 	}
 	return count
+}
+
+// returns true if all check() calls for each line coord are true
+func (g *Graph) CheckFuncForAllNodesInCardinalLine(check func(int, int) bool, fromX, fromY, toX, toY int) bool {
+	if fromX != toX && fromY != toY {
+		debugPanic("Line is not cardinal!")
+	}
+	if toX < fromX {
+		fromX, toX = toX, fromX
+	}
+	if toY < fromY {
+		fromY, toY = toY, fromY
+	}
+	for x := fromX; x <= toX; x++ {
+		for y := fromY; y <= toY; y++ {
+			if !check(x, y) {
+				return false
+			}
+		}
+	}
+	return true
 }
