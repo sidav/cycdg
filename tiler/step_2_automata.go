@@ -24,6 +24,13 @@ func (t *Tiler) doCellularAutomatae() {
 		}
 	})
 
+	// Randomly displace doors along walls
+	t.execFuncAsCAStep(2, func(x, y int) {
+		if t.tiledMap[x][y].TileType == TileTypeDoor && rndChancePercent(25) {
+			t.randomlySwapTileWithNeighbour(x, y, TileTypeWall)
+		}
+	})
+
 	// Grow the rooms for the square look (remove corners for rooms)
 	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
 		floors8 := t.countTileTypeIn8Around(TileTypeRoomFloor, x, y)
