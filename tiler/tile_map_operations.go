@@ -45,6 +45,20 @@ func (t *Tiler) countAllTileTypesInPlusAround(x, y int, types ...uint8) int {
 	return count
 }
 
+func (t *Tiler) countTileTypesInRadiusAround(x, y, r int, types ...uint8) int {
+	count := 0
+	for _, typ := range types {
+		for i := x - r; i <= x+r; i++ {
+			for j := y - r; j <= y+r; j++ {
+				if (i != x || j != y) && t.areCoordsValid(i, j) && t.tiledMap[i][j].TileType == typ {
+					count++
+				}
+			}
+		}
+	}
+	return count
+}
+
 func (t *Tiler) execFuncAtEachTile(execFunc func(x, y int)) {
 	for x := range t.tiledMap {
 		for y := range t.tiledMap[x] {
