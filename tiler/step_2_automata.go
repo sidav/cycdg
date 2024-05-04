@@ -31,6 +31,17 @@ func (t *Tiler) doCellularAutomatae() {
 		}
 	})
 
+	// Grow the rooms (increase size) - may give undesired results
+	t.execFuncAsCAStep(rnd(3), func(x, y int) {
+		floors4 := t.countTileTypeInPlusAround(TileTypeRoomFloor, x, y)
+		unsets := t.countTileTypeInPlusAround(TileTypeUnset, x, y)
+		if t.tiledMap[x][y].TileType == TileTypeUnset && floors4+unsets == 4 {
+			if floors4 != 2 && unsets != 4 {
+				t.tiledMap[x][y].nextTileType = TileTypeRoomFloor
+			}
+		}
+	})
+
 	// Grow the rooms for the square look (remove corners for rooms)
 	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
 		floors8 := t.countTileTypeIn8Around(TileTypeRoomFloor, x, y)
@@ -43,18 +54,6 @@ func (t *Tiler) doCellularAutomatae() {
 			t.tiledMap[x][y].nextTileType = TileTypeRoomFloor
 		}
 	})
-
-	// // Grow the rooms (increase size) - TODO: how to do it?!
-	// t.execFuncAsCAStep(1, func(x, y int) {
-	// 	floors4 := t.countTileTypeInPlusAround(TileTypeRoomFloor, x, y)
-	// 	floors8 := t.countTileTypeIn8Around(TileTypeRoomFloor, x, y)
-	// 	unsets := t.countTileTypeIn8Around(TileTypeUnset, x, y)
-	// 	if t.tiledMap[x][y].TileType == TileTypeUnset && floors4 == 1 {
-	// 		if unsets == 5 || unsets == 6 && floors8 == 2 {
-	// 			t.tiledMap[x][y].nextTileType = TileTypeRoomFloor
-	// 		}
-	// 	}
-	// })
 
 	// Grow the walls near the room floors
 	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
@@ -77,8 +76,9 @@ func (t *Tiler) doCellularAutomatae() {
 	})
 
 	// CAVES
+
 	// Remove cave-to-cave doors
-	// TODO: except the secret doors here!
+	// TODO: except secret and keyed doors here!
 	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
 		floorsPlus := t.countTileTypeInPlusAround(TileTypeCaveFloor, x, y)
 		if t.tiledMap[x][y].TileType == TileTypeDoor {
