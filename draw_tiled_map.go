@@ -22,12 +22,18 @@ func drawTiledMap(g *graph.Graph, sx, sy int) {
 				symbol = ' '
 			case TileTypeBarrier:
 				color = tcell.ColorRed
-			case TileTypeFloor:
+			case TileTypeRoomFloor:
 				color = tcell.ColorBlue
 				symbol = '.'
+			case TileTypeCaveFloor:
+				color = tcell.ColorDarkGray
+				symbol = ','
 			case TileTypeDoor:
 				color = tcell.ColorGreen
 				symbol = '+'
+			case TileTypeWall:
+				color = tcell.ColorDarkRed
+				symbol = '#'
 			}
 			cw.SetStyle(tcell.ColorBlack, color)
 			cw.PutChar(symbol, x+sx, y+sy)

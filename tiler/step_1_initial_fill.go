@@ -4,9 +4,9 @@ package tiler
 func (t *Tiler) setInitialTileMap() {
 	// create the map itself
 	w, h := t.graph.GetSize()
-	t.tiledMap = make([][]Tile, w*2*t.nodeSize)
+	t.tiledMap = make([][]StructTile, w*2*t.nodeSize)
 	for i := range t.tiledMap {
-		t.tiledMap[i] = make([]Tile, h*2*t.nodeSize)
+		t.tiledMap[i] = make([]StructTile, h*2*t.nodeSize)
 		for k := range t.tiledMap[i] {
 			t.tiledMap[i][k].TileType = TileTypeUnset
 		}
@@ -15,7 +15,11 @@ func (t *Tiler) setInitialTileMap() {
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			if t.graph.NodeAt(x, y).IsActive() {
-				t.fillSquare(x*2, y*2, TileTypeFloor)
+				tag := TileTypeCaveFloor
+				if t.graph.NodeAt(x, y).HasAnyTags() {
+					tag = TileTypeRoomFloor
+				}
+				t.fillSquare(x*2, y*2, tag)
 			}
 		}
 	}

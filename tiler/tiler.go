@@ -6,7 +6,7 @@ import graph "cycdg/graph_replacement/grid_graph"
 type Tiler struct {
 	graph    *graph.Graph
 	nodeSize int
-	tiledMap [][]Tile
+	tiledMap [][]StructTile
 }
 
 func (t *Tiler) Init(g *graph.Graph, nodeSize int) {

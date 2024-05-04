@@ -12,8 +12,8 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 	menu := ConsoleIntValuesSelection{
 		Title: "SELECT GENERATION PARAMS",
 		Entries: []*ValueSelectorEntry{
-			NewPointerSelectorEntry(&width, "Width", "", 4, 4, 25, 1),
-			NewPointerSelectorEntry(&height, "Height", "", 4, 5, 25, 1),
+			NewPointerSelectorEntry(&width, "Width", "", 4, 5, 25, 1),
+			NewPointerSelectorEntry(&height, "Height", "", 4, 4, 25, 1),
 			NewPointerSelectorEntry(&gra.MinFilledPercentage, "Min fill percentage", "%", 25, 65, 100, 5),
 			NewPointerSelectorEntry(&gra.MaxFilledPercentage, "Max fill percentage", "%", 25, 85, 100, 5),
 			NewPointerSelectorEntry(&gra.MinCycles, "Min cycles", "", 0, 3, 100, 1),
