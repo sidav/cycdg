@@ -45,9 +45,6 @@ func printInfo(gen *replacement.GraphReplacementApplier) {
 		cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
 		cw.PutStringf(w*(nodeWidth+nodeSpacing), (i*2+1)+2, "  %s", gen.AppliedRules[i].StringifyCoords())
 	}
-
-	// TODO: delete
-	drawTiledMap(gen.GetGraph(), w*(nodeWidth+nodeSpacing), 1)
 }
 
 func drawCoords(g *graph.Graph) {

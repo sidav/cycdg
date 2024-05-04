@@ -7,7 +7,10 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-func drawTiledMap(g *graph.Graph, sx, sy int) {
+func drawTiledMap(g *graph.Graph) {
+	w, _ := g.GetSize()
+	offsetX, offsetY := w*(nodeWidth+nodeSpacing), 1
+
 	tiler := Tiler{}
 	tiler.Init(g, 5)
 	itm := tiler.GetTileMap()
@@ -36,7 +39,8 @@ func drawTiledMap(g *graph.Graph, sx, sy int) {
 				symbol = '#'
 			}
 			cw.SetStyle(tcell.ColorBlack, color)
-			cw.PutChar(symbol, x+sx, y+sy)
+
+			cw.PutChar(symbol, x+offsetX, y+offsetY)
 		}
 	}
 }

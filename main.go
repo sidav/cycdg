@@ -44,6 +44,12 @@ func main() {
 			key = cw.ReadKey()
 			continue
 		}
+		if key == "t" {
+			drawTiledMap(gen.GetGraph())
+			cw.FlushScreen()
+			key = cw.ReadKey()
+			continue
+		}
 		if key == "" || gen.FilledEnough() {
 			gen.Reset()
 		} else {
