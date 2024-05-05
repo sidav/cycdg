@@ -77,6 +77,20 @@ func PrintCoordsArray(a [][]Coords) {
 	fmt.Printf("\n")
 }
 
+func (c *Coords) GetRectangleForAnotherCornerCoords(corner Coords) (x, y, w, h int) {
+	x, y = c.Unwrap()
+	x2, y2 := corner.Unwrap()
+	w = intAbs(x2-x) + 1 // +1 because the map is tiled
+	h = intAbs(y2-y) + 1
+	if x2 < x {
+		x = x2
+	}
+	if y2 < y {
+		y = y2
+	}
+	return x, y, w, h
+}
+
 func intAbs(x int) int {
 	if x < 0 {
 		return -x

@@ -84,3 +84,12 @@ func (g *Graph) drawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, si
 func (g *Graph) DrawBiсonnectedDirectionalRect(x, y, w, h int, source, sink Coords) {
 	g.drawBiсonnectedDirectionalRect(x, y, w, h, source[0], source[1], sink[0], sink[1])
 }
+
+func (g *Graph) DrawEnabledConnectedCardinalLine(from, to Coords) {
+	if !from.IsCardinalToPair(to.Unwrap()) {
+		debugPanic("%v is not cardinal to %v!", from, to)
+	}
+	fx, fy := from.Unwrap()
+	tx, ty := to.Unwrap()
+	g.drawCardinalConnectedLine(fx, fy, tx, ty, true)
+}

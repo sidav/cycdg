@@ -24,6 +24,10 @@ func areCoordsOnRectangle(x, y, rx, ry, w, h int) bool {
 	return x == rx || x == rx+w-1 || y == ry || y == ry+h-1
 }
 
+func areCoordsAdjacentToRectangleCorner(x, y, rx, ry, w, h int) bool {
+	return (x == rx || x == rx+w-1) && (y == ry+1 || y == ry+h-2) || (x == rx+1 || x == rx+w-2) && (y == ry || y == ry+h-1)
+}
+
 func areCoordsOnRectangleCorner(x, y, rx, ry, w, h int) bool {
 	return (x == rx || x == rx+w-1) && (y == ry || y == ry+h-1)
 }
@@ -113,7 +117,17 @@ func isTagMovable(tag *Tag) bool {
 	t := tag.Kind
 	// TODO: allow moving teleports somehow.
 	// currently they're disabled because it causes unreachable keys sometimes (teleport is moved behind a door, which is then locked).
-	return !(t == TagKey || t == TagHalfkey || t == TagMasterkey || t == TagStart || t == TagTeleportBidirectional)
+	restrictedTags := [...]TagKind{
+		TagKey, TagHalfkey, TagMasterkey,
+		TagStart,
+		TagTeleportBidir, TagTeleportFrom, TagTeleportTo,
+	}
+	for i := range restrictedTags {
+		if t == restrictedTags[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func areAllNodeTagsMovable(g *graph.Graph, crds geometry.Coords) bool {

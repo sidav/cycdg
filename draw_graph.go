@@ -37,8 +37,7 @@ func drawGraph(gen *replacement.GraphReplacementApplier) {
 func printInfo(gen *replacement.GraphReplacementApplier) {
 	w, _ := gen.GetGraph().GetSize()
 	cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
-	cw.PutStringf(w*(nodeWidth+nodeSpacing), 0, "%d rules, %d cycles, filled: %d%%",
-		gen.AppliedRulesCount, gen.CyclesCount, gen.GetGraph().GetFilledNodesPercentage())
+	cw.PutString(gen.StringifyGenerationMetadata(), w*(nodeWidth+nodeSpacing), 0)
 	cw.PutString("Applied rules: ", w*(nodeWidth+nodeSpacing), 1)
 	for i := range gen.AppliedRules {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
@@ -79,6 +78,10 @@ func drawNodeAt(g *graph.Graph, nx, ny int) {
 		str := GetNodeTagIdiomAndSetColor(tag)
 		cw.PutStringCenteredAt(str, x+halfNodeWidth, y+i)
 	}
+	if g.NodeAt(nx, ny).IsFlagged() {
+		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkBlue)
+		cw.PutChar('x', x+nodeWidth-1, y+nodeHeight-1)
+	}
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d", g.CountEdgesAt(nx, ny)), x+halfNodeWidth, y+nodeHeight-2)
 	// cw.PutStringCenteredAt(fmt.Sprintf("%d-%d",
 	// 	g.CountDirEdgesAt(nx, ny, true, false), g.CountDirEdgesAt(nx, ny, false, true)),
@@ -116,6 +119,8 @@ func drawNodeEdges(g *graph.Graph, nx, ny int) {
 				if change {
 					char = newChar
 				}
+			} else {
+				char = ' '
 			}
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+1), cy+dir[1]*(halfNodeHeight+1))
 			cw.PutChar(char, cx+dir[0]*(halfNodeWidth+2), cy+dir[1]*(halfNodeHeight+2))
@@ -179,14 +184,20 @@ func GetNodeTagIdiomAndSetColor(t *Tag) string {
 		str = "TRAP"
 		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
 	case TagHazard:
-		str = "HZRD"
 		cw.SetStyle(tcell.ColorRed, tcell.ColorDarkBlue)
+		return "HAZRD"
 	case TagTreasure:
-		str = "TRSR"
 		cw.SetStyle(tcell.ColorYellow, tcell.ColorDarkBlue)
-	case TagTeleportBidirectional:
+		return "TRESR"
+	case TagTeleportBidir:
 		str = "TEL-"
 		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
+	case TagTeleportFrom:
+		cw.SetStyle(tcell.ColorTeal, tcell.ColorDarkBlue)
+		return fmt.Sprintf("TL%d->", t.Id)
+	case TagTeleportTo:
+		cw.SetStyle(tcell.ColorGray, tcell.ColorDarkBlue)
+		return fmt.Sprintf("->TL%d", t.Id)
 	default:
 		panic("Unknown node tag!")
 	}

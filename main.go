@@ -14,10 +14,9 @@ import (
 )
 
 var (
-	cw                  tcell_console_wrapper.ConsoleWrapper
-	width, height, fill int
-	rnd                 random.PRNG
-	testResultString    string
+	cw               tcell_console_wrapper.ConsoleWrapper
+	rnd              random.PRNG
+	testResultString string
 )
 
 func main() {
@@ -33,28 +32,28 @@ func main() {
 	cw.Init()
 	defer cw.Close()
 
-	gen := replacement.GraphReplacementApplier{}
+	gen := CreateGraWithParamsMenu()
 
 	key := ""
 	for key != "ESCAPE" {
 		if key == "e" {
-			logName := exportRulesLog(&gen)
+			logName := exportRulesLog(gen)
 			cw.SetStyle(tcell.ColorYellow, tcell.ColorBlack)
 			cw.PutString("Exported the log to file "+logName, 0, 0)
 			cw.FlushScreen()
 			key = cw.ReadKey()
 			continue
 		}
-		if key == "" || gen.GetGraph().GetFilledNodesPercentage() >= fill {
-			gen.Init(rnd, width, height)
+		if key == "" || gen.FilledEnough() {
+			gen.Reset()
 		} else {
 			gen.ApplyRandomReplacementRuleToTheGraph()
-			for key == "ENTER" && gen.GetGraph().GetFilledNodesPercentage() < fill {
+			for key == "ENTER" && !gen.FilledEnough() {
 				gen.ApplyRandomReplacementRuleToTheGraph()
 			}
 		}
 
-		drawGraph(&gen)
+		drawGraph(gen)
 		cw.FlushScreen()
 		key = cw.ReadKey()
 	}
@@ -62,16 +61,31 @@ func main() {
 
 // returns true if the program should exit
 func execArgs() bool {
+	var width, height, fill int
 	benchOnly := false
+	fullBenchmark := false
 	var testMapsCount int
 	flag.IntVar(&width, "w", 5, "Graph width")
 	flag.IntVar(&height, "h", 5, "Graph height")
 	flag.IntVar(&fill, "fill", 70, "Fill percentage")
 	flag.BoolVar(&benchOnly, "b", false, "Run benchmark only")
+	flag.BoolVar(&fullBenchmark, "fullbench", false, "Run full benchmark for many sizes and fills; overrides benchOnly")
 	flag.IntVar(&testMapsCount, "total", 1000, "Generated maps count")
 	flag.Parse()
 
 	if testMapsCount > 0 {
+		if fullBenchmark {
+			benchOnly = true
+			minFill := fill
+			for fill := minFill; fill <= 100; fill += 5 {
+				for width := 4; width <= 8; width++ {
+					for height := 4; height <= width; height++ {
+						fmt.Printf("Benchmarking %dx%d map generation filled for %d%%\n", width, height, fill)
+						replacement.TestGen(rnd, width, height, testMapsCount, fill)
+					}
+				}
+			}
+		}
 		testResultString = replacement.TestGen(rnd, width, height, testMapsCount, fill)
 	}
 	return benchOnly

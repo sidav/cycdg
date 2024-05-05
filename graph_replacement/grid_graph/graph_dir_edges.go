@@ -38,6 +38,10 @@ func (g *Graph) IsEdgeDirectedBetweenCoords(x, y, tox, toy int) bool {
 	return n.IsActive() && n.IsReverse() == (vx < 0 || vy < 0)
 }
 
+func (g *Graph) IsEdgeDirectedFromCoordsToPair(from geometry.Coords, tox, toy int) bool {
+	return g.IsEdgeDirectedBetweenCoords(from[0], from[1], tox, toy)
+}
+
 func (g *Graph) doCoordsHaveIngoingLinksOnly(x, y int) bool {
 	for i := range cardinalDirections {
 		vx, vy := unwrapCoords(cardinalDirections[i])

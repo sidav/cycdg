@@ -34,7 +34,7 @@ func (g *Graph) TestSanity() (sane bool, problems []string) {
 		for y := range g.nodes[x] {
 			n := g.NodeAt(x, y)
 			if n.IsActive() {
-				if g.CountEdgesAt(x, y) == 0 && !g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidirectional) {
+				if g.CountEdgesAt(x, y) == 0 && !g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidir) {
 					sane = false
 					problems = append(problems, sprintf("Active node at %d,%d has no active links!", x, y))
 				}

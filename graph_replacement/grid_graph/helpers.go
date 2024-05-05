@@ -20,6 +20,10 @@ func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
 	return dx*dy == 0 && (dx == -1 || dx == 1 || dy == -1 || dy == 1)
 }
 
+func getIntPercentage(value, max int) int {
+	return (100*value + max/2) / max
+}
+
 func sprintf(str string, args ...interface{}) string {
 	return fmt.Sprintf(str, args...)
 }

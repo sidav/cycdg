@@ -13,7 +13,9 @@ const (
 	TagTreasure
 	TagHazard
 	TagTrap
-	TagTeleportBidirectional
+	TagTeleportBidir
+	TagTeleportFrom
+	TagTeleportTo
 	// Edge tags
 	TagLockedEdge
 	TagBilockedEdge     // requires two Halfkeys of same id
