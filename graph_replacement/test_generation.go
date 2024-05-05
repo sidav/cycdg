@@ -2,13 +2,14 @@ package replacement
 
 import (
 	. "cycdg/graph_replacement/geometry"
+	"cycdg/graph_replacement/grammar"
 	. "cycdg/graph_replacement/grammar"
 	"cycdg/lib/random"
 	"fmt"
 	"time"
 )
 
-func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultString string) {
+func TestGen(grammar grammar.Grammar, prng random.PRNG, width, height, tests, fillPerc int) (testResultString string) {
 	if fillPerc > 100 {
 		testResultString = "Inadequate fill percentage\n"
 		return
@@ -27,7 +28,7 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 		gen.MinFilledPercentage = fillPerc
 		gen.MaxFilledPercentage = fillPerc
 
-		gen.Init(prng, width, height)
+		gen.Init(grammar, prng, width, height)
 
 		gen.BenchGenerate(ruleUsages, worstRules)
 
@@ -42,7 +43,7 @@ func TestGen(prng random.PRNG, width, height, tests, fillPerc int) (testResultSt
 		appliedRules += gen.AppliedRulesCount
 		progressBarCLI("Benchmarking", i+1, tests+1, 20)
 	}
-	testResultString = showRulesInfo()
+	testResultString = showRulesInfo(grammar)
 	testResultString += "=========================\n"
 	testResultString += fmt.Sprintf("TEST: Total %d graphs of size %dx%d, filled for %d percents\n", tests, width, height, fillPerc)
 	testResultString += fmt.Sprintf("Total time %v, mean time per single gen %v\n", totalGenTime, totalGenTime/time.Duration(tests))
@@ -85,24 +86,24 @@ func (ra *GraphReplacementApplier) BenchGenerate(ruleUsages map[string]int, wors
 	return worstRules
 }
 
-func showRulesInfo() string {
+func showRulesInfo(grammar grammar.Grammar) string {
 	variants := 0
-	for _, r := range AllInitialRules {
+	for _, r := range grammar.GetAllInitialRules() {
 		variants++
 		variants += len(r.MandatoryFeatures)
 	}
-	str := fmt.Sprintf("Total initial rules %d (%d counting all the features)\n", len(AllInitialRules), variants)
+	str := fmt.Sprintf("Total initial rules %d (%d counting all the features)\n", len(grammar.GetAllInitialRules()), variants)
 
 	mandatory := 0
 	features := 0
 	totalVariants := 0
-	for _, r := range AllReplacementRules {
+	for _, r := range grammar.GetAllReplacementRules() {
 		mandatory += max(1, len(r.MandatoryFeatures))
 		features += len(r.OptionalFeatures)
 		totalVariants += max(1, len(r.MandatoryFeatures)) * (1 + len(r.OptionalFeatures))
 	}
 	str += fmt.Sprintf("Total replacement rules %d (%d with variants), total %d optional features\n",
-		len(AllReplacementRules), mandatory, features)
+		len(grammar.GetAllReplacementRules()), mandatory, features)
 	str += fmt.Sprintf("Total replacement rules variants: %d\n", totalVariants)
 	return str
 }

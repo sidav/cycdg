@@ -2,6 +2,7 @@ package main
 
 import (
 	replacement "cycdg/graph_replacement"
+	"cycdg/graph_replacement/grammar"
 	. "cycdg/lib/tcell_console_wrapper/console_menus"
 )
 
@@ -38,6 +39,7 @@ func CreateGraWithParamsMenu() *replacement.GraphReplacementApplier {
 		}
 	}
 
-	gra.Init(rnd, width, height)
+	grammar := grammar.CreateExampleGrammarObject()
+	gra.Init(grammar, rnd, width, height)
 	return gra
 }

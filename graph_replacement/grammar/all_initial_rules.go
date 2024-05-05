@@ -6,7 +6,7 @@ import (
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-var AllInitialRules = []InitialRule{
+var allInitialRules = []InitialRule{
 	// random start and non-adjacent goal, biconnected, random size
 	{
 		Name:      "nAj-CYCLE",

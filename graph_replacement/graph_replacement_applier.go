@@ -10,7 +10,9 @@ import (
 var rnd random.PRNG
 
 type GraphReplacementApplier struct {
-	graph                                    *graph.Graph
+	// Replacement grammar to use
+	grammar grammar.Grammar
+	// Parameters for desired results
 	MinCycles, MaxCycles                     int
 	DesiredFeatures                          int
 	MinFilledPercentage, MaxFilledPercentage int
@@ -25,13 +27,17 @@ type GraphReplacementApplier struct {
 	EnabledNodesCount           int
 	FinalizedDisabledNodesCount int
 	AppliedRules                []*AppliedRuleInfo
+
+	// The graph on which it all will be applied
+	graph *graph.Graph
 }
 
 func (gra *GraphReplacementApplier) GetGraph() *graph.Graph {
 	return gra.graph
 }
 
-func (gra *GraphReplacementApplier) Init(r random.PRNG, width, height int) {
+func (gra *GraphReplacementApplier) Init(g grammar.Grammar, r random.PRNG, width, height int) {
+	gra.grammar = g
 	rnd = r
 	grammar.SetRandom(rnd)
 

@@ -9,9 +9,10 @@ import (
 const baseRuleWeight = 10
 
 func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
-	index := rnd.SelectRandomIndexFromWeighted(len(AllReplacementRules),
+
+	index := rnd.SelectRandomIndexFromWeighted(len(ra.grammar.GetAllReplacementRules()),
 		func(i int) int {
-			r := AllReplacementRules[i]
+			r := ra.grammar.GetAllReplacementRules()[i]
 
 			if r.Metadata.EnablesNodes > 0 && !ra.canEnableNodes(r.Metadata.EnablesNodes) {
 				return 0
@@ -35,7 +36,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 			}
 			return r.Metadata.AdditionalWeight + baseRuleWeight
 		})
-	return AllReplacementRules[index]
+	return &ra.grammar.GetAllReplacementRules()[index]
 }
 
 func (ra *GraphReplacementApplier) canEnableNodes(howMany int) bool {
