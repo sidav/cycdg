@@ -14,6 +14,7 @@ type GraphReplacementApplier struct {
 	grammar grammar.Grammar
 	// Parameters for desired results
 	MinCycles, MaxCycles                     int
+	MinRulesToApply                          int
 	DesiredFeatures                          int
 	MinFilledPercentage, MaxFilledPercentage int
 	desiredFillPercentage                    int // The real resulting value will most likely be bigger than this
@@ -43,6 +44,10 @@ func (gra *GraphReplacementApplier) Init(g grammar.Grammar, r random.PRNG, width
 
 	if width < 4 || height < 4 {
 		gra.debugPanic("Minimum allowed size violation: at least 4x4 is allowed.")
+	}
+	if gra.MinRulesToApply == 0 {
+		// gra.debugPanic("Minimum rules to apply is zero or less.")
+		gra.MinRulesToApply = width * height / 2
 	}
 	if gra.MinCycles == 0 {
 		gra.MinCycles = 1
@@ -86,7 +91,9 @@ func (gra *GraphReplacementApplier) FilledEnough() bool {
 	}
 	currentPercentage := getIntPercentage(gra.EnabledNodesCount, gra.graph.GetTotalNodesCount())
 	currentPlusOnePercentage := getIntPercentage(gra.EnabledNodesCount+1, gra.graph.GetTotalNodesCount())
-	return currentPercentage == gra.desiredFillPercentage || currentPlusOnePercentage > gra.desiredFillPercentage
+	filledEnough := currentPercentage == gra.desiredFillPercentage || currentPlusOnePercentage > gra.desiredFillPercentage
+	appliedEnough := gra.AppliedRulesCount >= gra.MinRulesToApply
+	return appliedEnough && filledEnough
 }
 
 func (gra *GraphReplacementApplier) StringifyGenerationMetadata() string {
