@@ -4,7 +4,7 @@ import . "cycdg/graph_replacement/grammar"
 
 func (gra *GraphReplacementApplier) ApplyRandomInitialRule() {
 	totalRules := len(gra.grammar.GetAllInitialRules())
-	rule := &(gra.grammar.GetAllInitialRules()[rnd.Rand(totalRules)])
+	rule := gra.grammar.GetAllInitialRules()[rnd.Rand(totalRules)]
 	if rule.IsApplicableForGraph(gra.graph) {
 		gra.applyInitialRule(rule)
 	} else {

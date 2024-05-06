@@ -6,7 +6,7 @@ import (
 	"cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-var allCycleRules = []ReplacementRule{
+var allCycleRules = []*ReplacementRule{
 	// 0   2   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
 	{
 		Name: "CONNROOM",

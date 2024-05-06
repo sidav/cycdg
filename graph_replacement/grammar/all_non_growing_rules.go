@@ -6,7 +6,7 @@ import (
 	"cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-var allNonGrowingRules = []ReplacementRule{
+var allNonGrowingRules = []*ReplacementRule{
 
 	// 0  X  ; just finalize disabled node.
 	{

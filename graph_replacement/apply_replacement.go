@@ -36,7 +36,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 			}
 			return r.Metadata.AdditionalWeight + baseRuleWeight
 		})
-	return &ra.grammar.GetAllReplacementRules()[index]
+	return ra.grammar.GetAllReplacementRules()[index]
 }
 
 func (ra *GraphReplacementApplier) canEnableNodes(howMany int) bool {

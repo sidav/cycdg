@@ -6,7 +6,7 @@ import (
 	"cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-var allGrowingRules = []ReplacementRule{
+var allGrowingRules = []*ReplacementRule{
 	// 0   1       0 > 1  ; where 1 is inactive
 	{
 		Name: "ADDNODE",

@@ -9,6 +9,6 @@ func SetRandom(r random.PRNG) {
 }
 
 type Grammar interface {
-	GetAllInitialRules() []InitialRule
-	GetAllReplacementRules() []ReplacementRule
+	GetAllInitialRules() []*InitialRule
+	GetAllReplacementRules() []*ReplacementRule
 }
