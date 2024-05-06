@@ -4,8 +4,15 @@ import (
 	"cycdg/graph_replacement/geometry"
 	graph "cycdg/graph_replacement/grid_graph"
 	. "cycdg/graph_replacement/grid_graph/graph_element"
+	"cycdg/lib/random"
 	"fmt"
 )
+
+var rnd random.PRNG
+
+func SetRandom(r random.PRNG) {
+	rnd = r
+}
 
 var (
 	cardinalDirections = [4][2]int{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}

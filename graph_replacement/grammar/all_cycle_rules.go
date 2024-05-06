@@ -182,6 +182,88 @@ var allCycleRules = []*ReplacementRule{
 			},
 		},
 	},
+
+	// 4   3           4 < 3
+	//             >  ~V   ^          0, 1, 2 are active, others not, ~> means locked path
+	// 0 > 1 > 2       0 > 1 ~> 2
+	{
+		Name: "GOODLOCK+2",
+		Metadata: ruleMetadata{
+			AddsCycle:    true,
+			EnablesNodes: 2,
+		},
+		searchNearPrevIndex: []int{-1, 0, 1, 0, 1},
+		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
+			// node 0
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				return g.IsNodeActive(x, y)
+			},
+			// node 1
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				x0, y0 := prevСoords[0].Unwrap()
+				return g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x0, y0) &&
+					g.IsEdgeDirectedBetweenCoords(x0, y0, x, y) && g.DoesEdgeHaveZeroTags(prevСoords[0], NewCoords(x, y))
+			},
+			// node 2
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				x1, y1 := prevСoords[1].Unwrap()
+				return g.IsNodeActive(x, y) && areCoordsAdjacent(x, y, x1, y1) && g.DoesNodeHaveAnyTags(x, y) &&
+					g.IsEdgeDirectedBetweenCoords(x1, y1, x, y) && g.DoesEdgeHaveZeroTags(prevСoords[1], NewCoords(x, y))
+			},
+			// node 3
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				x1, y1 := prevСoords[1].Unwrap()
+				return !g.IsNodeActive(x, y) &&
+					areCoordsAdjacent(x, y, x1, y1)
+			},
+			// node 4
+			func(g *Graph, x, y int, prevСoords ...Coords) bool {
+				x0, y0 := prevСoords[0].Unwrap()
+				return !g.IsNodeActive(x, y) &&
+					areCoordsAdjacent(x, y, x0, y0) && prevСoords[3].IsAdjacentToXY(x, y)
+			},
+		},
+		ApplyToGraph: func(g *Graph, applyAt ...Coords) {
+			g.EnableNode(applyAt[3].Unwrap())
+			g.EnableNode(applyAt[4].Unwrap())
+			g.EnableDirLinkByCoords(applyAt[1], applyAt[3])
+			g.EnableDirLinkByCoords(applyAt[3], applyAt[4])
+			g.EnableDirLinkByCoords(applyAt[4], applyAt[0])
+			g.AddNodeTagByCoords(applyAt[4], graph_element.TagKey)
+			g.AddEdgeTagByCoords(applyAt[1], applyAt[2], graph_element.TagLockedEdge)
+		},
+		MandatoryFeatures: []*FeatureAdder{
+			nil,
+			{
+				Name: "Singleway",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoords(crds[1], crds[3], graph_element.TagOneWayEdge)
+					g.AddEdgeTagByCoordsPreserveLastId(crds[4], crds[0], graph_element.TagLockedEdge)
+				},
+			},
+			{
+				Name: "Window",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddEdgeTagByCoordsPreserveLastId(crds[4], crds[0], graph_element.TagWindowEdge)
+				},
+			},
+		},
+		OptionalFeatures: []*FeatureAdder{
+			{
+				Name: "BossGuardsKey",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[4], graph_element.TagBoss)
+				},
+			},
+			{
+				Name: "Ambush",
+				ApplyFeature: func(g *Graph, crds ...Coords) {
+					g.AddNodeTagByCoords(crds[4], graph_element.TagTrap)
+				},
+			},
+		},
+	},
+
 	// STRAIGHT EXAMPLE
 	// 0 > 1 > 2       0 > 1 > 2
 	//             >   V       ^   0-2 are active, others not, may be bent

@@ -22,15 +22,3 @@ func (eg *exampleGrammar) GetAllInitialRules() []*InitialRule {
 func (eg *exampleGrammar) GetAllReplacementRules() []*ReplacementRule {
 	return eg.replacementRules
 }
-
-// func (eg *exampleGrammar) GetAllCycleRules() []ReplacementRule {
-// 	return allCycleRules
-// }
-
-// func (eg *exampleGrammar) GetAllGrowingRules() []ReplacementRule {
-// 	return allGrowingRules
-// }
-
-// func (eg *exampleGrammar) GetAllNongrowingRules() []ReplacementRule {
-// 	return allNonGrowingRules
-// }
