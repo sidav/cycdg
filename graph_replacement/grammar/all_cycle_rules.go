@@ -52,7 +52,6 @@ var allCycleRules = []*ReplacementRule{
 		},
 		OptionalFeatures: []*FeatureAdder{
 			makeRandomHazardFeature(2),
-			makeMasterKeyLockFeature(2, 1),
 			{
 				Name: "Treasure",
 				ApplyFeature: func(g *Graph, crds ...Coords) {
