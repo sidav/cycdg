@@ -11,7 +11,8 @@ var allGrowingRules = []*ReplacementRule{
 	{
 		Name: "ADDNODE",
 		Metadata: ruleMetadata{
-			EnablesNodes: 1,
+			EnablesNodes:     1,
+			AdditionalWeight: -2,
 		},
 		searchNearPrevIndex: []int{-1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -57,7 +58,7 @@ var allGrowingRules = []*ReplacementRule{
 		Name: "TELEPORT",
 		Metadata: ruleMetadata{
 			AddsTeleport:     true,
-			AdditionalWeight: -2,
+			AdditionalWeight: -3,
 			EnablesNodes:     2,
 		},
 		searchNearPrevIndex: []int{-1, -1, 1},

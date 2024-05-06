@@ -12,7 +12,7 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "DISAB-1",
 		Metadata: ruleMetadata{
-			AdditionalWeight:       0,
+			AdditionalWeight:       -1,
 			FinalizesDisabledNodes: 1,
 		},
 		searchNearPrevIndex: []int{-1},
@@ -150,7 +150,8 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "CONNECT",
 		Metadata: ruleMetadata{
-			AddsCycle: true, // it's not guaranteed, but should be more possible than not
+			AddsCycle:        true, // it's not guaranteed, but should be more possible than not
+			AdditionalWeight: -3,
 		},
 		searchNearPrevIndex: []int{-1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -183,7 +184,8 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "L-FLIP",
 		Metadata: ruleMetadata{
-			EnablesNodes: 0, // Enables 1 node, disables 1 node -> 0 in general
+			EnablesNodes:     0, // Enables 1 node, disables 1 node -> 0 in general
+			AdditionalWeight: -2,
 		},
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{

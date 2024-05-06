@@ -24,9 +24,9 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 				return 0
 			}
 			if r.Metadata.AddsCycle {
-				if ra.MinCycles > ra.CyclesCount {
-					return 2 * baseRuleWeight // ra.graph.AppliedRulesCount
-				}
+				// if ra.MinCycles > ra.CyclesCount {
+				// 	return 2 * baseRuleWeight // ra.graph.AppliedRulesCount
+				// }
 				if ra.MaxCycles <= ra.CyclesCount {
 					return 0
 				}

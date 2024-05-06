@@ -188,8 +188,9 @@ var allCycleRules = []*ReplacementRule{
 	{
 		Name: "GOODLOCK+2",
 		Metadata: ruleMetadata{
-			AddsCycle:    true,
-			EnablesNodes: 2,
+			AddsCycle:        true,
+			EnablesNodes:     2,
+			AdditionalWeight: 3,
 		},
 		searchNearPrevIndex: []int{-1, 0, 1, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{

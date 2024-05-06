@@ -83,6 +83,10 @@ func (ra *GraphReplacementApplier) BenchGenerate(ruleUsages map[string]int, wors
 		}
 		ra.applyReplacementRule(rule, applicableCoords)
 	}
+	if ra.CyclesCount < ra.MinCycles || ra.CyclesCount > ra.MaxCycles {
+		ra.debugPanic("Min cycle requirement failed: generated %d when %d-%d allowed.",
+			ra.CyclesCount, ra.MinCycles, ra.MaxCycles)
+	}
 	return worstRules
 }
 
