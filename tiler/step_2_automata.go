@@ -2,34 +2,9 @@ package tiler
 
 func (t *Tiler) doCellularAutomatae() {
 	t.resetCellularAutomataNextState()
-
-	// Thin all the doors
-	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
-		roomFloors := t.countTileTypesInPlusAround(x, y, false, TileTypeRoomFloor)
-		caveFloors := t.countTileTypesInPlusAround(x, y, false, TileTypeCaveFloor)
-		if t.tiledMap[x][y].TileType == TileTypeDoor {
-			if roomFloors == 1 && caveFloors == 0 {
-				t.tiledMap[x][y].nextTileType = TileTypeRoomFloor
-			} else if roomFloors == 0 && caveFloors == 1 {
-				t.tiledMap[x][y].nextTileType = TileTypeCaveFloor
-			}
-		}
-	})
-
-	// Leave only 1 tile for doors, wall everything else
-	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
-		if t.tiledMap[x][y].TileType == TileTypeDoor &&
-			t.countTileTypesInPlusAround(x, y, false, TileTypeDoor) == 1 {
-			t.tiledMap[x][y].nextTileType = TileTypeWall
-		}
-	})
-
-	// Randomly displace doors along walls
-	t.execFuncAsCAStep(2, func(x, y int) {
-		if t.tiledMap[x][y].TileType == TileTypeDoor && rndChancePercent(25) {
-			t.randomlySwapTileWithNeighbour(x, y, TileTypeWall)
-		}
-	})
+	t.DoorStep(TileTypeDoor)
+	t.DoorStep(TileTypeSecretDoor)
+	t.DoorStep(TileTypeLockedDoor)
 
 	// Grow the rooms (increase size) - may give undesired results
 	t.execFuncAsCAStep(rnd(3), func(x, y int) {
@@ -78,7 +53,6 @@ func (t *Tiler) doCellularAutomatae() {
 	// CAVES
 
 	// Remove cave-to-cave doors
-	// TODO: except secret and keyed doors here!
 	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
 		floorsPlus := t.countTileTypesInPlusAround(x, y, false, TileTypeCaveFloor)
 		if t.tiledMap[x][y].TileType == TileTypeDoor {
@@ -93,7 +67,8 @@ func (t *Tiler) doCellularAutomatae() {
 		rfloors := t.countTileTypesIn8Around(x, y, true, TileTypeRoomFloor)
 		cfloors8 := t.countTileTypesIn8Around(x, y, true, TileTypeCaveFloor)
 		cfloors4 := t.countTileTypesInPlusAround(x, y, false, TileTypeCaveFloor)
-		if t.tiledMap[x][y].TileType == TileTypeWall && rndChancePercent(50) {
+		unallowedDoors := t.countTileTypesInRadiusAround(x, y, 3, TileTypeSecretDoor, TileTypeLockedDoor)
+		if t.tiledMap[x][y].TileType == TileTypeWall && unallowedDoors == 0 && rndChancePercent(50) {
 			if rfloors == 0 && (cfloors8 > 2 || cfloors4 > 2) {
 				t.tiledMap[x][y].nextTileType = TileTypeCaveFloor
 			}
@@ -117,11 +92,12 @@ func (t *Tiler) doCellularAutomatae() {
 		cfloors8 := t.countTileTypesIn8Around(x, y, true, TileTypeCaveFloor)
 		rfloors8 := t.countTileTypesIn8Around(x, y, true, TileTypeRoomFloor)
 		// cfloors4 := t.countAllTileTypesInPlusAround(x, y, false, TileTypeCaveFloor)
-		doors4 := t.countTileTypesInPlusAround(x, y, false, TileTypeDoor)
+		doors4 := t.countTileTypesInPlusAround(x, y, false, TileTypeDoor, TileTypeSecretDoor, TileTypeLockedDoor)
 		walls4 := t.countTileTypesInPlusAround(x, y, true, TileTypeWall)
 		walls8 := t.countTileTypesIn8Around(x, y, true, TileTypeWall)
 		wallsR2 := t.countTileTypesInRadiusAround(x, y, 2, TileTypeWall)
-		if doors4 == 0 && rfloors8 == 0 {
+		unallowedDoors := t.countTileTypesInRadiusAround(x, y, t.nodeSize+1, TileTypeSecretDoor, TileTypeLockedDoor)
+		if doors4 == 0 && rfloors8 == 0 && unallowedDoors == 0 {
 			if t.tiledMap[x][y].TileType == TileTypeCaveFloor {
 				if walls4 != 2 && (walls8 >= 6 || wallsR2 <= 2) {
 					t.tiledMap[x][y].nextTileType = TileTypeWall
@@ -132,6 +108,36 @@ func (t *Tiler) doCellularAutomatae() {
 					t.tiledMap[x][y].nextTileType = TileTypeCaveFloor
 				}
 			}
+		}
+	})
+}
+
+func (t *Tiler) DoorStep(doorCode uint8) {
+	// Thin all the doors
+	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
+		roomFloors := t.countTileTypesInPlusAround(x, y, false, TileTypeRoomFloor)
+		caveFloors := t.countTileTypesInPlusAround(x, y, false, TileTypeCaveFloor)
+		if t.tiledMap[x][y].TileType == doorCode {
+			if roomFloors == 1 && caveFloors == 0 {
+				t.tiledMap[x][y].nextTileType = TileTypeRoomFloor
+			} else if roomFloors == 0 && caveFloors == 1 {
+				t.tiledMap[x][y].nextTileType = TileTypeCaveFloor
+			}
+		}
+	})
+
+	// Leave only 1 tile for doors, wall everything else
+	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
+		if t.tiledMap[x][y].TileType == doorCode &&
+			t.countTileTypesInPlusAround(x, y, false, doorCode) == 1 {
+			t.tiledMap[x][y].nextTileType = TileTypeWall
+		}
+	})
+
+	// Randomly displace doors along walls
+	t.execFuncAsCAStep(2, func(x, y int) {
+		if t.tiledMap[x][y].TileType == doorCode && rndChancePercent(25) {
+			t.randomlySwapTileWithNeighbour(x, y, TileTypeWall)
 		}
 	})
 }

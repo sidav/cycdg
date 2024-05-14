@@ -17,28 +17,36 @@ func drawTiledMap(g *graph.Graph) {
 
 	for x := range itm {
 		for y := range itm[x] {
-			color := tcell.ColorBlack
-			symbol := ' '
+			fgcolor := tcell.ColorBlack
+			bgcolor := tcell.ColorDarkMagenta
+			symbol := '?'
 			switch itm[x][y].TileType {
 			case TileTypeUnset:
-				color = tcell.ColorBlack
+				bgcolor = tcell.ColorBlack
 				symbol = ' '
 			case TileTypeBarrier:
-				color = tcell.ColorRed
+				bgcolor = tcell.ColorRed
 			case TileTypeRoomFloor:
-				color = tcell.ColorBlue
+				bgcolor = tcell.ColorBlue
 				symbol = '.'
 			case TileTypeCaveFloor:
-				color = tcell.ColorDarkGray
+				bgcolor = tcell.ColorDarkGray
 				symbol = ','
 			case TileTypeDoor:
-				color = tcell.ColorGreen
+				bgcolor = tcell.ColorGreen
 				symbol = '+'
 			case TileTypeWall:
-				color = tcell.ColorDarkRed
+				bgcolor = tcell.ColorDarkRed
 				symbol = '#'
+			case TileTypeSecretDoor:
+				fgcolor = tcell.ColorDarkGray
+				bgcolor = tcell.ColorDarkRed
+			case TileTypeLockedDoor:
+				fgcolor = tcell.ColorRed
+				bgcolor = tcell.ColorDarkRed
+				symbol = 'X'
 			}
-			cw.SetStyle(tcell.ColorBlack, color)
+			cw.SetStyle(fgcolor, bgcolor)
 
 			cw.PutChar(symbol, x+offsetX, y+offsetY)
 		}

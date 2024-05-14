@@ -1,5 +1,7 @@
 package tiler
 
+import "cycdg/graph_replacement/grid_graph/graph_element"
+
 // Build map of 5x5 (or other, set in NodeSize) tiles of appropriate type
 func (t *Tiler) setInitialTileMap() {
 	// create the map itself
@@ -31,19 +33,13 @@ func (t *Tiler) setInitialTileMap() {
 			}
 			// check right edge
 			if x < w-1 && t.graph.NodeAt(x+1, y).IsActive() {
-				if t.graph.GetEdgeBetweenIntCoords(x, y, x+1, y).IsActive() {
-					t.fillSquare(x*2+1, y*2, TileTypeDoor)
-				} else {
-					t.fillSquare(x*2+1, y*2, TileTypeBarrier)
-				}
+				tileType := t.getTileTypeForEdge(t.graph.GetEdgeBetweenIntCoords(x, y, x+1, y))
+				t.fillSquare(x*2+1, y*2, tileType)
 			}
 			// check bottom edge
 			if y < h-1 && t.graph.NodeAt(x, y+1).IsActive() {
-				if t.graph.GetEdgeBetweenIntCoords(x, y, x, y+1).IsActive() {
-					t.fillSquare(x*2, y*2+1, TileTypeDoor)
-				} else {
-					t.fillSquare(x*2, y*2+1, TileTypeBarrier)
-				}
+				tileType := t.getTileTypeForEdge(t.graph.GetEdgeBetweenIntCoords(x, y, x, y+1))
+				t.fillSquare(x*2, y*2+1, tileType)
 			}
 		}
 	}
@@ -57,4 +53,21 @@ func (t *Tiler) fillSquare(x, y int, tileType uint8) {
 			t.tiledMap[startX+i][startY+j].TileType = tileType
 		}
 	}
+}
+
+func (t *Tiler) getTileTypeForEdge(e *graph_element.Edge) uint8 {
+	tags := e.GetTags()
+	if e.IsActive() {
+		if len(tags) > 0 {
+			tag := tags[0]
+			switch tag.Kind {
+			case graph_element.TagLockedEdge:
+				return TileTypeLockedDoor
+			case graph_element.TagSecretEdge:
+				return TileTypeSecretDoor
+			}
+		}
+		return TileTypeDoor
+	}
+	return TileTypeBarrier
 }
