@@ -7,7 +7,7 @@ func (t *Tiler) GetTileMap() [][]StructTile {
 
 	// TODO: remove this
 	t.repeatedlyExecFuncAsCAStep(func(x, y int) {
-		wallsOrUnsets := t.countTileTypesIn8Around(x, y, TileTypeWall, TileTypeUnset)
+		wallsOrUnsets := t.countTileTypesIn8Around(x, y, true, TileTypeWall, TileTypeUnset)
 		if x == 0 || y == 0 || x == len(t.tiledMap)-1 || y == len(t.tiledMap[x])-1 {
 			t.tiledMap[x][y].nextTileType = TileTypeWall
 		}
