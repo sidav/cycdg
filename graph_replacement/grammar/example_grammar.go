@@ -19,6 +19,12 @@ func (eg *exampleGrammar) GetAllInitialRules() []*InitialRule {
 	return eg.initialRules
 }
 
-func (eg *exampleGrammar) GetAllReplacementRules() []*ReplacementRule {
-	return eg.replacementRules
+func (eg *exampleGrammar) GetAllReplacementRulesForStep(step int) []*ReplacementRule {
+	var applicableRules []*ReplacementRule
+	for _, v := range eg.replacementRules {
+		if v.isApplicableAtStep(step) {
+			applicableRules = append(applicableRules, v)
+		}
+	}
+	return applicableRules
 }

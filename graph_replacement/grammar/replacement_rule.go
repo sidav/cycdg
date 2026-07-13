@@ -23,6 +23,13 @@ type ReplacementRule struct {
 	OptionalFeatures   []*FeatureAdder // One (or more?) of them could be applied. Should NOT conflict with any of the mandatory and optional features.
 }
 
+func (ir *ReplacementRule) isApplicableAtStep(currentStep int) bool {
+	if (ir.Metadata.StepApplicability == nil) {
+		return true
+	}
+	return ir.Metadata.StepApplicability(currentStep)
+}
+
 func (ir *ReplacementRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (result [][]Coords) {
 	return ir.tryFindAllCoordVariantsRecursively(g)
 }

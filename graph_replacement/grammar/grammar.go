@@ -2,5 +2,5 @@ package grammar
 
 type Grammar interface {
 	GetAllInitialRules() []*InitialRule
-	GetAllReplacementRules() []*ReplacementRule
+	GetAllReplacementRulesForStep(step int) []*ReplacementRule
 }

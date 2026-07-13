@@ -12,6 +12,7 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "DISAB-1",
 		Metadata: ruleMetadata{
+			StepApplicability:      LessThan(5),
 			AdditionalWeight:       -1,
 			FinalizesDisabledNodes: 1,
 		},
@@ -31,6 +32,7 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "DISAB-2",
 		Metadata: ruleMetadata{
+			StepApplicability:      LessThan(5),
 			AdditionalWeight:       -2,
 			FinalizesDisabledNodes: 2,
 		},
@@ -55,6 +57,7 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "DISAB-3",
 		Metadata: ruleMetadata{
+			StepApplicability:      LessThan(4),
 			AdditionalWeight:       -7,
 			FinalizesDisabledNodes: 3,
 		},

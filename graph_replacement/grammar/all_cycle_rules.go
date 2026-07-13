@@ -7,12 +7,13 @@ import (
 )
 
 var allCycleRules = []*ReplacementRule{
-	// 0   2   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
+	// 0   X   1       0 > 2 > 1 ; where 0 and 1 are active; may be bent
 	{
 		Name: "CONNROOM",
 		Metadata: ruleMetadata{
-			AddsCycle:    true, // it's not guaranteed, but should be more possible than not
-			EnablesNodes: 1,
+			StepApplicability: Even(),
+			AddsCycle:         true, // it's not guaranteed, but should be more possible than not
+			EnablesNodes:      1,
 		},
 		searchNearPrevIndex: []int{-1, -1, 0},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -480,6 +481,7 @@ var allCycleRules = []*ReplacementRule{
 	{
 		Name: "RND-ADJ-CYCL",
 		Metadata: ruleMetadata{
+			StepApplicability:    OnSteps(1, 2),
 			AddsCycle:           true,
 			EnablesNodesUnknown: true,
 		},

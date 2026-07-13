@@ -108,7 +108,8 @@ var allGrowingRules = []*ReplacementRule{
 	{
 		Name: "U-RULE",
 		Metadata: ruleMetadata{
-			EnablesNodes: 2,
+			StepApplicability: Even(),
+			EnablesNodes:      2,
 		},
 		searchNearPrevIndex: []int{-1, 0, 0, 1},
 		applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
@@ -182,6 +183,7 @@ var allGrowingRules = []*ReplacementRule{
 	{
 		Name: "RND-LINE",
 		Metadata: ruleMetadata{
+			StepApplicability:   OnSteps(1, 2),
 			AddsTeleport:        true,
 			EnablesNodesUnknown: true,
 		},
