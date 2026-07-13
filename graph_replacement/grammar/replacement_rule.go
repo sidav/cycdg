@@ -27,54 +27,57 @@ func (ir *ReplacementRule) FindAllApplicableCoordVariantsRecursively(g *Graph) (
 	return ir.tryFindAllCoordVariantsRecursively(g)
 }
 
-func (ir *ReplacementRule) tryFindAllCoordVariantsRecursively(g *Graph, argsForFunc ...Coords) [][]Coords {
-	currFuncIndex := len(argsForFunc)
+func (ir *ReplacementRule) tryFindAllCoordVariantsRecursively(g *Graph, picked ...Coords) [][]Coords {
+	stepIndex := len(picked)
 	w, h := g.GetSize()
-	var result [][]Coords
-
-	xFrom, xTo := 0, w-1
-	yFrom, yTo := 0, h-1
 	if len(ir.searchNearPrevIndex) != len(ir.applicabilityFuncs) {
 		debugPanic("Rule %s has wrong searchNearPrevIndex count", ir.Name)
 	}
-	if ir.searchNearPrevIndex[currFuncIndex] != -1 {
-		searchNearX, searchNearY := argsForFunc[ir.searchNearPrevIndex[currFuncIndex]].Unwrap()
-		xFrom, yFrom = maxint(searchNearX-1, 0), maxint(searchNearY-1, 0)
-		xTo, yTo = minint(searchNearX+1, w-1), minint(searchNearY+1, h-1)
-	}
 
-	// try all coordinates
+	xFrom, xTo, yFrom, yTo := ir.stepSearchBounds(stepIndex, picked, w, h)
+
+	var result [][]Coords
 	for x := xFrom; x <= xTo; x++ {
 		for y := yFrom; y <= yTo; y++ {
-
-			if !ir.WorksWithFinalizedNodes {
-				if g.IsNodeFinalized(x, y) {
-					continue
-				}
-			}
-
-			if geometry.AreXYCoordsInCoordsArray(x, y, argsForFunc) {
+			if !ir.WorksWithFinalizedNodes && g.IsNodeFinalized(x, y) {
 				continue
 			}
-			if ir.applicabilityFuncs[currFuncIndex](g, x, y, argsForFunc...) {
-				// This function is not the last in rule
-				if currFuncIndex < len(ir.applicabilityFuncs)-1 {
-					// Warning: possible bug in append(argsForFunc, NewCoords(x, y)) usage.
-					res := ir.tryFindAllCoordVariantsRecursively(g, append(argsForFunc, NewCoords(x, y))...)
-					if len(res) > 0 { // next coords are good, so we can add them to the list
-						result = append(result, res...)
-					}
-				} else { // it's last in rule, should add the previous and current coords to the list
-					allArguments := make([]Coords, len(argsForFunc)+1)
-					copy(allArguments, argsForFunc)
-					allArguments[len(argsForFunc)] = NewCoords(x, y)
-					result = append(result, allArguments)
-					// Prevously: result = append(result, append(argsForFunc, NewCoords(x, y)))
-					// It's fixed; was severely buggy with large total coords num (was observed with 8 coords, was ok with 6 or less)
-					// Thus append() seems to be destructive to argsForFunc in that case; it's better to use slice copy for appending to.
-				}
+			if geometry.AreXYCoordsInCoordsArray(x, y, picked) {
+				continue
+			}
+			if !ir.applicabilityFuncs[stepIndex](g, x, y, picked...) {
+				continue
+			}
+
+			next := appendCoordCopy(picked, NewCoords(x, y))
+			if stepIndex < len(ir.applicabilityFuncs)-1 {
+				result = append(result, ir.tryFindAllCoordVariantsRecursively(g, next...)...)
+			} else {
+				result = append(result, next)
 			}
 		}
 	}
+	return result
+}
+
+// stepSearchBounds returns the grid area to search for the current step.
+// If searchNearPrevIndex[step] != -1, narrows to 3×3 around the referenced picked coord.
+func (ir *ReplacementRule) stepSearchBounds(step int, picked []Coords, w, h int) (xFrom, xTo, yFrom, yTo int) {
+	xFrom, xTo = 0, w-1
+	yFrom, yTo = 0, h-1
+	if nearIdx := ir.searchNearPrevIndex[step]; nearIdx != -1 {
+		cx, cy := picked[nearIdx].Unwrap()
+		xFrom, yFrom = maxint(cx-1, 0), maxint(cy-1, 0)
+		xTo, yTo = minint(cx+1, w-1), minint(cy+1, h-1)
+	}
+	return
+}
+
+// appendCoordCopy returns a fresh slice — avoids append aliasing when multiple
+// loop iterations share the same backing array behind `coords`.
+func appendCoordCopy(coords []Coords, c Coords) []Coords {
+	result := make([]Coords, len(coords)+1)
+	copy(result, coords)
+	result[len(coords)] = c
 	return result
 }
