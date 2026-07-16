@@ -108,7 +108,6 @@ var allGrowingRules = []*ReplacementRule{
 	{
 		Name: "U-RULE",
 		Metadata: ruleMetadata{
-			StepApplicability: Even(),
 			EnablesNodes:      2,
 		},
 		searchNearPrevIndex: []int{-1, 0, 0, 1},

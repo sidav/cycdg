@@ -75,7 +75,7 @@ func (ra *GraphReplacementApplier) ApplyRandomReplacementRuleToTheGraph() {
 		}
 		try++
 		if try > 10000 {
-			panic("No applicable coords even after 10000 tries!")
+			ra.debugPanic("No applicable coords even after 10000 tries!")
 		}
 	}
 	ra.applyReplacementRule(rule, applicableCoords)

@@ -12,7 +12,7 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "DISAB-1",
 		Metadata: ruleMetadata{
-			StepApplicability:      LessThan(5),
+			StepApplicability:      And(Odd(), LessThan(5)),
 			AdditionalWeight:       -1,
 			FinalizesDisabledNodes: 1,
 		},
@@ -32,7 +32,7 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "DISAB-2",
 		Metadata: ruleMetadata{
-			StepApplicability:      LessThan(5),
+			StepApplicability:      And(Odd(), LessThan(5)),
 			AdditionalWeight:       -2,
 			FinalizesDisabledNodes: 2,
 		},
@@ -57,7 +57,7 @@ var allNonGrowingRules = []*ReplacementRule{
 	{
 		Name: "DISAB-3",
 		Metadata: ruleMetadata{
-			StepApplicability:      LessThan(4),
+			StepApplicability:      And(Odd(), LessThan(5)),
 			AdditionalWeight:       -7,
 			FinalizesDisabledNodes: 3,
 		},
@@ -93,36 +93,6 @@ var allNonGrowingRules = []*ReplacementRule{
 			g.FinalizeNode(applyAt[2])
 		},
 	},
-
-	// WORKAROUND RULE
-	// just unfinalize disabled node adjacent to an active one
-	// Used as a workaround, so that DISABLE-rules won't "wall up" the nodes' growth.
-	// {
-	// 	Name:                    "~~UNDISABLE",
-	// 	WorksWithFinalizedNodes: true,
-	// 	Metadata: ruleMetadata{
-	// 		AdditionalWeight:         -8,
-	// 		UnfinalizesDisabledNodes: 1,
-	// 	},
-	// 	searchNearPrevIndex: []int{-1, 0, -1},
-	// 	applicabilityFuncs: []func(g *Graph, x, y int, prevСoords ...Coords) bool{
-	// 		// node 0
-	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
-	// 			return !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y)
-	// 		},
-	// 		// node 1
-	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
-	// 			return g.IsNodeActive(x, y) && prevСoords[0].IsAdjacentToXY(x, y)
-	// 		},
-	// 		// node 2 (not an actual node, just an applicability check)
-	// 		func(g *Graph, x, y int, prevСoords ...Coords) bool {
-	// 			return x == 0 && y == 0 && g.CountEmptyEditableNodesNearEnabledOnes() < 3
-	// 		},
-	// 	},
-	// 	ApplyToGraph: func(g *Graph, applyAt ...Coords) {
-	// 		g.UnsafeUnfinalizeNode(applyAt[0])
-	// 	},
-	// },
 
 	// 0; just add someting to empty active node
 	{

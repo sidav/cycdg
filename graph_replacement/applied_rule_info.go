@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+// This struct is needed for logging only
 type AppliedRuleInfo struct {
 	ruleName, mandatoryFeatureName, optionalFeatureName string
 	appliedAt                                           []Coords
