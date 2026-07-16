@@ -38,7 +38,7 @@ func printInfo(gen *replacement.GraphReplacementApplier) {
 	w, _ := gen.GetGraph().GetSize()
 	cw.SetStyle(tcell.ColorDarkGray, tcell.ColorBlack)
 	cw.PutString(gen.StringifyGenerationMetadata(), w*(nodeWidth+nodeSpacing), 0)
-	cw.PutString("Applied rules: ", w*(nodeWidth+nodeSpacing), 1)
+	cw.PutStringf(w*(nodeWidth+nodeSpacing), 1, "Applied rules: %d (min %d)", gen.AppliedRulesCount, gen.MinRulesToApply)
 	for i := range gen.AppliedRules {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkGray)
 		cw.PutStringf(w*(nodeWidth+nodeSpacing), (i*2)+2, "%d:%s", i, gen.AppliedRules[i].StringifyRule())

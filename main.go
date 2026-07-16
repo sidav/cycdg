@@ -2,6 +2,7 @@ package main
 
 import (
 	replacement "cycdg/graph_replacement"
+	"cycdg/graph_replacement/grammar"
 	"cycdg/lib/random"
 	"cycdg/lib/random/pcgrandom"
 	"cycdg/lib/tcell_console_wrapper"
@@ -73,6 +74,7 @@ func execArgs() bool {
 	flag.IntVar(&testMapsCount, "total", 1000, "Generated maps count")
 	flag.Parse()
 
+	grammar := grammar.CreateExampleGrammarObject()
 	if testMapsCount > 0 {
 		if fullBenchmark {
 			benchOnly = true
@@ -81,12 +83,12 @@ func execArgs() bool {
 				for width := 4; width <= 8; width++ {
 					for height := 4; height <= width; height++ {
 						fmt.Printf("Benchmarking %dx%d map generation filled for %d%%\n", width, height, fill)
-						replacement.TestGen(rnd, width, height, testMapsCount, fill)
+						replacement.TestGen(grammar, rnd, width, height, testMapsCount, fill)
 					}
 				}
 			}
 		}
-		testResultString = replacement.TestGen(rnd, width, height, testMapsCount, fill)
+		testResultString = replacement.TestGen(grammar, rnd, width, height, testMapsCount, fill)
 	}
 	return benchOnly
 }

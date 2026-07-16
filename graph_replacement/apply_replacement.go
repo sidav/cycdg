@@ -9,9 +9,10 @@ import (
 const baseRuleWeight = 10
 
 func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
-	index := rnd.SelectRandomIndexFromWeighted(len(AllReplacementRules),
+	applicableRules := ra.grammar.GetAllReplacementRulesForStep(ra.AppliedRulesCount)
+	index := rnd.SelectRandomIndexFromWeighted(len(applicableRules),
 		func(i int) int {
-			r := AllReplacementRules[i]
+			r := applicableRules[i]
 
 			if r.Metadata.EnablesNodes > 0 && !ra.canEnableNodes(r.Metadata.EnablesNodes) {
 				return 0
@@ -23,9 +24,9 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 				return 0
 			}
 			if r.Metadata.AddsCycle {
-				if ra.MinCycles > ra.CyclesCount {
-					return 2 * baseRuleWeight // ra.graph.AppliedRulesCount
-				}
+				// if ra.MinCycles > ra.CyclesCount {
+				// 	return 2 * baseRuleWeight // ra.graph.AppliedRulesCount
+				// }
 				if ra.MaxCycles <= ra.CyclesCount {
 					return 0
 				}
@@ -35,7 +36,7 @@ func (ra *GraphReplacementApplier) SelectRandomRuleToApply() *ReplacementRule {
 			}
 			return r.Metadata.AdditionalWeight + baseRuleWeight
 		})
-	return AllReplacementRules[index]
+	return applicableRules[index]
 }
 
 func (ra *GraphReplacementApplier) canEnableNodes(howMany int) bool {
@@ -74,7 +75,7 @@ func (ra *GraphReplacementApplier) ApplyRandomReplacementRuleToTheGraph() {
 		}
 		try++
 		if try > 10000 {
-			panic("No applicable coords even after 10000 tries!")
+			ra.debugPanic("No applicable coords even after 10000 tries!")
 		}
 	}
 	ra.applyReplacementRule(rule, applicableCoords)

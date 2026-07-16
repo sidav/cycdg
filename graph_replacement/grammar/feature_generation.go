@@ -10,9 +10,21 @@ import (
 
 func makeKeyLockFeature(lockBetweenIndex1, lockBetweenIndex2 int) *FeatureAdder {
 	return &FeatureAdder{
-		Name: "Locked",
+		Name: "LockedRandom",
 		PrepareFeature: func(g *Graph, crds ...Coords) {
 			addTagAtRandomActiveNode(g, TagKey)
+		},
+		ApplyFeature: func(g *Graph, crds ...Coords) {
+			g.AddEdgeTagByCoords(crds[lockBetweenIndex1], crds[lockBetweenIndex2], TagLockedEdge)
+		},
+	}
+}
+
+func makeKeyLockAtKnownCoordsFeature(lockBetweenIndex1, lockBetweenIndex2, keyX, keyY int) *FeatureAdder {
+	return &FeatureAdder{
+		Name: "LockedKnown",
+		PrepareFeature: func(g *Graph, crds ...Coords) {
+			g.AddNodeTag(keyX, keyY, TagKey)
 		},
 		ApplyFeature: func(g *Graph, crds ...Coords) {
 			g.AddEdgeTagByCoords(crds[lockBetweenIndex1], crds[lockBetweenIndex2], TagLockedEdge)
