@@ -93,6 +93,7 @@ func (gra *GraphReplacementApplier) FilledEnough() bool {
 	currentPlusOnePercentage := getIntPercentage(gra.EnabledNodesCount+1, gra.graph.GetTotalNodesCount())
 	filledEnough := currentPercentage == gra.desiredFillPercentage || currentPlusOnePercentage > gra.desiredFillPercentage
 	appliedEnough := gra.AppliedRulesCount >= gra.MinRulesToApply
+	return filledEnough // TODO: appliedEnough is important too?
 	return appliedEnough && filledEnough
 }
 

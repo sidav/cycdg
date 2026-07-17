@@ -7,7 +7,7 @@ func (g *Graph) TestSanity() (sane bool, problems []string) {
 	// test if any disabled node has tags
 	for x := range g.nodes {
 		for y := range g.nodes[x] {
-			n := g.NodeAt(x, y)
+			n := g.NodeAtXY(x, y)
 			if !n.IsActive() && n.HasAnyTags() {
 				sane = false
 				problems = append(problems, sprintf("Inactive node at %d,%d has tags", x, y))
@@ -17,7 +17,7 @@ func (g *Graph) TestSanity() (sane bool, problems []string) {
 	// test if any disabled node has active links
 	for x := range g.nodes {
 		for y := range g.nodes[x] {
-			n := g.NodeAt(x, y)
+			n := g.NodeAtXY(x, y)
 			if !n.IsActive() {
 				for _, d := range cardinalDirections {
 					if g.IsEdgeByVectorActive(x, y, d[0], d[1]) {
@@ -32,9 +32,9 @@ func (g *Graph) TestSanity() (sane bool, problems []string) {
 	// test if any enabled node has no links
 	for x := range g.nodes {
 		for y := range g.nodes[x] {
-			n := g.NodeAt(x, y)
+			n := g.NodeAtXY(x, y)
 			if n.IsActive() {
-				if g.CountEdgesAt(x, y) == 0 && !g.DoesNodeHaveTag(x, y, graph_element.TagTeleportBidir) {
+				if g.CountEdgesAtXY(x, y) == 0 && !g.DoesNodeHaveTagXY(x, y, graph_element.TagTeleportBidir) {
 					sane = false
 					problems = append(problems, sprintf("Active node at %d,%d has no active links!", x, y))
 				}

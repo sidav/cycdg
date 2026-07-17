@@ -5,21 +5,25 @@ import (
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-func (g *Graph) AreCoordsInterlinked(x1, y1, x2, y2 int) bool {
+func (g *Graph) AreCoordsLinked(c1, c2 Coords) bool {
+	return g.AreCoordsLinkedXY(c1.X, c1.Y, c2.X, c2.Y)
+}
+
+func (g *Graph) AreCoordsLinkedXY(x1, y1, x2, y2 int) bool {
 	if x1 < 0 || y1 < 0 {
 		return false
 	}
 	if x2 < 0 || y2 < 0 {
 		return false
 	}
-	return g.GetEdgeBetweenIntCoords(x1, y1, x2, y2).IsActive()
+	return g.GetEdgeBetweenCoordsXY(x1, y1, x2, y2).IsActive()
 }
 
 func (g *Graph) IsEdgeByVectorActive(x, y, vx, vy int) bool {
-	return g.AreCoordsInterlinked(x, y, x+vx, y+vy)
+	return g.AreCoordsLinkedXY(x, y, x+vx, y+vy)
 }
 
-func (g *Graph) CountEdgesAt(x, y int) int {
+func (g *Graph) CountEdgesAtXY(x, y int) int {
 	count := 0
 	for _, dir := range cardinalDirections {
 		vx, vy := unwrapCoords(dir)
@@ -27,7 +31,7 @@ func (g *Graph) CountEdgesAt(x, y int) int {
 		if !g.AreCoordsInBounds(otherx, othery) {
 			continue
 		}
-		if g.GetEdgeBetweenIntCoords(otherx, othery, x, y).IsActive() {
+		if g.GetEdgeBetweenCoordsXY(otherx, othery, x, y).IsActive() {
 			count++
 		}
 	}
@@ -35,10 +39,10 @@ func (g *Graph) CountEdgesAt(x, y int) int {
 }
 
 func (g *Graph) GetEdgeByVector(x, y, vx, vy int) *Edge {
-	return g.GetEdgeBetweenIntCoords(x, y, x+vx, y+vy)
+	return g.GetEdgeBetweenCoordsXY(x, y, x+vx, y+vy)
 }
 
-func (g *Graph) GetEdgeBetweenIntCoords(fromx, fromy, x, y int) *Edge {
+func (g *Graph) GetEdgeBetweenCoordsXY(fromx, fromy, x, y int) *Edge {
 	vx, vy := x-fromx, y-fromy
 	if vx*vy != 0 {
 		debugPanic("Diagonal connection?.. %d,%d -> %d,%d", fromx, fromy, x, y)
@@ -54,13 +58,13 @@ func (g *Graph) GetEdgeBetweenIntCoords(fromx, fromy, x, y int) *Edge {
 		fromy--
 		vy = 1
 	}
-	return g.NodeAt(fromx, fromy).GetEdgeByVector(vx, vy)
+	return g.NodeAtXY(fromx, fromy).GetEdgeByVector(vx, vy)
 }
 
 func (g *Graph) GetEdgeBetweenCoords(from, to Coords) *Edge {
 	fx, fy := from.Unwrap()
 	tx, ty := to.Unwrap()
-	return g.GetEdgeBetweenIntCoords(fx, fy, tx, ty)
+	return g.GetEdgeBetweenCoordsXY(fx, fy, tx, ty)
 }
 
 func (g *Graph) setLinkByVector(x, y, vx, vy int, link bool) {
@@ -75,5 +79,5 @@ func (g *Graph) setLinkByVector(x, y, vx, vy int, link bool) {
 		y--
 		vy = 1
 	}
-	g.NodeAt(x, y).SetLinkByVector(vx, vy, link, false)
+	g.NodeAtXY(x, y).SetLinkByVector(vx, vy, link, false)
 }

@@ -1,13 +1,13 @@
 package graph
 
 import (
-	"cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/geometry"
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 )
 
-func (g *Graph) ResetNodeAndConnections(c geometry.Coords) {
+func (g *Graph) ResetNodeAndConnections(c Coords) {
 	x, y := c.Unwrap()
-	g.NodeAt(x, y).ResetActiveAndLinks()
+	g.NodeAtXY(x, y).ResetActiveAndLinks()
 	for _, d := range cardinalDirections {
 		if g.AreCoordsInBounds(x+d[0], y+d[1]) {
 			e := g.GetEdgeByVector(x, y, d[0], d[1])
@@ -44,17 +44,17 @@ func (g *Graph) EnableNodeByVector(x, y, vx, vy int) {
 	g.nodes[x+vx][y+vy].SetActive(true)
 }
 
-func (g *Graph) EnableNodeByCoords(c geometry.Coords) {
+func (g *Graph) EnableNodeByCoords(c Coords) {
 	g.EnableNode(c.Unwrap())
 }
 
-func (g *Graph) FinalizeNode(c geometry.Coords) {
-	g.NodeAt(c.Unwrap()).Finalize()
+func (g *Graph) FinalizeNode(c Coords) {
+	g.NodeAt(c).Finalize()
 }
 
 // Used for workarounds... Use cautiously
-func (g *Graph) UnsafeUnfinalizeNode(c geometry.Coords) {
-	g.NodeAt(c.Unwrap()).UnsafeUnfinalize()
+func (g *Graph) UnsafeUnfinalizeNode(c Coords) {
+	g.NodeAt(c).UnsafeUnfinalize()
 }
 
 func (g *Graph) IsNodeEditable(x, y int) bool {
@@ -62,7 +62,7 @@ func (g *Graph) IsNodeEditable(x, y int) bool {
 }
 
 func (g *Graph) IsNodeFinalized(x, y int) bool {
-	return g.NodeAt(x, y).IsFinalized()
+	return g.NodeAtXY(x, y).IsFinalized()
 }
 
 func (g *Graph) HasNoFinalizedNodesNearXY(x, y int, allowDiagonal bool) bool {
@@ -74,7 +74,7 @@ func (g *Graph) HasNoFinalizedNodesNearXY(x, y int, allowDiagonal bool) bool {
 			if vx == vy && vx == 0 {
 				continue
 			}
-			nodeHere := g.NodeAt(x+vx, y+vy)
+			nodeHere := g.NodeAtXY(x+vx, y+vy)
 			if nodeHere != nil && nodeHere.IsFinalized() {
 				return false
 			}
@@ -83,22 +83,33 @@ func (g *Graph) HasNoFinalizedNodesNearXY(x, y int, allowDiagonal bool) bool {
 	return true
 }
 
-func (g *Graph) IsNodeActive(x, y int) bool {
-	return g.NodeAt(x, y).IsActive()
+func (g *Graph) IsNodeActiveXY(x, y int) bool {
+	return g.NodeAtXY(x, y).IsActive()
 }
 
-func (g *Graph) NodeAt(x, y int) *Node {
+func (g *Graph) IsNodeActive(c Coords) bool {
+	return g.NodeAt(c).IsActive()
+}
+
+func (g *Graph) NodeAtXY(x, y int) *Node {
 	if !g.AreCoordsInBounds(x, y) {
 		return nil
 	}
 	return g.nodes[x][y]
 }
 
+func (g *Graph) NodeAt(crd Coords) *Node {
+	if !g.AreCoordsInBounds(crd.Unwrap()) {
+		return nil
+	}
+	return g.nodes[crd.X][crd.Y]
+}
+
 func (g *Graph) GetEnabledNodesCount() int {
 	total := 0
 	for x := range g.nodes {
 		for y := range g.nodes[x] {
-			if g.IsNodeActive(x, y) {
+			if g.IsNodeActiveXY(x, y) {
 				total++
 			}
 		}
@@ -130,7 +141,7 @@ func (g *Graph) GetFinalizedEmptyNodesCount() int {
 	emptyFinsCount := 0
 	for x := range g.nodes {
 		for y := range g.nodes[x] {
-			if !g.IsNodeActive(x, y) && g.IsNodeFinalized(x, y) {
+			if !g.IsNodeActiveXY(x, y) && g.IsNodeFinalized(x, y) {
 				emptyFinsCount++
 			}
 		}
@@ -146,11 +157,11 @@ func (g *Graph) CountEmptyEditableNodesNearEnabledOnes() int {
 	count := 0
 	for x := 0; x < len(g.nodes); x++ {
 		for y := 0; y < len(g.nodes[x]); y++ {
-			currNode := g.NodeAt(x, y)
+			currNode := g.NodeAtXY(x, y)
 			if currNode != nil && !currNode.IsActive() && !currNode.IsFinalized() {
 				// check if any neighbour is active
 				for i := range cardinalDirections {
-					neighbour := g.NodeAt(x+cardinalDirections[i][0], y+cardinalDirections[i][1])
+					neighbour := g.NodeAtXY(x+cardinalDirections[i][0], y+cardinalDirections[i][1])
 					if neighbour != nil && neighbour.IsActive() {
 						count++
 						break

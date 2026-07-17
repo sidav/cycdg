@@ -15,9 +15,10 @@ type ReplacementRule struct {
 	WorksWithFinalizedNodes bool // true if coords search should not skip finalized nodes; USE CAUTIOUSLY
 
 	// each value is coords index, near which the applicability func will be checked
+	// It's needed for optimization, in order not to check each and every coord out there for each tile
 	searchNearPrevIndex []int // -1 means "any coords"
 
-	applicabilityFuncs []func(g *Graph, x, y int, prevСoords ...Coords) bool
+	applicabilityFuncs []func(g *Graph, c Coords, prevСoords ...Coords) bool
 	ApplyToGraph       func(g *Graph, applyAt ...Coords)
 	MandatoryFeatures  []*FeatureAdder // One (and only) of them SHOULD apply! (May have nil though)
 	OptionalFeatures   []*FeatureAdder // One (or more?) of them could be applied. Should NOT conflict with any of the mandatory and optional features.
@@ -52,7 +53,7 @@ func (ir *ReplacementRule) tryFindAllCoordVariantsRecursively(g *Graph, picked .
 			if geometry.AreXYCoordsInCoordsArray(x, y, picked) {
 				continue
 			}
-			if !ir.applicabilityFuncs[stepIndex](g, x, y, picked...) {
+			if !ir.applicabilityFuncs[stepIndex](g, NewCoords(x, y), picked...) {
 				continue
 			}
 

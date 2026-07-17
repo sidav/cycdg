@@ -39,7 +39,11 @@ func (g *Graph) IsEdgeDirectedBetweenCoords(x, y, tox, toy int) bool {
 }
 
 func (g *Graph) IsEdgeDirectedFromCoordsToPair(from geometry.Coords, tox, toy int) bool {
-	return g.IsEdgeDirectedBetweenCoords(from[0], from[1], tox, toy)
+	return g.IsEdgeDirectedBetweenCoords(from.X, from.Y, tox, toy)
+}
+
+func (g *Graph) IsEdgeDirectedFromCoords(from, to geometry.Coords) bool {
+	return g.IsEdgeDirectedBetweenCoords(from.X, from.Y, to.X, to.Y)
 }
 
 func (g *Graph) doCoordsHaveIngoingLinksOnly(x, y int) bool {
@@ -70,18 +74,18 @@ func (g *Graph) EnableDirLinkByVector(x, y, vx, vy int) {
 		vy = 1
 		reverse = true
 	}
-	g.NodeAt(x, y).SetLinkByVector(vx, vy, true, reverse)
+	g.NodeAtXY(x, y).SetLinkByVector(vx, vy, true, reverse)
 }
 
 func (g *Graph) EnableDirLinkByCoords(from, to geometry.Coords) {
 	vx, vy := from.VectorTo(to)
-	g.EnableDirLinkByVector(from[0], from[1], vx, vy)
+	g.EnableDirLinkByVector(from.X, from.Y, vx, vy)
 }
 
 func (g *Graph) DisableDirLinkByCoords(from, to geometry.Coords) {
-	if !g.IsEdgeDirectedBetweenCoords(from[0], from[1], to[0], to[1]) {
+	if !g.IsEdgeDirectedBetweenCoords(from.X, from.Y, to.X, to.Y) {
 		debugPanic("Direction unsatisfied")
 	}
 	vx, vy := from.VectorTo(to)
-	g.setLinkByVector(from[0], from[1], vx, vy, false)
+	g.setLinkByVector(from.X, from.Y, vx, vy, false)
 }

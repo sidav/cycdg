@@ -82,7 +82,7 @@ func (g *Graph) drawBiсonnectedDirectionalRect(x, y, w, h, sourceX, sourceY, si
 }
 
 func (g *Graph) DrawBiсonnectedDirectionalRect(x, y, w, h int, source, sink Coords) {
-	g.drawBiсonnectedDirectionalRect(x, y, w, h, source[0], source[1], sink[0], sink[1])
+	g.drawBiсonnectedDirectionalRect(x, y, w, h, source.X, source.Y, sink.X, sink.Y)
 }
 
 func (g *Graph) DrawEnabledConnectedCardinalLine(from, to Coords) {

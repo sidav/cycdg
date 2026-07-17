@@ -65,7 +65,7 @@ func drawCoords(g *graph.Graph) {
 func drawNodeAt(g *graph.Graph, nx, ny int) {
 	x, y := 1+nx*(nodeWidth+nodeSpacing), 1+ny*(nodeHeight+nodeSpacing)
 	background := tcell.ColorDarkBlue
-	if !g.IsNodeActive(nx, ny) {
+	if !g.IsNodeActiveXY(nx, ny) {
 		background = tcell.ColorDarkGray
 		if g.IsNodeFinalized(nx, ny) {
 			background = tcell.ColorBlack
@@ -74,11 +74,11 @@ func drawNodeAt(g *graph.Graph, nx, ny int) {
 	cw.SetStyle(tcell.ColorBlack, background)
 	cw.DrawFilledRect(' ', x, y, nodeWidth-1, nodeHeight-1)
 	drawNodeEdges(g, nx, ny)
-	for i, tag := range g.NodeAt(nx, ny).GetTags() {
+	for i, tag := range g.NodeAtXY(nx, ny).GetTags() {
 		str := GetNodeTagIdiomAndSetColor(tag)
 		cw.PutStringCenteredAt(str, x+halfNodeWidth, y+i)
 	}
-	if g.NodeAt(nx, ny).IsFlagged() {
+	if g.NodeAtXY(nx, ny).IsFlagged() {
 		cw.SetStyle(tcell.ColorBlack, tcell.ColorDarkBlue)
 		cw.PutChar('x', x+nodeWidth-1, y+nodeHeight-1)
 	}

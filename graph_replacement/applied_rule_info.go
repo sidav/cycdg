@@ -51,7 +51,7 @@ func (ari *AppliedRuleInfo) StringifyRule() string {
 func (ari *AppliedRuleInfo) StringifyCoords() string {
 	coordString := ""
 	for i := range ari.appliedAt {
-		coordString += fmt.Sprintf("%d,%d  ", ari.appliedAt[i][0], ari.appliedAt[i][1])
+		coordString += fmt.Sprintf("%d,%d  ", ari.appliedAt[i].X, ari.appliedAt[i].Y)
 	}
 	return coordString
 }

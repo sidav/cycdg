@@ -20,18 +20,15 @@ type FeatureAdder struct {
 // It may end up being behind the lock otherwise.
 // So it must be used with rules which add locked edge, not change an existing to locked
 func addTagAtRandomActiveNode(g *Graph, tag TagKind) {
-	// crd := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
-	// 	return g.IsNodeActive(x, y)
-	// })
-	// prefer non-tagged nodes
 	crd := getRandomGraphCoordsByScore(g, func(x, y int) int {
-		if !g.IsNodeActive(x, y) {
+		crd := NewCoords(x, y)
+		if !g.IsNodeActive(crd) {
 			return 0
 		}
-		if g.DoesNodeHaveAnyTags(x, y) {
+		if g.DoesNodeHaveAnyTags(crd) {
 			return 1
 		}
-		return 5
+		return 100 // prefer non-tagged nodes
 	})
 	g.AddNodeTagByCoords(crd, tag)
 }

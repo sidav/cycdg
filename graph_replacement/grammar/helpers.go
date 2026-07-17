@@ -1,7 +1,7 @@
 package grammar
 
 import (
-	"cycdg/graph_replacement/geometry"
+	. "cycdg/graph_replacement/geometry"
 	graph "cycdg/graph_replacement/grid_graph"
 	. "cycdg/graph_replacement/grid_graph/graph_element"
 	"cycdg/lib/random"
@@ -21,28 +21,6 @@ var (
 func debugPanic(msg string, args ...interface{}) {
 	fmt.Println()
 	panic(sprintf(msg, args...))
-}
-
-// note: it's not IN rectangle!
-func areCoordsOnRectangle(x, y, rx, ry, w, h int) bool {
-	if x < rx || x >= rx+w || y < ry || y >= ry+h {
-		return false
-	}
-	return x == rx || x == rx+w-1 || y == ry || y == ry+h-1
-}
-
-func areCoordsAdjacentToRectangleCorner(x, y, rx, ry, w, h int) bool {
-	return (x == rx || x == rx+w-1) && (y == ry+1 || y == ry+h-2) || (x == rx+1 || x == rx+w-2) && (y == ry || y == ry+h-1)
-}
-
-func areCoordsOnRectangleCorner(x, y, rx, ry, w, h int) bool {
-	return (x == rx || x == rx+w-1) && (y == ry || y == ry+h-1)
-}
-
-func areCoordsAdjacent(x1, y1, x2, y2 int) bool {
-	dx := intabs(x2 - x1)
-	dy := intabs(y2 - y1)
-	return dx+dy == 1
 }
 
 func sprintf(str string, args ...interface{}) string {
@@ -70,13 +48,13 @@ func minint(a, b int) int {
 	return b
 }
 
-func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geometry.Coords {
-	var candidates []geometry.Coords
+func getRandomGraphCoordsByFunc(g *graph.Graph, good func(c Coords) bool) Coords {
+	var candidates []Coords
 	w, h := g.GetSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			if good(x, y) {
-				candidates = append(candidates, [2]int{x, y})
+			if good(NewCoords(x, y)) {
+				candidates = append(candidates, NewCoords(x, y))
 			}
 		}
 	}
@@ -88,15 +66,34 @@ func getRandomGraphCoordsByFunc(g *graph.Graph, good func(x, y int) bool) geomet
 	return candidates[ind]
 }
 
-func getRandomGraphCoordsByScore(g *graph.Graph, score func(x, y int) int) geometry.Coords {
-	var candidates []geometry.Coords
+func getRandomGraphCoordsByTag(g *graph.Graph, tag TagKind) Coords {
+	var candidates []Coords
+	w, h := g.GetSize()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			c := NewCoords(x, y)
+			if g.DoesNodeHaveTag(c, tag) {
+				candidates = append(candidates, c)
+			}
+		}
+	}
+	if len(candidates) == 0 {
+		debugPanic("No candidates!")
+		// return geometry.NewCoords(-1, -1)
+	}
+	ind := rnd.Rand(len(candidates))
+	return candidates[ind]
+}
+
+func getRandomGraphCoordsByScore(g *graph.Graph, score func(x, y int) int) Coords {
+	var candidates []Coords
 	var scores []int
 	w, h := g.GetSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			score := score(x, y)
 			if score > 0 {
-				candidates = append(candidates, [2]int{x, y})
+				candidates = append(candidates, NewCoords(x, y))
 				scores = append(scores, score)
 			}
 		}
@@ -108,11 +105,23 @@ func getRandomGraphCoordsByScore(g *graph.Graph, score func(x, y int) int) geome
 	return candidates[ind]
 }
 
+func getFirstGraphCoordsWithTag(g *graph.Graph, tag TagKind) Coords {
+	w, h := g.GetSize()
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			if g.NodeAtXY(x, y).HasTag(tag) {
+				return NewCoords(x, y)
+			}
+		}
+	}
+	panic("No coords with requested tag exist!")
+}
+
 func doesGraphContainNodeTag(g *graph.Graph, tag TagKind) bool {
 	w, h := g.GetSize()
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			if g.NodeAt(x, y).HasTag(tag) {
+			if g.NodeAtXY(x, y).HasTag(tag) {
 				return true
 			}
 		}
@@ -137,8 +146,8 @@ func isTagMovable(tag *Tag) bool {
 	return true
 }
 
-func areAllNodeTagsMovable(g *graph.Graph, crds geometry.Coords) bool {
-	tags := g.NodeAt(crds.Unwrap()).GetTags()
+func areAllNodeTagsMovable(g *graph.Graph, crds Coords) bool {
+	tags := g.NodeAtXY(crds.Unwrap()).GetTags()
 	for _, t := range tags {
 		if !isTagMovable(t) {
 			return false
@@ -147,13 +156,13 @@ func areAllNodeTagsMovable(g *graph.Graph, crds geometry.Coords) bool {
 	return true
 }
 
-func AddRandomHazardAt(g *graph.Graph, crds geometry.Coords) {
+func AddRandomHazardAt(g *graph.Graph, crds Coords) {
 	possibleTags := []TagKind{TagBoss, TagTrap, TagHazard}
 	g.AddNodeTagByCoords(crds, possibleTags[rnd.Rand(len(possibleTags))])
 }
 
-func moveRandomNodeTag(g *graph.Graph, from, to geometry.Coords) {
-	fromNode := g.NodeAt(from.Unwrap())
+func moveRandomNodeTag(g *graph.Graph, from, to Coords) {
+	fromNode := g.NodeAtXY(from.Unwrap())
 	fromTags := fromNode.GetTags()
 	if len(fromTags) == 0 {
 		return
@@ -162,14 +171,14 @@ func moveRandomNodeTag(g *graph.Graph, from, to geometry.Coords) {
 	if !isTagMovable(fromTags[index]) {
 		return
 	}
-	toNode := g.NodeAt(to.Unwrap())
+	toNode := g.NodeAtXY(to.Unwrap())
 	toNode.AddTag(fromTags[index].Kind, fromTags[index].Id)
 	fromNode.RemoveTagByIndex(index)
 }
 
-func PushNodeContentsInRandomDirection(g *graph.Graph, crds geometry.Coords) {
-	pushTo := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
-		return !g.IsNodeActive(x, y) && crds.IsAdjacentToXY(x, y)
+func PushNodeContentsInRandomDirection(g *graph.Graph, crds Coords) {
+	pushTo := getRandomGraphCoordsByFunc(g, func(c Coords) bool {
+		return !g.IsNodeActiveXY(c.Unwrap()) && crds.IsAdjacentTo(c)
 	})
 	if pushTo.EqualsPair(-1, -1) || !areAllNodeTagsMovable(g, crds) {
 		return
@@ -179,9 +188,9 @@ func PushNodeContentsInRandomDirection(g *graph.Graph, crds geometry.Coords) {
 	g.SwapNodeTags(crds, pushTo)
 }
 
-func PushNodeContentsInRandomDirectionWithEdgeTag(g *graph.Graph, crds geometry.Coords, tag TagKind) {
-	pushTo := getRandomGraphCoordsByFunc(g, func(x, y int) bool {
-		return !g.IsNodeActive(x, y) && crds.IsAdjacentToXY(x, y)
+func PushNodeContentsInRandomDirectionWithEdgeTag(g *graph.Graph, crds Coords, tag TagKind) {
+	pushTo := getRandomGraphCoordsByFunc(g, func(c Coords) bool {
+		return !g.IsNodeActiveXY(c.Unwrap()) && crds.IsAdjacentTo(c)
 	})
 	if pushTo.EqualsPair(-1, -1) || !areAllNodeTagsMovable(g, crds) {
 		return

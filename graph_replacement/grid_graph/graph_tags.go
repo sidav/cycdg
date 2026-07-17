@@ -50,26 +50,30 @@ func (g *Graph) AddTagToAllActiveEdgesAtCoords(t TagKind, crds Coords) {
 }
 
 func (g *Graph) SwapNodeTags(c1, c2 Coords) {
-	n1 := g.NodeAt(c1.Unwrap())
-	n2 := g.NodeAt(c2.Unwrap())
+	n1 := g.NodeAtXY(c1.Unwrap())
+	n2 := g.NodeAtXY(c2.Unwrap())
 	n1.SwapTagsWith(n2)
 }
 
-func (g *Graph) DoesNodeHaveAnyTags(x, y int) bool {
-	return g.NodeAt(x, y).HasAnyTags()
+func (g *Graph) DoesNodeHaveAnyTags(c Coords) bool {
+	return g.NodeAt(c).HasAnyTags()
 }
 
-func (g *Graph) DoesNodeHaveTag(x, y int, t TagKind) bool {
-	return g.NodeAt(x, y).HasTag(t)
+func (g *Graph) DoesNodeHaveTag(nc Coords, t TagKind) bool {
+	return g.NodeAtXY(nc.Unwrap()).HasTag(t)
+}
+
+func (g *Graph) DoesNodeHaveTagXY(x, y int, t TagKind) bool {
+	return g.NodeAtXY(x, y).HasTag(t)
 }
 
 func (g *Graph) DoesNodeByCoordsHaveTag(c Coords, t TagKind) bool {
-	return g.NodeAt(c.Unwrap()).HasTag(t)
+	return g.NodeAtXY(c.Unwrap()).HasTag(t)
 }
 
 func (g *Graph) CountNodeTags(c Coords) int {
 	x, y := c.Unwrap()
-	return len(g.NodeAt(x, y).GetTags())
+	return len(g.NodeAtXY(x, y).GetTags())
 }
 
 func (g *Graph) DoesEdgeHaveZeroTags(c1, c2 Coords) bool {

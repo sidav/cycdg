@@ -22,7 +22,7 @@ func (g *Graph) areCoordsInCorner(x, y int) bool {
 
 func (g *Graph) checkNearCoords(x, y int, check func(x, y int) bool) bool {
 	for _, d := range cardinalDirections {
-		n := g.NodeAt(x+d[0], y+d[1])
+		n := g.NodeAtXY(x+d[0], y+d[1])
 		if n != nil && check(x+d[0], y+d[1]) {
 			return true
 		}
